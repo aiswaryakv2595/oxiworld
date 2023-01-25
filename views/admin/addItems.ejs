@@ -1,0 +1,108 @@
+<%-include('../layouts/admin-header.ejs')-%>
+<div id="content" class="p-4 p-md-5 pt-5 text-dark">
+    
+<!-- Button trigger modal -->
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+ Add Products
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/admin/additems" method="post" id="form" enctype="multipart/form-data">
+         
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="name"  placeholder="Name" >
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputPassword3" class="col-sm-2 col-form-label">Category</label>
+              <div class="col-sm-10">
+                <select class="form-select" name="category" aria-label="Default select example">
+                  <option selected>--Select--</option>
+                  <% category.forEach(cate=>{ %>
+                  <option value="<%= cate._id%>"><%= cate.name %></option>
+               <% }) %>
+                </select>
+              </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Price</label>
+                <div class="col-sm-10">
+                  <input type="number" name="price" class="form-control" placeholder="Price" >
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Description</label>
+                <div class="col-sm-10">
+                  <textarea name="description" class="form-control" id="" cols="30" rows="5"></textarea>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Images</label>
+                <div class="col-sm-10">
+                  <input type="file" name="images" class="form-control" id="formFile" multiple >
+                </div>
+              </div>
+        
+              <% if(locals.message){%>
+                <p class="text-danger"><%= message %></p>
+               <%}%>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Category</th>
+      <th scope="col">Price</th>
+      <th scope="col">Description</th>
+      <th scope="col">Image</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <% if(item.length){
+ 
+        for(var i = 0; i< item.length; i++) {%> 
+      <th scope="row"><%=(i+1) %></th>
+      <td><%=item[i].name %></td>
+      <td><%=item[i].category_id.name %></td>
+      <td><%=item[i].price %></td>
+      <td><%=item[i].description %></td>
+      <td><img src="<%=item[i].images %>" width="50" alt="" class="img-thumbnail"> </td>
+      
+      <td><a href="/admin/edit_item/<%= item[i]._id%>">EDIT</a></td>
+      <form action="/admin/deleteitem/<%= item[i]._id%>" method="post" id="formdel" enctype="multipart/form-data">
+        <td><button type="submit" class="delete" onclick="checker()">DELETE</button> </td>
+    </form>
+     
+    </tr>
+    <% }
+  }%>
+     
+  </tbody>
+</table>
+
+
+<%-include("../layouts/admin-footer.ejs")-%>

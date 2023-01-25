@@ -1,0 +1,118 @@
+<%-include('../layouts/admin-header.ejs')-%>
+
+  <main class="py-6 bg-surface-secondary">
+    
+    <div class="container">
+        <!-- Card stats -->
+        <div id="content" class="p-4 p-md-5 pt-5">
+          <h2 class="mb-4">Dashboard</h2>
+         <h3>Welcome <%=user.name %></h3>
+          
+        </div>
+        <div class="row g-6 mb-6">
+            <div class="col-xl-3 col-sm-6 col-12">
+                <div class="card shadow border-0">
+                  <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <span class="h6 font-semibold text-muted text-sm d-block mb-2">Order Placed</span>
+                            <span class="h3 font-bold mb-0">0</span>
+                        </div>
+                        <div class="col-auto">
+                          <div class="icon icon-shape bg-primary text-white text-lg rounded-circle">
+                            <i class="bi bi-people"></i>
+                        </div>
+                            </div>
+                       
+                    </div>
+                    
+                </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12">
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h6 font-semibold text-muted text-sm d-block mb-2">Order Accepted</span>
+                                <span class="h3 font-bold mb-0">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-primary text-white text-lg rounded-circle">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12">
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h6 font-semibold text-muted text-sm d-block mb-2">Order Assigned </span>
+                                <span class="h3 font-bold mb-0">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-info text-white text-lg rounded-circle">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12">
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <span class="h6 font-semibold text-muted text-sm d-block mb-2">Order Pickup</span>
+                                <span class="h3 font-bold mb-0">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-warning text-white text-lg rounded-circle">
+                                    <i class="bi bi-minecart-loaded"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="background-color:#FFF8DC;">
+          <div class="col-xl-3 col-sm-6 col-12">
+           <div class="p-4">
+                  <span class="h6 font-semibold text-muted text-sm d-block mb-2">DELIVERED</span>
+                  <span class="h3 font-bold mb-0">0</span>
+           </div>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12">
+            <div class="p-4">
+              <span class="h6 font-semibold text-muted text-sm d-block mb-2">CANCELED</span>
+              <span class="h3 font-bold mb-0">0</span>
+       </div>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12">
+            <div class="p-4">
+              <span class="h6 font-semibold text-muted text-sm d-block mb-2">PAYMENT FAILED</span>
+              <span class="h3 font-bold mb-0">0</span>
+       </div>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12">
+            <div class="p-4">
+              <span class="h6 font-semibold text-muted text-sm d-block mb-2">REFUNDED</span>
+              <span class="h3 font-bold mb-0">0</span>
+       </div>
+          </div>
+        </div>
+       
+    </div>
+</main>
+   
+
+<%-include("../layouts/admin-footer.ejs")-%>

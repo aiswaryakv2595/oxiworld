@@ -1,0 +1,131 @@
+<%-include('../layouts/admin-header.ejs')-%>
+<div id="content" class="p-4 p-md-5 pt-5 text-dark">
+    
+<!-- Button trigger modal -->
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+ Add Category
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/admin/addcategory" method="post" id="form" enctype="multipart/form-data">
+         
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="name"  placeholder="Name" >
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputPassword3" class="col-sm-2 col-form-label">Size</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="size" placeholder="Category">
+              </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
+                <div class="col-sm-10">
+                  <input type="text" name="color" class="form-control" placeholder="Color" >
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
+                <div class="col-sm-10">
+                  <input type="text" name="material" class="form-control" placeholder="Material" >
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
+                <div class="col-sm-10">
+                  <input type="text" name="material_type" class="form-control" placeholder="Material Type" >
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Brand </label>
+                <div class="col-sm-10">
+                  <input type="text" name="brand" class="form-control" placeholder="Brand" >
+                </div>
+              </div>
+              
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Images</label>
+                <div class="col-sm-10">
+                  <input type="file" name="images" class="form-control" id="formFile" multiple >
+                </div>
+              </div>
+        
+              <% if(locals.message){%>
+                <p class="text-danger"><%= message %></p>
+               <%}%>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Size</th>
+      <th scope="col">Color</th>
+      <th scope="col">Material</th>
+      <th scope="col">Material Type</th>
+      <th scope="col">Brand</th>
+      <th scope="col">Image</th>
+      <th scope="col">Edit</th>
+      <th scope="col">Delete</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <% if(category.length){
+ 
+        category.forEach((row,index)=>{ %> 
+      <th scope="row"><%=index %></th>
+      <td><%= row.name %></td>
+      <td><%= row.size %></td>
+      <td><%= row.color %></td>
+      <td><%= row.material %></td>
+      <td><%= row.material_type %></td>
+      <td><%= row.brand %></td>
+     
+      <td><img src="<%=row.images %>" width="50" alt="" class="img-thumbnail"> </td>
+      
+      <td><a href="/admin/editCategory/<%= row._id%>">EDIT</a></td>
+      <form action="/admin/deletecategory/<%= row._id%>" method="post" id="formdel" enctype="multipart/form-data">
+        <td><button type="button" class="delete" onclick="checker()">DELETE</button> </td>
+    </form>
+    </tr>
+    <% })
+  }%>
+     
+  </tbody>
+</table>
+<script>
+  function checker(){
+    if(window.confirm("Are you sure want to Delete !!")){
+      document.getElementById("formdel").submit();
+    } else {
+      return;
+    }
+  }
+     </script>
+
+<%-include("../layouts/admin-footer.ejs")-%>

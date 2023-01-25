@@ -1,0 +1,132 @@
+<%-include('../layouts/header')-%>
+<div class="container">
+  
+    <div class="d-flex justify-content-center">
+    <div class="card mt-3 w-75 ">
+   
+            <div class="card-body">
+              <h5 class="card-title">Register</h5>
+              <form action="" method="post" id="form" onsubmit="return onSubmitFunction()">
+                <div class="mb-3 row">
+                    <label for="staticEmail" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-9">
+                      <input type="text" name="name" class="form-control" id="name">
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3 row">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Email</label>
+                    <div class="col-sm-9">
+                      <input type="email" id="email" name="email" class="form-control">
+                    </div>
+                  </div>
+
+                  <div class="mb-3 row">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Phone</label>
+                    <div class="col-sm-9">
+                      <input type="text" name="phone" class="form-control" id="phone" >
+                    </div>
+                  </div>
+                  <div class="mb-3 row">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Gender</label>
+                    <div class="col-sm-9">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio1" value="Male">
+                        <label class="form-check-label" for="inlineRadio1">Male</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="Female">
+                        <label class="form-check-label" for="inlineRadio2">Female</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="Others">
+                        <label class="form-check-label" for="inlineRadio3">Others</label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3 row">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
+                    <div class="col-sm-9">
+                      <input type="password" name="password" class="form-control" id="inputPassword" >
+                    </div>
+                  </div>
+                  <div class="mb-3 row">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Confirm Password</label>
+                    <div class="col-sm-9">
+                      <input type="password" name="confirmPassword" class="form-control" id="confirm" >
+                    </div>
+                  </div>
+                  <% if(locals.message){%>
+                  <p class="text-danger"><%= message %></p>
+                 <%}%>
+                <button type="submit" class="btn btn-primary" onclick="onSubmitFunction()">Submit</button>
+              <p id="error"></p>
+                      
+              </form>
+           
+         
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+  function onSubmitFunction(){
+
+const names = document.getElementById('name');
+const email = document.getElementById('email');
+const phone = document.getElementById('phone');
+const inputPassword = document.getElementById('inputPassword')
+const confirmpass = document.getElementById('confirm')
+   
+    
+    let errorMsg=new Array(); 
+   
+    
+    if(names.value==''){
+        
+        errorMsg.push("Please provide your number!");
+    }  
+    if(email.value==''){
+        
+        errorMsg.push("Please provide your email ID!");
+    }  
+     
+  
+    if(phone.value==''){
+        
+        errorMsg.push("Please provide your Phone number!");
+    }  
+    
+    else if(phone.value.length != 10){
+        
+        errorMsg.push("Enter 10 digit number!");
+    }  
+    var option=document.getElementsByName('gender');
+     
+    console.log(errorMsg);
+if (option.length!=0 && !(option[0].checked || option[1].checked || option[2].checked)) {
+    errorMsg.push("Please select one option!");
+}
+if(inputPassword=='' || confirmpass==''){
+    errorMsg.push("Please provide password!");
+}
+var messageHtml = "";
+errorMsg.forEach(function (message) {
+    messageHtml += "<li style='color:red'>" + message + "</li>";
+});
+
+if(errorMsg.length > 0){
+    
+document.getElementById("error").innerHTML = messageHtml;
+return false
+
+}
+if(errorMsg.length ==0){
+return true
+}
+}
+</script>
+
+
+<%-include("../layouts/footer.ejs")-%>

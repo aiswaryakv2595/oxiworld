@@ -1,0 +1,68 @@
+<%-include('../layouts/admin-header.ejs')-%>
+  <div class="container">
+    <% if(locals.message) { %>
+    <p><%= message%></p>
+    <%}%>
+    <div class="row d-flex justify-content-center align-items-center mt-5">
+      <div class="card" style="border-radius: 15px;">
+        <div class="card-body">
+          <h5 class="card-title">Edit Item</h5>
+          <form action="/admin/updateitem" method="post" id="form" enctype="multipart/form-data">
+            <div class="form-group row">
+                <input type="hidden" name="id" value="<%= item._id %>">
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="name"  placeholder="Name" value="<%= item.name%>" >
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Category</label>
+                <div class="col-sm-10">
+                  <select class="form-select" name="category" aria-label="Default select example">
+                    
+                    <% category.forEach(cate=>{ %>
+                        <option <% if(cate._id ==  item.category_id ) selected %> value="<%= cate._id%>"><%= cate.name %></option>
+                     <% }) %>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Price</label>
+                  <div class="col-sm-10">
+                    <input type="number" name="price" class="form-control" placeholder="Price" value="<%= item.price%>" >
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Description</label>
+                  <div class="col-sm-10">
+                    <textarea name="description" class="form-control" id="" cols="30" rows="5" >
+                    <%= item.description%>
+                    </textarea>
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="Brand" class="col-sm-2 col-form-label">Image</label>
+                    <div class="col-sm-10">
+                     
+                        <img src="/<%= item.images%>" width="100" class="img-thumbnail">
+                        
+                          <input type="hidden" name="old_image" value="<%= item.images%>">
+                          <input type="file" class="form-control" id="images" name="images">
+                    </div>
+                  </div>
+          
+            <button class="btn btn-primary" type="submit">Update</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <script>
+    function checker() {
+      if (window.alert("Category Updated !!")) {
+        document.getElementById("form").submit();
+        return
+      }
+    }
+  </script> -->
+  <%-include("../layouts/admin-footer.ejs")-%>

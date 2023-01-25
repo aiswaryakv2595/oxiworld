@@ -1,0 +1,31 @@
+<%-include('../layouts/header')-%>
+<div class="container">
+    <h1>Admin Setup</h1>
+    <form action="/admin/admin-setup" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="mb-3">
+            <label for="AdminName" class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" required>
+          
+          </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Email address</label>
+          <input type="email" name="email" class="form-control" required>
+        
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" id="exampleInputPassword1" required>
+        </div>
+       
+        <button type="submit" class="btn btn-primary">Admin Setup</button>
+      </form>
+      <%
+      if(typeof message !== 'undefined'){
+        %> 
+        <p style="color: red;"> <%= message %></p>
+        <%
+      }
+      %>
+</div>
+
+<%-include("../layouts/footer.ejs")-%>

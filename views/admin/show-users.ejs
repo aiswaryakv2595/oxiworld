@@ -1,0 +1,58 @@
+<%-include('../layouts/admin-header.ejs')-%>
+<div id="content" class="p-4 p-md-5 pt-5">
+    <h2 class="mb-4">Show User</h2>
+<!-- Button trigger modal -->
+<form action="/admin/searchuser" method="post">
+  <div class="input-group">
+    <input type="search" name="search" class="form-control rounded bg-light" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+    <button type="submit" class="btn btn-outline-primary">search</button>
+  </div>
+</form>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Gender</th>
+            <th scope="col">Edit user</th>
+            <th scope="col">Delete user</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <% if(user.length){
+ 
+                for(var i = 0; i< user.length; i++) {%> 
+            <th scope="row"><%=(i+1) %></th>
+            <td><%= user[i].name %></td>
+            <td><%= user[i].email %></td>
+            <td><%= user[i].phone %></td>
+            <td><%= user[i].gender %></td>
+            
+            <td><a href="/admin/edituser/<%= user[i]._id%>">Edit</a></td>
+            <form action="/admin/deleteuser/<%= user[i]._id%>" method="post" id="form">
+            <td><button type="button" class="delete" onclick="checker()">Delete</button> </td>
+                </form>
+          </tr>
+          <% }
+        }%>
+           
+        </tbody>
+      </table>
+    
+  </div>
+ 
+   <script>
+function checker(){
+  if(window.confirm("Are you sure want to Delete !!")){
+    document.getElementById("form").submit();
+  } else {
+    return;
+  }
+}
+   </script>
+
+<%-include("../layouts/admin-footer.ejs")-%>
