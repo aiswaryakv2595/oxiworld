@@ -1,67 +1,73 @@
 <%-include('../layouts/admin-header.ejs')-%>
-  <div class="container">
-    <% if(locals.message) { %>
-    <p><%= message%></p>
-    <%}%>
-    <div class="row d-flex justify-content-center align-items-center mt-5">
-      <div class="card" style="border-radius: 15px;">
-        <div class="card-body">
-          <h5 class="card-title">Edit Category</h5>
-          <form action="/admin/updateCategory/<%= category._id%>" method="post" id="form" enctype="multipart/form-data">
-            <div class="mb-3 row">
-              <input type="hidden" name="catid" value="<%= category._id%>">
-              <label for="Name" class="col-sm-2 col-form-label">Name</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="name" name="name" value="<%=category.name%>">
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="Size" class="col-sm-2 col-form-label">Size</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="size" name="size" value="<%=category.size%>">
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="Size" class="col-sm-2 col-form-label">Color</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="color" name="color" value="<%=category.color%>">
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="Material" class="col-sm-2 col-form-label">Material</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="material" name="material" value="<%=category.material%>">
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="Material Type" class="col-sm-2 col-form-label">Material Type</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="material_type" name="material_type"
-                  value="<%=category.material_type%>">
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="Brand" class="col-sm-2 col-form-label">Brand</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" id="brand" name="brand" value="<%=category.brand%>">
-              </div>
-            </div>
-            <div class="mb-3 row">
-              <label for="Brand" class="col-sm-2 col-form-label">Image</label>
-              <div class="col-sm-10">
-                <% if(category.images){%>
-                  <img src="/<%= category.images%>" width="100" class="img-thumbnail">
-                  <%}%>
-                    <input type="hidden" name="old_image" value="<%= category.images%>">
-                    <input type="file" class="form-control" id="images" name="images">
-              </div>
-            </div>
-            <button class="btn btn-primary" type="submit">Update</button>
-          </form>
-        </div>
+ 
+   
+    <!-- breadcrumb -->
+    <div class="container">
+      <% if(locals.message) { %>
+        <p><%= message%></p>
+        <%}%>
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Pages</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Edit-Profile</span>
       </div>
     </div>
+   
   </div>
+  <!-- breadcrumb -->
+    <!-- row -->
+  <div class="row row-sm">
+ 
+    <!-- Col -->
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+         
+          <form class="form-horizontal" action="/admin/updateCategory" method="post" id="form">
+            <input type="hidden" value="<%= category._id %>" name="catid">
+            <div class="form-group ">
+             
+            </div>
+            
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Name</label>
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  placeholder="User Name" value="<%= category.name%>" name="name">
+                </div>
+              </div>
+            </div>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Image</label>
+                </div>
+                <div class="col-md-9">
+                  <% if(category.images){%>
+                    <img src="/<%= category.images%>" width="100" class="img-thumbnail">
+                    <%}%>
+                    <input type="hidden" name="old_image" value="<%= category.images%>">
+                    <input type="file" class="form-control" id="images" name="images">
+                </div>
+              </div>
+            </div>
+
+          
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary waves-effect waves-light"> Update </button>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+    <!-- /Col -->
+  </div>
+  <!-- row closed -->
+  </div>
+  
   <script>
     function checker() {
       if (window.alert("Category Updated !!")) {

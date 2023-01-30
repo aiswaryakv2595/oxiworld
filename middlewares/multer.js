@@ -1,15 +1,23 @@
 // const multer = require('multer')
+// const path = require('path')
 
-// //set storage
-// let storage = multer.diskStorage({
-//     destination:function(req,file,cb){
-//         cb(null,'./uploads')
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//       cb(null,path.join(__dirname,'../public/products')),function(err,success){
+//         if(err){
+//             console.log(err);
+//             throw err;
+            
+//         }
+//       }
 //     },
-//     filename:function(req,file,cb){
+//     filename: (req, file, cb) => {
 //         var ext =file.originalname.substr(file.originalname.lastIndexOf('.'))
-//         cb(null,file.fieldname+'-'+Date.now()+ext)
+//       cb(null,file.fieldname+'-'+Date.now()+'-'+ext)
 //     }
+//   })
+// const upload = multer({
+//   storage: storage,
+ 
 // })
-
-// let store = multer({storage:storage})
-// module.exports = store
+// module.exports = upload

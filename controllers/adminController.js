@@ -3,6 +3,7 @@ const Admin = require('../models/adminModel')
 const Item = require('../models/itemModel')
 const Category = require('../models/categoryModel')
 const fs = require('fs')
+const sharp = require('sharp')
 
 const securePassword = async(password)=>{
     try {
@@ -143,8 +144,9 @@ const showUsers = async(req,res)=>{
 const addItems = async(req,res)=>{
     try {
         
-        const category = await Category.find({}) 
+        const category = await Category.find({});
         const itemData = await Item.find({}).populate('category_id');
+      
        
         res.render('addItems',{item:itemData,category:category})
         
@@ -158,22 +160,56 @@ const addItemSave = async(req,res,next)=>{
 
     try {
         const name = req.body.name;
+        const model_number = req.body.model_number;
         const category_id = req.body.category;
         const price = req.body.price;
         const description = req.body.description;
-        const images =req.file.filename;
+        const size = req.body.size;
+        const color = req.body.color;
+        const material = req.body.material;
+        const material_type = req.body.material_type;
+        const brand = req.body.brand;
+        
         console.log(req.category_id);
         
             const item = new Item({
-                owner:req.session.user_id,
                 name:name,
+                model_number:model_number,
                 description:description,
                 category_id:category_id,
                 price:price,
-                images:images,
-                      
+                size:size,
+                color:color,
+                material:material,
+                material_type:material_type,
+                brand:brand
+               
+                  
             });
-        
+            const uploadDir = "public/products";
+
+            if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+          
+            const images = [];
+          
+            req.files.images = !req.files.images.length
+              ? [req.files.images]
+              : req.files.images;
+            for (let i = 0; i < req.files.images.length; i++) {
+              const image = req.files.images[i];
+              let uploadPath = __dirname + "/../public/products/" + image.name;
+          
+              await new Promise((resolve) => {
+                image.mv(uploadPath, (err) => {
+                  if (err) throw err;
+                  console.log(image);
+                  if (!err) images.push(`products/${image.name}`);
+                  resolve(true);
+                });
+              });
+            }
+            item.images = images;
+            
           const userData = await item.save();
           if (userData) {
            res.redirect('/admin/additems')
@@ -193,7 +229,7 @@ const editItem = async(req,res)=>{
     try {
         const id = req.params.id;
         const category = await Category.find({});
-        const itemData = await Item.findById({_id:id});
+        const itemData = await Item.findById({_id:id}).populate('category_id');
        
         if(itemData){
             res.render('editItem',{item:itemData,category:category})
@@ -209,27 +245,53 @@ const editItem = async(req,res)=>{
 
 const updateItem = async(req,res)=>{
     try {
-        const catid = req.body.id;
-        let new_image ="";
-
-        const name = req.body.name;
-        const category = req.body.category;
-        const price = req.body.price;
-        const description = req.body.description;
-        
-
-        if(req.file){
-            new_image = req.file.filename;
-          fs.unlinkSync('./uploads/'+ req.body.old_image)
-  
-        }
-        else{
-            new_image = req.body.old_image
-        }
-
-        const categoryData =await Item.findByIdAndUpdate({_id:catid},{$set:{name:name,description:description,category_id:category,price:price,images:new_image}})
+        const catid = req.params.id;
+        const product = await Item.findOne({ _id: catid });
+        console.log(req.body);
+        let editedImages = JSON.stringify(req.body.old_image) || [];
        
-       if (categoryData) {
+
+  if (editedImages.length) editedImages = editedImages.map((i) => i.slice(1));
+
+  const uploadDir = "public/products";
+  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+  const images = [];
+
+  if (req.files) {
+    req.files.image = !req.files.image.length
+      ? [req.files.image]
+      : req.files.image;
+    for (let i = 0; i < req.files.image.length; i++) {
+      const image = req.files.image[i];
+      let uploadPath = __dirname + "/../public/products/" + image.name;
+
+      await new Promise((resolve) => {
+        image.mv(uploadPath, (err) => {
+          if (err) throw err;
+          console.log(image);
+          if (!err) images.push(`products/${image.name}`);
+          resolve(true);
+        });
+      });
+    }
+  }
+  product.images = [...editedImages, ...images];
+
+  product.name = req.body.name;
+  product.model_number = req.body.model_number
+  product.description = req.body.description;
+  product.category_id = req.body.category;
+  product.size = req.body.size;
+  product.price = req.body.price
+  product.color = req.body.color
+  product.material = req.body.material
+  product.material_type = req.body.material_type
+  product.brand = req.body.brand
+ 
+  const itemData = await product.save();
+  console.log(itemData);
+       
+       if (itemData) {
  
         res.redirect('/admin/additems');
        }
@@ -245,25 +307,22 @@ const updateItem = async(req,res)=>{
 const deleteItem = async(req,res)=>{
     try {
         let id = req.params.id;
-        const userData = await Item.findById({_id:id});
-        if(userData.images != ''){
-            console.log('success');
-            try {
-                const itemDelete = await Item.findByIdAndDelete({_id:id});
-                fs.unlinkSync('./uploads/'+userData.images)
-                if(itemDelete)
-                res.redirect('/admin/additems');
-                
-            } catch (error) {
-                console.log(error.message);
-            }
-        }
+        const userData = await Item.findByIdAndUpdate({_id:id},{$set:{is_available:false}});
+        if(userData)     
+        res.redirect('/admin/additems');
         
-        else
-        console.log('failed');
-       
-        res.redirect('/admin/addcategory')
+     } catch (error) {
         
+     }
+
+}
+
+const showItem = async(req,res)=>{
+    try {
+        let id = req.params.id;
+        const userData = await Item.findByIdAndUpdate({_id:id},{$set:{is_available:true}});
+        if(userData)     
+        res.redirect('/admin/additems');
         
      } catch (error) {
         
@@ -291,9 +350,9 @@ const addCategorySave = async(req,res,next)=>{
         const material = req.body.material;
         const material_type = req.body.material_type;
         const brand = req.body.brand
-        const images =req.file.filename;
+       
         console.log(req.file);
-        
+    
             const category = new Category({
                 owner:req.session.user_id,
                 name:name,
@@ -302,10 +361,35 @@ const addCategorySave = async(req,res,next)=>{
                 material:material,
                 material_type:material_type,
                 brand:brand,
-                images:images,
-                      
+          
             });
-    
+            const uploadDir = "public/uploads";
+
+            if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+          
+            const images = [];
+          
+            req.files.images = !req.files.images.length
+              ? [req.files.images]
+              : req.files.images;
+              console.log(req.files);
+            for (let i = 0; i < req.files.images.length; i++) {
+              const image = req.files.images[i];
+              let uploadPath = __dirname + "/../public/uploads/" + image.name;
+              console.log(uploadPath);
+          
+              await new Promise((resolve) => {
+                image.mv(uploadPath, (err) => {
+                  if (err) throw err;
+                 
+                  if (!err) images.push(`uploads/${image.name}`);
+                  resolve(true);
+                });
+              });
+            }
+            category.images = images;
+            
+          
           const categoryData = await category.save();
           if (categoryData) {
            res.redirect('/admin/addcategory')
@@ -343,15 +427,15 @@ const editCategory = async(req,res)=>{
 }
 const updateCategory = async(req,res)=>{
     try {
-        const catid = req.params.categoryid;
+        const catid = req.body.catid;
         let new_image ="";
 
         const name = req.body.name;
-        const size = req.body.size;
-        const color = req.body.color;
-        const material = req.body.material;
-        const material_type = req.body.material_type;
-        const brand = req.body.brand;
+        // const size = req.body.size;
+        // const color = req.body.color;
+        // const material = req.body.material;
+        // const material_type = req.body.material_type;
+        // const brand = req.body.brand;
 
         if(req.file){
             new_image = req.file.filename;
@@ -362,11 +446,11 @@ const updateCategory = async(req,res)=>{
             new_image = req.body.old_image
         }
 
-        const categoryData =await Category.findByIdAndUpdate({_id:catid},{$set:{name:name,size:size,color:color,material:material,material_type:material_type,brand:brand,images:new_image}})
+        const categoryData =await Category.findByIdAndUpdate({_id:catid},{$set:{name:name,images:new_image}})
        console.log(categoryData);
        if (categoryData) {
  
-        res.redirect('/admin/add')
+        res.redirect('/admin/addcategory')
        }
        else{
         res.render('editCategory',{message:'something went wrong!!!'})
@@ -382,37 +466,36 @@ const deleteCategory = async(req,res)=>{
     
      try {
         let id = req.params.id;
-        const userData = await Category.findById({_id:id});
-        if(userData.images != ''){
-            console.log('success');
-            try {
-                const catDelete = await Category.findByIdAndDelete({_id:id});
-                fs.unlinkSync('./uploads/'+userData.images)
-                if(catDelete)
-                res.redirect('/admin/addcategory');
-                
-            } catch (error) {
-                console.log(error.message);
-            }
-        }
+        const userData = await Category.findByIdAndUpdate({_id:id},{$set:{is_available:false}});
         
-        else
-        console.log('failed');
-       
+       if(userData)
         res.redirect('/admin/addcategory')
         
         
      } catch (error) {
-        
+        console.log(error.message);
      }
     
   
+}
+const showCategory = async(req,res)=>{
+    try {
+        let id = req.params.id;
+        const userData = await Category.findByIdAndUpdate({_id:id},{$set:{is_available:true}});
+        if(userData)     
+        res.redirect('/admin/addcategory');
+        
+     } catch (error) {
+        
+     }
+
+    
 }
 //end
 const editUser = async(req,res)=>{
 
     try {
-        const userId = req.body.userid;
+        const userId = req.params.userid;
         const userData = await User.findOne({_id:userId})
         
        
@@ -421,7 +504,7 @@ const editUser = async(req,res)=>{
             res.render('edituserView.ejs',{user:userData})
 
         } else {
-            res.redirect('/admin/showuser')
+            res.redirect('/admin/showusers')
         }
         
     } catch (error) {
@@ -455,10 +538,11 @@ const updateUser = async(req,res)=>{
     }
 }
 
-const deleteUser = async(req,res)=>{
+const banUser = async(req,res)=>{
     try {
         const userId = req.params.userid;
-        const userData = await User.deleteOne({_id:userId})
+        const userData = await User.findByIdAndUpdate({_id:userId},{$set:{is_active:0}})
+        console.log(userData);
         if (userData) {
             console.log('success');
             
@@ -473,6 +557,26 @@ const deleteUser = async(req,res)=>{
         
     }
 
+}
+
+const removeBanUser = async(req,res)=>{
+    try {
+        const userId = req.params.userid;
+        const userData = await User.findByIdAndUpdate({_id:userId},{$set:{is_active:1}})
+        console.log(userData);
+        if (userData) {
+            console.log('success');
+            
+        } else {
+            console.log('failed');
+            
+        }
+        res.redirect('/admin/showusers')
+        
+    } catch (error) {
+        console.log(error.message);
+        
+    }
 }
 
 const searchUser = async(req,res) =>{
@@ -501,13 +605,16 @@ module.exports ={
     editItem,
     updateItem,
     deleteItem,
+    showItem,
     addCategory,
     addCategorySave,
     editCategory,
     updateCategory,
     deleteCategory,
+    showCategory,
     editUser,
     updateUser,
-    deleteUser,
+    banUser,
+    removeBanUser,
     searchUser
 }

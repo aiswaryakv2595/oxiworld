@@ -1,66 +1,102 @@
 <%-include('../layouts/admin-header.ejs')-%>
 
-<div class="container py-5">
-  
-<div id="content" class="p-4 p-md-5 pt-5 bg-light text-dark">
-    <h2 class="mb-4">Edit User</h2>
-<!-- Button trigger modal -->
-<form action="/admin/updateuser" method="post" id="form" >
-  <input type="hidden" value="<%= user._id %>" name="id">
-    <div class="form-group row">
-      <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" name="name"  placeholder="Name" value="<%=user.name %>">
+<!-- container opened -->
+<div class="container">
+
+  <!-- breadcrumb -->
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Pages</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Edit-Profile</span>
       </div>
     </div>
-    <div class="form-group row">
-      <label for="inputPassword3" class="col-sm-2 col-form-label">Email</label>
-      <div class="col-sm-10">
-        <input type="email" class="form-control" name="email" placeholder="Email" value="<%=user.email %>">
-      </div>
-    </div>
-    <div class="form-group row">
-        <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
-        <div class="col-sm-10">
-          <input type="password" name="password" class="form-control" placeholder="Password" value="<%=user.password %>">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="inputPassword3" class="col-sm-2 col-form-label">Phone</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" placeholder="Phone" name="phone" value="<%=user.phone %>">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="inputPassword3" class="col-sm-2 col-form-label">Gender</label>
-        <div class="col-sm-10">
-          <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio1" value="Male" <%= user.gender=='Male' ? 'checked' : '' %>>
-                        <label class="form-check-label" for="inlineRadio1">Male</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="Female" <%= user.gender=='Female' ? 'checked' : '' %>>
-                        <label class="form-check-label" for="inlineRadio2">Female</label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="Others" <%= user.gender=='Others' ? 'checked' : '' %>>
-                        <label class="form-check-label" for="inlineRadio3">Others</label>
-                      </div>
-        </div>
-      </div>
-      <div class="form-group ">
-        <button type="submit" class="btn btn-primary" onclick="checker()">Update</button>
-        <button type="submit" class="btn btn-primary" formaction="/admin/banuser" formmethod="post">Ban User</button>
-      </div>
-      
-      <% if(locals.message){%>
-        <p class="text-danger"><%= message %></p>
-       <%}%>
-</form>
- 
-    
+   
   </div>
+  <!-- breadcrumb -->
+
+  <!-- row -->
+  <div class="row row-sm">
+ 
+    <!-- Col -->
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="mb-4 main-content-label">User Information</div>
+          <form class="form-horizontal" action="/admin/updateuser" method="post" id="form">
+            <input type="hidden" value="<%= user._id %>" name="id">
+            <div class="form-group ">
+             
+            </div>
+            <div class="mb-4 main-content-label">Name</div>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">User Name</label>
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  placeholder="User Name" value="<%= user.name%>" name="name">
+                </div>
+              </div>
+            </div>
+
+           
+            <div class="mb-4 main-content-label">Contact Info</div>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">Email<i>(required)</i></label>
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  placeholder="Email" value="<%= user.email%>" name="email">
+                </div>
+              </div>
+            </div>
+           
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">Phone</label>
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  placeholder="phone number" value="<%= user.phone%>" name="phone">
+                </div>
+              </div>
+            </div>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">Gender</label>
+                </div>
+                <div class="col-md-9">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="inlineRadio1" value="Male" <%= user.gender=='Male' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="inlineRadio1">Male</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="Female" <%= user.gender=='Female' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="inlineRadio2">Female</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="Others" <%= user.gender=='Others' ? 'checked' : '' %>>
+                    <label class="form-check-label" for="inlineRadio3">Others</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary waves-effect waves-light">Update Profile</button>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+    <!-- /Col -->
+  </div>
+  <!-- row closed -->
 </div>
+<!-- Container closed -->
 
   <script>
     function checker(){

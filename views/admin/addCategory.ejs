@@ -4,17 +4,14 @@
 <!-- Button trigger modal -->
 
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
- Add Category
-</button>
+
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+<div class="modal" id="exampleModal">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content modal-content-demo">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Item</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h6 class="modal-title">Add Category</h6><button aria-label="Close" class="close" data-dismiss="modal"  type="button"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
         <form action="/admin/addcategory" method="post" id="form" enctype="multipart/form-data">
@@ -22,45 +19,14 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" name="name"  placeholder="Name" >
+                <input type="text" class="form-control" name="name"  placeholder="Name" required>
               </div>
             </div>
-            <div class="form-group row">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Size</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" name="size" placeholder="Category">
-              </div>
-            </div>
-            <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
-                <div class="col-sm-10">
-                  <input type="text" name="color" class="form-control" placeholder="Color" >
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
-                <div class="col-sm-10">
-                  <input type="text" name="material" class="form-control" placeholder="Material" >
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
-                <div class="col-sm-10">
-                  <input type="text" name="material_type" class="form-control" placeholder="Material Type" >
-                </div>
-              </div>
-
-              <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Brand </label>
-                <div class="col-sm-10">
-                  <input type="text" name="brand" class="form-control" placeholder="Brand" >
-                </div>
-              </div>
-              
+           
               <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Images</label>
                 <div class="col-sm-10">
-                  <input type="file" name="images" class="form-control" id="formFile" multiple >
+                  <input type="file" name="images" class="form-control" id="formFile" accept="image/*" >
                 </div>
               </div>
         
@@ -68,64 +34,138 @@
                 <p class="text-danger"><%= message %></p>
                <%}%>
         
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
-      </div>
-    </form>
+            </div>
+              <div class="modal-footer">
+                <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
     </div>
   </div>
 </div>
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Size</th>
-      <th scope="col">Color</th>
-      <th scope="col">Material</th>
-      <th scope="col">Material Type</th>
-      <th scope="col">Brand</th>
-      <th scope="col">Image</th>
-      <th scope="col">Edit</th>
-      <th scope="col">Delete</th>
+<div class="container">
+
+  <!-- breadcrumb -->
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Advanced ui</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Userlist</span>
+      </div>
+    </div>
+    <div class="d-flex my-xl-auto right-content">
       
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <% if(category.length){
- 
-        category.forEach((row,index)=>{ %> 
-      <th scope="row"><%=index %></th>
-      <td><%= row.name %></td>
-      <td><%= row.size %></td>
-      <td><%= row.color %></td>
-      <td><%= row.material %></td>
-      <td><%= row.material_type %></td>
-      <td><%= row.brand %></td>
-     
-      <td><img src="<%=row.images %>" width="50" alt="" class="img-thumbnail"> </td>
-      
-      <td><a href="/admin/editCategory/<%= row._id%>">EDIT</a></td>
-      <form action="/admin/deletecategory/<%= row._id%>" method="post" id="formdel" enctype="multipart/form-data">
-        <td><button type="button" class="delete" onclick="checker()">DELETE</button> </td>
-    </form>
-    </tr>
-    <% })
-  }%>
-     
-  </tbody>
-</table>
+      <div class="mb-xl-0">
+        <button type="button" class="btn btn-primary modal-effect" data-toggle="modal"  data-target="#exampleModal">
+          Add Category
+         </button>
+      </div>
+    </div>
+  </div>
+  <!-- breadcrumb -->
+
+  <!--Row-->
+  <div class="row row-sm">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 grid-margin">
+      <div class="card">
+        <div class="card-header pb-0">
+          <div class="d-flex justify-content-between">
+            <h4 class="card-title mg-b-0">Categories</h4>
+            <i class="mdi mdi-dots-horizontal text-gray"></i>
+          </div>
+          
+        </div>
+        <div class="card-body">
+          <div class="table-responsive border-top userlist-table">
+            <table class="table card-table table-striped table-vcenter text-nowrap mb-0">
+              <thead>
+                <tr>
+                  <th class="wd-lg-8p"><span>Image</span></th>
+                  <th class="wd-lg-20p"><span>Category</span></th>
+                  <th class="wd-lg-20p"><span>Created</span></th>
+                  <th class="wd-lg-20p"><span>Status</span></th>
+                 
+                  <th class="wd-lg-20p">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% category.forEach((row,element)=>{%>
+                <tr>
+                  <td>
+                    <img alt="avatar" class=" avatar-md mr-2" src="/<%=row.images%>">
+                  </td>
+                  <td><%=row.name%></td>
+                  <td>
+                    <%= row.createdAt.toDateString() %>
+                  </td>
+                  <td class="text-center">
+                   <% if(row.is_available==true){%>
+                    <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
+                    <%} else{%>
+                    <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
+                    <%}%>
+                  </td>
+                  
+                  <td>
+                    <div class="d-flex flex-row">
+                 
+                    <a href="/admin/editCategory/<%=row._id%>" class="btn btn-sm btn-info">
+                      <i class="las la-pen"></i>
+                    </a>
+                 
+                  <div>
+                  <form method="post">
+                  <%if(row.is_available==true){%>
+                    <input class="btn btn-sm btn-info" type="submit" value="ON" formaction="/admin/deletecategory/<%=row._id%>">
+                    <%}else {%>
+                    <input class="btn btn-sm btn-danger" type="submit" value="OFF" formaction="/admin/showcategory/<%=row._id%>">
+                    <%}%>
+                  </form>
+                </div>
+                  </div>
+                  </td>
+                </tr>
+                <%})%>
+              </tbody>
+            </table>
+          </div>
+          <ul class="pagination mt-4 mb-0 float-right">
+            <li class="page-item page-prev disabled">
+              <a class="page-link" href="#" tabindex="-1">Prev</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+            <li class="page-item"><a class="page-link" href="#">5</a></li>
+            <li class="page-item page-next">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- COL END -->
+  </div>
+  <!-- row closed  -->
+</div>
+<!-- Container closed -->
 <script>
   function checker(){
-    if(window.confirm("Are you sure want to Delete !!")){
-      document.getElementById("formdel").submit();
+    if(window.confirm("Category Restocked !!")){
+      document.getElementById("removeban").submit();
     } else {
       return;
     }
   }
+
+  function banChecker(){
+  if(window.confirm("Category Stocked!!")){
+    document.getElementById("ban").submit();
+  } else {
+    return;
+  }
+}
+
      </script>
+   
 
 <%-include("../layouts/admin-footer.ejs")-%>

@@ -1,20 +1,17 @@
 <%-include('../layouts/admin-header.ejs')-%>
-<div id="content" class="p-4 p-md-5 pt-5 text-dark">
+
     
 <!-- Button trigger modal -->
 
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
- Add Products
-</button>
+
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+<div class="modal" id="exampleModal">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Item</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h6 class="modal-title">Add Items</h6><button aria-label="Close" class="close" data-dismiss="modal"  type="button"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="modal-body">
         <form action="/admin/additems" method="post" id="form" enctype="multipart/form-data">
@@ -22,13 +19,19 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" name="name"  placeholder="Name" >
+                <input type="text" class="form-control" name="name"  placeholder=" Name" >
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Model Number</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="model_number"  placeholder="Model Name" >
               </div>
             </div>
             <div class="form-group row">
               <label for="inputPassword3" class="col-sm-2 col-form-label">Category</label>
               <div class="col-sm-10">
-                <select class="form-select" name="category" aria-label="Default select example">
+                <select class="form-control" name="category" aria-label="Default select example">
                   <option selected>--Select--</option>
                   <% category.forEach(cate=>{ %>
                   <option value="<%= cate._id%>"><%= cate.name %></option>
@@ -36,6 +39,39 @@
                 </select>
               </div>
             </div>
+            <div class="form-group row">
+              <label for="inputPassword3" class="col-sm-2 col-form-label">Size</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="size" placeholder="Category" required>
+              </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
+                <div class="col-sm-10">
+                  <input type="text" name="color" class="form-control" placeholder="Color" >
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
+                <div class="col-sm-10">
+                  <input type="text" name="material" class="form-control" placeholder="Material" >
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
+                <div class="col-sm-10">
+                  <input type="text" name="material_type" class="form-control" placeholder="Material Type" >
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Brand </label>
+                <div class="col-sm-10">
+                  <input type="text" name="brand" class="form-control" placeholder="Brand" >
+                </div>
+              </div>
+              
+              
             <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Price</label>
                 <div class="col-sm-10">
@@ -45,7 +81,7 @@
               <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Description</label>
                 <div class="col-sm-10">
-                  <textarea name="description" class="form-control" id="" cols="30" rows="5"></textarea>
+                  <textarea name="description" class="form-control" id="" cols="30" rows="5" style="white-space: pre-wrap;"></textarea>
                 </div>
               </div>
               <div class="form-group row">
@@ -58,51 +94,128 @@
               <% if(locals.message){%>
                 <p class="text-danger"><%= message %></p>
                <%}%>
-        
+               <div class="modal-footer">
+                <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
-      </div>
-    </form>
+      
     </div>
   </div>
 </div>
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Category</th>
-      <th scope="col">Price</th>
-      <th scope="col">Description</th>
-      <th scope="col">Image</th>
+<div class="container">
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Items</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Itemlist</span>
+      </div>
+    </div>
+    <div class="d-flex my-xl-auto right-content">
       
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <% if(item.length){
- 
-        for(var i = 0; i< item.length; i++) {%> 
-      <th scope="row"><%=(i+1) %></th>
-      <td><%=item[i].name %></td>
-      <td><%=item[i].category_id.name %></td>
-      <td><%=item[i].price %></td>
-      <td><%=item[i].description %></td>
-      <td><img src="<%=item[i].images %>" width="50" alt="" class="img-thumbnail"> </td>
-      
-      <td><a href="/admin/edit_item/<%= item[i]._id%>">EDIT</a></td>
-      <form action="/admin/deleteitem/<%= item[i]._id%>" method="post" id="formdel" enctype="multipart/form-data">
-        <td><button type="submit" class="delete" onclick="checker()">DELETE</button> </td>
-    </form>
-     
-    </tr>
-    <% }
-  }%>
-     
-  </tbody>
-</table>
+      <div class="mb-xl-0">
+        <button type="button" class="btn btn-primary modal-effect" data-toggle="modal"  data-target="#exampleModal">
+          Add Item
+         </button>
+      </div>
+    </div>
+  </div>
+   <!--Row-->
+   <div class="row row-sm">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 grid-margin">
+      <div class="card">
+        <div class="card-header pb-0">
+          <div class="d-flex justify-content-between">
+            <h4 class="card-title mg-b-0">Categories</h4>
+            <i class="mdi mdi-dots-horizontal text-gray"></i>
+          </div>
+          
+        </div>
+        <div class="card-body">
+          <div class="table-responsive border-top userlist-table">
+            <table class="table card-table table-striped table-vcenter text-nowrap mb-0">
+              <thead>
+                <tr>
+                  <th class="wd-lg-8p"><span>Image</span></th>
+                  <th class="wd-lg-20p"><span>Item Name</span></th>
+                  <th class="wd-lg-20p"><span>Category</span></th>
+                  <th class="wd-lg-20p"><span>Price</span></th>
+                  <th class="wd-lg-20p"><span>Status</span></th>
+                 
+                  <th class="wd-lg-20p">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% item.forEach((row,element)=>{%>
+                <tr>
+                  <td>
+                    <img alt="avatar" class=" avatar-md mr-2" src="/<%=row.images[0]%>">
+                  </td>
+                  <td><%=row.name%></td>
+                  <td>
+                    <%= row.category_id.name %>
+                  </td>
+                  <td><%=row.price%></td>
+                  <td class="text-center">
+                   <% if(row.is_available==true){%>
+                    <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
+                    <%} else{%>
+                    <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
+                    <%}%>
+                  </td>
+                  
+                  <td>
+                    <div class="d-flex">
+                   <div>
+                    <a href="/admin/edit_item/<%=row._id%>" class="btn btn-sm btn-info">
+                      <i class="las la-pen"></i>
+                    </a>
+                  </div>
+                  <div  class="main-toggle main-toggle-success on">
+                    <span></span>
+                 </div>
+                </div>
+                  </td>
+                </tr>
+                <%})%>
+              </tbody>
+            </table>
+          </div>
+          <ul class="pagination mt-4 mb-0 float-right">
+            <li class="page-item page-prev disabled">
+              <a class="page-link" href="#" tabindex="-1">Prev</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+            <li class="page-item"><a class="page-link" href="#">5</a></li>
+            <li class="page-item page-next">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- COL END -->
+  </div>
+  <!-- row closed  -->
 
 
+</div>
+<script>
+  function banChecker(){
+  if(window.confirm("Are you sure want to remove the item!!")){
+    document.getElementById("ban").submit();
+  } else {
+    return;
+  }
+}
+function checker(){
+  if(window.confirm("Item Stocked !!")){
+    document.getElementById("removeban").submit();
+  } else {
+    return;
+  }
+}
+</script>
 <%-include("../layouts/admin-footer.ejs")-%>

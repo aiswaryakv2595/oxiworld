@@ -7,7 +7,7 @@
       <div class="card" style="border-radius: 15px;">
         <div class="card-body">
           <h5 class="card-title">Edit Item</h5>
-          <form action="/admin/updateitem" method="post" id="form" enctype="multipart/form-data">
+          <form method="post" action="/admin/updateitem/<%= item._id %>" id="form" enctype="multipart/form-data">
             <div class="form-group row">
                 <input type="hidden" name="id" value="<%= item._id %>">
                 <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
@@ -16,9 +16,16 @@
                 </div>
               </div>
               <div class="form-group row">
+                
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Model Number</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="model_number"  placeholder="Model Number" value="<%= item.model_number%>" >
+                </div>
+              </div>
+              <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Category</label>
                 <div class="col-sm-10">
-                  <select class="form-select" name="category" aria-label="Default select example">
+                  <select class="form-control" name="category" aria-label="Default select example">
                     
                     <% category.forEach(cate=>{ %>
                         <option <% if(cate._id ==  item.category_id ) selected %> value="<%= cate._id%>"><%= cate.name %></option>
@@ -33,21 +40,56 @@
                   </div>
                 </div>
                 <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Size</label>
+                  <div class="col-sm-10">
+                    <input type="number" name="size" class="form-control" placeholder="Size" value="<%= item.size%>" >
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="color" class="form-control" placeholder="Color" value="<%=item.color%>" >
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="material" class="form-control" placeholder="Material" value="<%= item.material%>" >
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="material_type" class="form-control" placeholder="Material Type" value="<%= item.material_type%>" >
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Brand Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="brand" class="form-control" placeholder="Brand Name" value="<%= item.brand%>" >
+                  </div>
+                </div>
+                <div class="form-group row">
                   <label for="inputPassword3" class="col-sm-2 col-form-label">Description</label>
                   <div class="col-sm-10">
-                    <textarea name="description" class="form-control" id="" cols="30" rows="5" >
+                    <textarea name="description" class="form-control" id="" cols="30" rows="5" style="white-space: pre-wrap; ">
                     <%= item.description%>
                     </textarea>
                   </div>
                 </div>
                 <div class="mb-3 row">
                     <label for="Brand" class="col-sm-2 col-form-label">Image</label>
-                    <div class="col-sm-10">
+                    <div class="row g-0">
                      
-                        <img src="/<%= item.images%>" width="100" class="img-thumbnail">
+                      <% item.images.forEach((image)=> {%>
+                        <div class="card-image-col col-3 p-1">
+                            <span class="close"></span> 
+                            <img class="card-image" src="/<%=image %>" alt="">
+                        </div>
+                        <%}) %>
                         
                           <input type="hidden" name="old_image" value="<%= item.images%>">
-                          <input type="file" class="form-control" id="images" name="images">
+                          <input type="file" class="form-control" id="images" name="images" multiple>
                     </div>
                   </div>
           

@@ -1,54 +1,128 @@
 <%-include('../layouts/admin-header.ejs')-%>
-<div id="content" class="p-4 p-md-5 pt-5">
-    <h2 class="mb-4">Show User</h2>
-<!-- Button trigger modal -->
-<form action="/admin/searchuser" method="post">
-  <div class="input-group">
-    <input type="search" name="search" class="form-control rounded bg-light" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
-    <button type="submit" class="btn btn-outline-primary">search</button>
+<style>
+  .btn {
+    background-color: DodgerBlue;
+    border: none;
+    color: white;
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  /* Darker background on mouse-over */
+  .btn:hover {
+    background-color: RoyalBlue;
+  }
+  </style>
+<div class="container">
+
+  <!-- breadcrumb -->
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Users</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Userlist</span>
+      </div>
+    </div>
+    <div class="d-flex my-xl-auto right-content">
+     
+     
+     
+    </div>
   </div>
-</form>
-    <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-            <th scope="col">Gender</th>
-            <th scope="col">Edit user</th>
-            <th scope="col">Delete user</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <% if(user.length){
- 
-                for(var i = 0; i< user.length; i++) {%> 
-            <th scope="row"><%=(i+1) %></th>
-            <td><%= user[i].name %></td>
-            <td><%= user[i].email %></td>
-            <td><%= user[i].phone %></td>
-            <td><%= user[i].gender %></td>
-            
-            <td><a href="/admin/edituser/<%= user[i]._id%>">Edit</a></td>
-            <form action="/admin/deleteuser/<%= user[i]._id%>" method="post" id="form">
-            <td><button type="button" class="delete" onclick="checker()">Delete</button> </td>
-                </form>
-          </tr>
-          <% }
-        }%>
-           
-        </tbody>
-      </table>
-    
+  <!-- breadcrumb -->
+
+  <!--Row-->
+  <div class="row row-sm">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 grid-margin">
+      <div class="card">
+        <div class="card-header pb-0">
+          <div class="d-flex justify-content-between">
+            <h4 class="card-title mg-b-0">USERS DETAILS</h4>
+            <i class="mdi mdi-dots-horizontal text-gray"></i>
+          </div>
+         
+        </div>
+        <div class="card-body">
+          <div class="table-responsive border-top userlist-table">
+            <table class="table card-table table-striped table-vcenter text-nowrap mb-0">
+              <thead>
+                <tr>
+                  <th class="wd-lg-8p"><span>User</span></th>
+                  <th class="wd-lg-20p"><span></span></th>
+                  <th class="wd-lg-20p"><span>Phone</span></th>
+                  <th class="wd-lg-20p"><span>Status</span></th>
+                  <th class="wd-lg-20p"><span>Email</span></th>
+                  <th class="wd-lg-20p">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% user.forEach((row,element)=>{%>
+                <tr>                 
+                  <td>
+                    <img alt="avatar" class="rounded-circle avatar-md mr-2" src="/assets/img/faces/1.jpg">
+                  </td>
+                  <td><%= row.name %></td>
+                  <td>
+                    <%= row.phone %>
+                  </td>
+                  <td class="text-center">
+                    <% if(row.is_active==0){%>
+                    <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Inactive</span>
+                    <%}else{%>
+                    <span class="label text-muted d-flex"><div class="dot-label bg-success mr-1"></div>Active</span>
+                    <%}%>
+                  </td>
+                  <td>
+                    <a href="#"><%= row.email %></a>
+                  </td>
+                  <td>
+                    
+                    <a href="/admin/edituser/<%=row._id %>" class="btn btn-sm btn-info">
+                      <i class="las la-pen"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm btn-danger">
+                      <i class="las la-trash"></i>
+                    </a>
+                   
+                  </td>
+                </tr>
+                <%})%>
+              
+              </tbody>
+            </table>
+          </div>
+          <ul class="pagination mt-4 mb-0 float-right">
+            <li class="page-item page-prev disabled">
+              <a class="page-link" href="#" tabindex="-1">Prev</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">4</a></li>
+            <li class="page-item"><a class="page-link" href="#">5</a></li>
+            <li class="page-item page-next">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- COL END -->
   </div>
+  <!-- row closed  -->
+</div>
+	
  
    <script>
 function checker(){
-  if(window.confirm("Are you sure want to Delete !!")){
-    document.getElementById("form").submit();
+  if(window.confirm("Unblocked the user !!")){
+    document.getElementById("removeban").submit();
+  } else {
+    return;
+  }
+}
+function banChecker(){
+  if(window.confirm("Are you sure want to block the USER!!")){
+    document.getElementById("ban").submit();
   } else {
     return;
   }

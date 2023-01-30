@@ -1,0 +1,277 @@
+<%- include('../layouts/user-header.ejs') -%>
+<style>
+    .image-preview{
+  width: 500px;
+  height: 250px;
+  overflow: hidden;
+  position: relative;
+    }
+    .image-preview>img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: scale(2);
+    transform-origin: left top;
+  }
+  
+
+.d-none{
+  display: none !important;
+}
+.magnifiying-glass{
+  width: 100px;
+  height: 100px;
+  border: 1px dashed black;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0,0.2);
+}
+figure{
+  display: inline-block;
+  vertical-align: top;
+}
+            .text-bold {
+            font-weight: 800;
+        }
+
+        text-color {
+            color: #0093c4;
+        }
+
+        /* Main image - left */
+        .main-img img {
+            width: 100%;
+        }
+
+        /* Preview images */
+        .previews img {
+            width: 100%;
+            height: 140px;
+        }
+
+        .main-description .category {
+            text-transform: uppercase;
+            color: #0093c4;
+        }
+
+        .main-description .product-title {
+            font-size: 2.5rem;
+        }
+
+        .old-price-discount {
+            font-weight: 600;
+        }
+
+        .new-price {
+            font-size: 2rem;
+        }
+
+        .details-title {
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #757575;
+        }
+
+        .buttons .block {
+            margin-right: 5px;
+        }
+
+        .quantity input {
+            border-radius: 0;
+            height: 40px;
+
+        }
+
+
+        .custom-btn {
+            text-transform: capitalize;
+            background-color: #0093c4;
+            color: white;
+            width: 150px;
+            height: 40px;
+            border-radius: 0;
+        }
+
+        .custom-btn:hover {
+            background-color: #0093c4 !important;
+            font-size: 18px;
+            color: white !important;
+        }
+
+        .similar-product img {
+            height: 400px;
+        }
+
+        .similar-product {
+            text-align: left;
+        }
+
+        .similar-product .title {
+            margin: 17px 0px 4px 0px;
+        }
+
+        .similar-product .price {
+            font-weight: bold;
+        }
+
+        .questions .icon i {
+            font-size: 2rem;
+        }
+
+        .questions-icon {
+            font-size: 2rem;
+            color: #0093c4;
+        }
+
+
+        
+
+        /* Small devices (landscape phones, less than 768px) */
+        @media (max-width: 767.98px) {
+
+            /* Make preview images responsive  */
+            .previews img {
+                width: 100%;
+                height: auto;
+            }
+
+        }
+</style>
+<div class="container mt-20">
+    
+    <div class="row">
+        <div class="col-md-5">
+            
+            <div class="main-img">
+                <img class="img-fluid image-holder" src="/<%= product.images[0] %>" alt="ProductS" id="image">
+                <div class="row my-3 previews">
+                   <% for(let i=1;i<product.images.length;i++){%>
+                    <div class="col-md-3">
+                        <img class="w-100" src="/<%= product.images[i] %>" alt="Sale">
+                    </div>
+                    <%}%>
+                   
+                </div>
+            </div>
+            
+            
+        </div>
+        <figure class="image-preview d-none">
+            <!--   <img src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80" id="image-preview"> -->
+                <img src="/<%= product.images[0] %>" id="image-preview">
+            </figure>
+        <div class="col-md-7">
+            
+            <div class="main-description px-2 pt-2">
+                
+                <div class="category text-bold">
+                   <%=product.category_id.name%>
+                </div>
+                <div class="product-title text-bold my-3">
+                    <%=product.name%>
+                </div>
+
+
+                <div class="price-area my-4">
+                    
+                    <p class="new-price text-bold mb-1">&#8377; <%=product.price%></p>
+                    <p class="text-secondary mb-1">(Additional tax may apply on checkout)</p>
+
+                </div>
+
+
+                <div class="buttons d-flex my-5">
+                    <div class="block">
+                        <a href="#" class="shadow btn custom-btn ">Wishlist</a>
+                    </div>
+                    <div class="block">
+                        <button class="shadow btn custom-btn">Add to cart</button>
+                    </div>
+
+                    <div class="block quantity">
+                        <input type="number" class="form-control" id="cart_quantity" value="1" min="0" max="5" placeholder="Enter email" name="cart_quantity">
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+            <div class="product-details my-4">
+                <p class="details-title text-color mb-1">Product Details</p>
+                <p class="description"><%= product.description%></p>
+            </div>
+          
+                   
+            
+            
+         
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+</div>
+
+<script>
+    var holder = document.querySelector('.image-holder');
+var image = document.getElementById('image');
+var previewHolder = document.querySelector('.image-preview');
+var imagePreview = document.getElementById('image-preview');
+imagePreview.src = image.src;
+holder.addEventListener('mousemove', () => {
+    var magGlass = document.querySelector('.magnifiying-glass');
+    let left = event.clientX - holder.offsetLeft;
+    let top = event.clientY - holder.offsetTop;
+    let height = image.clientHeight;
+    let width = image.clientWidth;
+    let previewWidth = imagePreview.clientWidth;
+    let scaleValue = 2500 / previewWidth;
+    imagePreview.style.transform = 'scale(' + scaleValue + ')';
+    let magTop = top - 50;
+    let magLeft = left - 50;
+    if(magTop <= 0){
+      magTop = 0;
+    } 
+    if(magLeft <= 0){
+       magLeft = 0;
+    }
+    if(magLeft >= (width - 100)){
+      magLeft = width - 100;
+    }
+    if(magTop >= (height - 100)){
+       magTop = height - 100;
+    }
+    magGlass.style.top = magTop + 'px';
+    magGlass.style.left = magLeft + 'px';
+    let topPercentage = top / height * 100;
+    let leftPercentage = left / width * 100;
+    imagePreview.style.top = - (5 * magTop) + "px";
+    imagePreview.style.left = - (5 * magLeft) + "px";
+});
+holder.addEventListener('mouseenter', () => {
+    previewHolder.classList.remove('d-none');
+    let magGlass = document.createElement("DIV");
+    magGlass.className = 'magnifiying-glass';
+    holder.appendChild(magGlass);
+});
+holder.addEventListener('mouseleave', () => {
+    var magGlass = holder.querySelector('.magnifiying-glass');
+    previewHolder.classList.add('d-none');
+    magGlass.parentNode.removeChild(magGlass);
+    imagePreview.style.top = 0;
+    imagePreview.style.left = 0;
+});
+
+
+
+</script>
+<%- include('../layouts/user-footer.ejs') -%>

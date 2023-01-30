@@ -1,4 +1,6 @@
 const User = require('../models/userModel')
+const Category = require('../models/categoryModel')
+const Item = require('../models/itemModel')
 const bcrypt = require('bcrypt')
 
 const securePassword = async(password)=>{
@@ -24,7 +26,7 @@ const verifyLogin = async(req,res)=>{
     try {
         const email = req.body.email;
         const password = req.body.password;
-      const userData = await User.findOne({email:email});
+      const userData = await User.findOne({email:email,is_active:1});
     
     //   console.log(userData);
        
@@ -63,8 +65,14 @@ const verifyLogin = async(req,res)=>{
 const profile = async(req,res)=>{
     try {
         const userData = await User.findOne({_id:req.session.user_id})
+        const category = await Category.find({is_available:true})
+        const item = await Item.find({is_available:true}).populate('category_id');
         console.log(userData);
-        res.render('profile',{user:userData})
+        res.render('profile',{
+            user:userData,
+            categories:category,
+            items:item
+        })
         
     } catch (error) {
        console.log(error.message); 
@@ -147,6 +155,22 @@ const saveUser = async(req,res)=>{
 
 }
 
+const productDetails = async(req,res)=>{
+    try {
+        const id = req.params.id;
+        const userData = await User.findOne({_id:req.session.user_id})
+        const productDetail = await Item.findById({_id:id}).populate('category_id');
+        console.log(productDetail);
+        res.render('productdetails',{product:productDetail,user:userData})
+
+        
+    } catch (error) {
+        console.log(error.message);
+        
+    }
+
+}
+
 
 module.exports = {
     loadLogin,
@@ -155,4 +179,5 @@ module.exports = {
     logout,
     register,
     saveUser,
+    productDetails
 }
