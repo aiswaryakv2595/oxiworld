@@ -1,0 +1,165 @@
+<%- include('../layouts/admin-header.ejs') %>
+<!-- Modal -->
+<div class="modal" id="exampleModal">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content modal-content-demo">
+        <div class="modal-header">
+          <h6 class="modal-title">Add Category</h6><button aria-label="Close" class="close" data-dismiss="modal"  type="button"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <form action="/admin/loadBanners" method="post" id="form" enctype="multipart/form-data">
+           
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="banner"  placeholder="Name" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Heading 1</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="head_1"  placeholder="Heading 1" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-2 col-form-label">Heading 2</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="head_2"  placeholder="Heading 2">
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="" class="col-sm-2 col-form-label">Sub Heading</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="sub_head"  placeholder="Sub Heading">
+                </div>
+              </div>
+             
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Images</label>
+                  <div class="col-sm-10">
+                    <input type="file" name="bannerImage" class="form-control" id="formFile" multiple accept="image/*" required>
+                    
+                  </div>
+                </div>
+          
+                <% if(locals.message){%>
+                  <p class="text-danger"><%= message %></p>
+                 <%}%>
+          
+              </div>
+                <div class="modal-footer">
+                  <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+      </div>
+    </div>
+  </div>
+<div class="container">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+      <div class="my-auto">
+        <div class="d-flex">
+          <h4 class="content-title mb-0 my-auto">Banner</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Bannerlist</span>
+        </div>
+      </div>
+      <div class="d-flex my-xl-auto right-content">
+        
+        <div class="mb-xl-0">
+          <button type="button" class="btn btn-primary modal-effect" data-toggle="modal"  data-target="#exampleModal">
+            Add Banner
+           </button>
+        </div>
+      </div>
+    </div>
+    <!-- breadcrumb -->
+    <div class="row row-sm">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 grid-margin">
+          <div class="card">
+            <div class="card-header pb-0">
+              <div class="d-flex justify-content-between">
+                <h4 class="card-title mg-b-0">Banners</h4>
+                <i class="mdi mdi-dots-horizontal text-gray"></i>
+              </div>
+              
+            </div>
+            <div class="card-body">
+              <div class="table-responsive border-top userlist-table">
+                <table class="table card-table table-striped table-vcenter text-nowrap mb-0">
+                  <thead>
+                    <tr>
+                      <th class="wd-lg-8p"><span>Image</span></th>
+                      <th class="wd-lg-20p"><span>Banner</span></th>
+                      <th class="wd-lg-20p"><span>Created</span></th>
+                      <th class="wd-lg-20p"><span>Status</span></th>
+                     
+                      <th class="wd-lg-20p">Action</th>
+                    </tr>
+                  </thead>
+                  <% if(banner.length> 0){
+                     for(let i=0;i<banner.length;i++){%>
+                  <tbody>
+                    
+                    <tr>
+                      <td>
+                        <% banner[i].bannerImage.forEach((image)=>{%>
+                        <img alt="avatar" class=" avatar-md mr-2" src="/banners/<%=image%>">
+                        <%})%>
+                      </td>
+                      <td><%=banner[i].banner%></td>
+                      <td>
+                        <%= banner[i].createdAt.toDateString() %>
+                      </td>
+                      <td class="text-center">
+                       <% if(banner[i].is_active==1){%>
+                        <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
+                        <%} else{%>
+                        <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
+                        <%}%>
+                      </td>
+                      
+                      <td>
+                        <div class="d-flex flex-row">
+                     
+                        <a href="/admin/currentBanner?id=<%= banner[i]._id %>" class="btn btn-sm btn-info">
+                          <i class="las la-hand-pointer"></i>
+                        </a>
+                        <a href="/admin/editBanner?id=<%=banner[i]._id%>" class="btn btn-sm btn-info">
+                          <i class="las la-pen"></i>
+                        </a>
+                     
+                      
+                    </div>
+                      </div>
+                      </td>
+                    </tr>
+                   
+                  </tbody>
+                  <%}%>
+                  <%} %>
+                    
+                </table>
+              </div>
+              <ul class="pagination mt-4 mb-0 float-right">
+                <li class="page-item page-prev disabled">
+                  <a class="page-link" href="#" tabindex="-1">Prev</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">4</a></li>
+                <li class="page-item"><a class="page-link" href="#">5</a></li>
+                <li class="page-item page-next">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div><!-- COL END -->
+      </div>
+  
+  
+  </div>
+<%- include('../layouts/admin-footer.ejs') %>

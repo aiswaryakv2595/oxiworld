@@ -1,5 +1,5 @@
 <%-include('../layouts/admin-header.ejs')-%>
-<div id="content" class="p-4 p-md-5 pt-5 text-dark">
+
     
 <!-- Button trigger modal -->
 
@@ -26,7 +26,8 @@
               <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Images</label>
                 <div class="col-sm-10">
-                  <input type="file" name="images" class="form-control" id="formFile" accept="image/*" >
+                  <input type="file" name="image" class="form-control" id="formFile" accept="image/*" required>
+                  
                 </div>
               </div>
         
@@ -49,7 +50,7 @@
   <div class="breadcrumb-header justify-content-between">
     <div class="my-auto">
       <div class="d-flex">
-        <h4 class="content-title mb-0 my-auto">Advanced ui</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Userlist</span>
+        <h4 class="content-title mb-0 my-auto">Categories</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Category List</span>
       </div>
     </div>
     <div class="d-flex my-xl-auto right-content">
@@ -91,7 +92,7 @@
                 <% category.forEach((row,element)=>{%>
                 <tr>
                   <td>
-                    <img alt="avatar" class=" avatar-md mr-2" src="/<%=row.images%>">
+                    <img alt="avatar" class=" avatar-md mr-2" src="/uploads/<%=row.images%>">
                   </td>
                   <td><%=row.name%></td>
                   <td>
@@ -106,22 +107,13 @@
                   </td>
                   
                   <td>
-                    <div class="d-flex flex-row">
-                 
-                    <a href="/admin/editCategory/<%=row._id%>" class="btn btn-sm btn-info">
-                      <i class="las la-pen"></i>
-                    </a>
-                 
-                  <div>
-                  <form method="post">
-                  <%if(row.is_available==true){%>
-                    <input class="btn btn-sm btn-info" type="submit" value="ON" formaction="/admin/deletecategory/<%=row._id%>">
-                    <%}else {%>
-                    <input class="btn btn-sm btn-danger" type="submit" value="OFF" formaction="/admin/showcategory/<%=row._id%>">
-                    <%}%>
-                  </form>
-                </div>
-                  </div>
+                    
+                   
+                  <input class="check-box mr-2" type="checkbox" data-id="<%=row._id%>" <%if(row.is_available==1){%>checked="checked"<%}%> >
+                  <a href="/admin/editCategory/<%=row._id%>" class="btn btn-sm btn-info">
+                    <i class="las la-pen"></i>
+                  </a>
+               
                   </td>
                 </tr>
                 <%})%>
@@ -166,6 +158,17 @@
 }
 
      </script>
+     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+     <script>
+      $(function () {
+          $('.check-box').click(function(event) {
+           let id = $(this).attr("data-id")
+           console.log(id);
+           let url = "/admin/togglecategory/"+id;
+           window.location.href = url;
+        });
+      });
+  </script>
    
 
 <%-include("../layouts/admin-footer.ejs")-%>

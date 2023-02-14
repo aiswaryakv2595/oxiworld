@@ -1,0 +1,120 @@
+<%-include('../layouts/admin-header.ejs')-%>
+ 
+   
+    <!-- breadcrumb -->
+    <div class="container">
+      <% if(locals.message) { %>
+        <p><%= message%></p>
+        <%}%>
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Pages</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Edit-Profile</span>
+      </div>
+    </div>
+   
+  </div>
+  <!-- breadcrumb -->
+    <!-- row -->
+  <div class="row row-sm">
+ 
+    <!-- Col -->
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+         
+          <form class="form-horizontal" action="/admin/updateBanner" method="post" id="form" enctype="multipart/form-data">
+            <input type="hidden" value="<%= banner._id %>" name="id">
+            <div class="form-group ">
+             
+            </div>
+            
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Name</label>
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  placeholder="User Name" value="<%= banner.banner%>" name="banner">
+                </div>
+              </div>
+            </div>
+            <%if(content){
+              content.forEach((row,element)=>{%>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Heading 1</label>
+                </div>
+                <div class="col-md-9">
+                  
+                  <input type="text" class="form-control"  placeholder="Heading 1" value="<%= row.head_1%>" name="head_1">
+                </div>
+              </div>
+            </div>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Heading 2</label>
+                </div>
+                <div class="col-md-9">
+                  
+                  <input type="text" class="form-control"  placeholder="Heading 2" value="<%= row.head_2%>" name="head_2">
+                </div>
+              </div>
+            </div>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Sub Heading </label>
+                </div>
+                <div class="col-md-9">
+                  
+                  <input type="text" class="form-control"  placeholder="Sub Heading " value="<%= row.sub_head%>" name="sub_head">
+                </div>
+              </div>
+            </div>
+            <%})%>
+            <%}%>
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Image</label>
+                </div>
+                <div class="col-md-9">
+                 
+                   <% bannerImage.forEach((image)=>{%>
+                    <img src="/banners/<%= image %>" width="300"  class="img-thumbnail">
+                   
+                    
+                   <%})%>
+                   <input type="hidden" name="old_image" value="<%=banner.bannerImage %>">
+                   
+                    <input type="file" name="BannerImage" multiple class="form-control" id="formFile" accept="image/*" >
+                </div>
+              </div>
+            </div>
+
+          
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary waves-effect waves-light"> Update </button>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+    <!-- /Col -->
+  </div>
+  <!-- row closed -->
+  </div>
+  
+  <script>
+    function checker() {
+      if (window.alert("Category Updated !!")) {
+        document.getElementById("form").submit();
+        return
+      }
+    }
+  </script>
+  <%-include("../layouts/admin-footer.ejs")-%>

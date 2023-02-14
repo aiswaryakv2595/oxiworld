@@ -1,0 +1,120 @@
+<%-include('../layouts/admin-header.ejs')-%>
+ 
+    <!-- breadcrumb -->
+    <div class="container">
+      <% if(locals.message) { %>
+        <p><%= message%></p>
+        <%}%>
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Coupon</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Edit-Coupon</span>
+      </div>
+    </div>
+   
+  </div>
+  <!-- breadcrumb -->
+    <!-- row -->
+  <div class="row row-sm">
+ 
+    <!-- Col -->
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+         
+          <form class="form-horizontal" action="/admin/updateCoupon" method="post" id="form">
+            
+              <input type="hidden" value="<%= coupon._id %>" name="id">
+         
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Name</label>
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  placeholder="User Name" value="<%= coupon.name%>" name="name">
+                </div>
+              </div>
+            </div>
+            <div class="form-group ">
+                <div class="row">
+                  <div class="col-md-3">
+                    <label class="form-label"> Description</label>
+                  </div>
+                  <div class="col-md-9">
+                    <textarea name="description"class="form-control" id="" cols="10" rows="3"><%= coupon.description%></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-md-3">
+                    <label class="form-label"> Enter Discount Type</label>
+                  </div>
+                  <div class="col-md-9">
+                    <select class="form-control select-search select" name="discount_type" required>
+                        <option value="AMOUNT" class="text-capitalize" <%if(coupon.discount_type == "AMOUNT") {%> selected="selected"<%}%> >
+                        Fixed Amount Discount
+                        </option>
+                        <option value="PERCENTAGE" class="text-capitalize" <%if(coupon.discount_type == "PERCENTAGE") {%> selected="selected" <%}%>>
+                        Percentage Discount
+                        </option>
+                        </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group ">
+                <div class="row">
+                  <div class="col-md-3">
+                    <label class="form-label">Enter Discount</label>
+                  </div>
+                  <div class="col-md-9">
+                    <input type="text" class="form-control"  placeholder="User Name" value="<%= coupon.discount%>" name="discount">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group ">
+                <div class="row">
+                  <div class="col-md-3">
+                    <label class="form-label"> Enter Minimum Value</label>
+                  </div>
+                  <div class="col-md-9">
+                    <input type="text" class="form-control"  placeholder="User Name" value="<%= coupon.min_value%>" name="min_value">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group ">
+                <div class="row">
+                  <div class="col-md-3">
+                    <label class="form-label"> Enter Maximum Discount</label>
+                  </div>
+                  <div class="col-md-9">
+                    <input type="text" class="form-control"  placeholder="User Name" value="<%= coupon.max_discount%>" name="max_discount">
+                  </div>
+                </div>
+              </div>
+
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary waves-effect waves-light"> Update </button>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+    <!-- /Col -->
+  </div>
+  <!-- row closed -->
+  </div>
+  
+  <script>
+    function checker() {
+      if (window.alert("Category Updated !!")) {
+        document.getElementById("form").submit();
+        return
+      }
+    }
+  </script>
+  <%-include("../layouts/admin-footer.ejs")-%>

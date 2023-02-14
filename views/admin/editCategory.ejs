@@ -23,7 +23,7 @@
       <div class="card">
         <div class="card-body">
          
-          <form class="form-horizontal" action="/admin/updateCategory" method="post" id="form">
+          <form class="form-horizontal" action="/admin/updateCategory" method="post" id="form" enctype="multipart/form-data">
             <input type="hidden" value="<%= category._id %>" name="catid">
             <div class="form-group ">
              
@@ -46,10 +46,10 @@
                 </div>
                 <div class="col-md-9">
                   <% if(category.images){%>
-                    <img src="/<%= category.images%>" width="100" class="img-thumbnail">
+                    <img src="/uploads/<%= category.images%>" width="100" class="img-thumbnail">
                     <%}%>
                     <input type="hidden" name="old_image" value="<%= category.images%>">
-                    <input type="file" class="form-control" id="images" name="images">
+                    <input type="file" name="image" class="form-control" id="formFile" accept="image/*" >
                 </div>
               </div>
             </div>

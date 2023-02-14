@@ -31,7 +31,8 @@
             <div class="form-group row">
               <label for="inputPassword3" class="col-sm-2 col-form-label">Category</label>
               <div class="col-sm-10">
-                <select class="form-control" name="category" aria-label="Default select example">
+              
+                <select class="form-control" name="category" id="category-select" aria-label="Default select example">
                   <option selected>--Select--</option>
                   <% category.forEach(cate=>{ %>
                   <option value="<%= cate._id%>"><%= cate.name %></option>
@@ -39,35 +40,18 @@
                 </select>
               </div>
             </div>
-            <div class="form-group row">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Size</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" name="size" placeholder="Category" required>
-              </div>
-            </div>
-            <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
-                <div class="col-sm-10">
-                  <input type="text" name="color" class="form-control" placeholder="Color" >
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
-                <div class="col-sm-10">
-                  <input type="text" name="material" class="form-control" placeholder="Material" >
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
-                <div class="col-sm-10">
-                  <input type="text" name="material_type" class="form-control" placeholder="Material Type" >
-                </div>
-              </div>
+           
 
               <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Brand </label>
                 <div class="col-sm-10">
-                  <input type="text" name="brand" class="form-control" placeholder="Brand" >
+
+                  <select id="brand-select" name="brand_id" class="form-control">
+                    <% filter.forEach(function(brand) { %>
+                      <option value="<%= brand._id %>"><%= brand.name %></option>
+                    <% }) %>
+                  </select>
+                
                 </div>
               </div>
               
@@ -79,6 +63,26 @@
                 </div>
               </div>
               <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
+                <div class="col-sm-10">
+                  <select id="brand-material" name="material" class="form-control">
+                    <% filter.forEach(function(brand) { %>
+                      <option value="<%= brand.material %>"><%= brand.material %></option>
+                    <% }) %>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
+                <div class="col-sm-10">
+                  <select id="brand-materialtype" name="material_type" class="form-control">
+                    <% filter.forEach(function(brand) { %>
+                      <option value="<%= brand.material_type %>"><%= brand.material_type %></option>
+                    <% }) %>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Description</label>
                 <div class="col-sm-10">
                   <textarea name="description" class="form-control" id="" cols="30" rows="5" style="white-space: pre-wrap;"></textarea>
@@ -87,7 +91,7 @@
               <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Images</label>
                 <div class="col-sm-10">
-                  <input type="file" name="images" class="form-control" id="formFile" multiple >
+                  <input type="file" name="images" class="form-control" id="formFile" accept="image/*" multiple >
                 </div>
               </div>
         
@@ -96,7 +100,7 @@
                <%}%>
                <div class="modal-footer">
                 <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                <button type="submit" id="submit" class="btn btn-primary">Save changes</button>
               </div>
             </form>
       </div>
@@ -146,18 +150,19 @@
                 </tr>
               </thead>
               <tbody>
-                <% item.forEach((row,element)=>{%>
+                <% if( item.length> 0){ %>
+                  <% for(let i=0;i < item.length; i++){ %>
                 <tr>
                   <td>
-                    <img alt="avatar" class=" avatar-md mr-2" src="/<%=row.images[0]%>">
+                    <img alt="avatar" class=" avatar-md mr-2" src="products/<%=item[i].images[0]%>">
                   </td>
-                  <td><%=row.name%></td>
+                  <td><%=item[i].name%></td>
                   <td>
-                    <%= row.category_id.name %>
+                    <%= item[i].category_id.name %>
                   </td>
-                  <td><%=row.price%></td>
+                  <td><%=item[i].price%></td>
                   <td class="text-center">
-                   <% if(row.is_available==true){%>
+                   <% if(item[i].is_available==true){%>
                     <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
                     <%} else{%>
                     <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
@@ -165,19 +170,19 @@
                   </td>
                   
                   <td>
-                    <div class="d-flex">
-                   <div>
-                    <a href="/admin/edit_item/<%=row._id%>" class="btn btn-sm btn-info">
-                      <i class="las la-pen"></i>
-                    </a>
-                  </div>
-                  <div  class="main-toggle main-toggle-success on">
-                    <span></span>
-                 </div>
-                </div>
+                      <input class="check-box mr-2" type="checkbox" data-id="<%=item[i]._id%>" <%if(item[i].is_available==1){%>checked="checked"<%}%> >
+                      <a href="/admin/edit_item/<%=item[i]._id%>" class="btn btn-sm btn-info">
+                        <i class="las la-pen"></i>
+                      </a>
+                   
+                    
                   </td>
                 </tr>
-                <%})%>
+                <% }} else { %>
+                  <tr>
+                      <td colspan="5">Item Not Found</td>
+                  </tr>
+                  <% } %>
               </tbody>
             </table>
           </div>
@@ -217,5 +222,78 @@ function checker(){
     return;
   }
 }
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script>
+  $(function () {
+      $('.check-box').click(function(event) {
+       let id = $(this).attr("data-id")
+       console.log(id);
+       let url = "/admin/toggleitem/"+id;
+       window.location.href = url;
+    });
+    $('#category').change(function() {
+  var val = $(this).val(); 
+
+})
+  });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#category-select").change(function() {
+      var selectedCategory = $(this).val();
+      $.ajax({
+        type: "POST",
+        url: "/admin/brands",
+        data: { category: selectedCategory },
+        success: function(brands) {
+          $("#brand-select").empty();
+         
+          $.each(brands, function(i, brand) {
+            $("#brand-select").append(
+              $("<option></option>").val(brand._id).text(brand.name)
+            );
+          
+          });
+         
+        }
+      });
+    });
+   
+    $("#brand-select").change(function() {
+      var selectedbrand = $(this).val();
+      $.ajax({
+        type: "POST",
+        url: "/admin/brandsDetails",
+        data: { brand_id: selectedbrand },
+        success: function(brands) {
+         
+          $("#brand-material").empty();
+          $("#brand-materialtype").empty();
+          $.each(brands, function(i, brand) {
+           
+            brands.forEach(brand => {
+            brand.material.forEach(material => {
+           $("#brand-material").append(
+            $("<option></option>").val(material).text(material)
+             );
+              });
+            });
+
+            brands.forEach(brand => {
+            brand.material_type.forEach(material_type => {
+           $("#brand-materialtype").append(
+            $("<option></option>").val(material_type).text(material_type)
+             );
+              });
+            });
+          });
+         
+        }
+      });
+    });
+  });
+ 
 </script>
 <%-include("../layouts/admin-footer.ejs")-%>

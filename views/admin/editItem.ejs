@@ -1,4 +1,17 @@
 <%-include('../layouts/admin-header.ejs')-%>
+<style>
+  .img-wrap {
+    position: relative;
+    
+}
+.img-wrap .close {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 100;
+   
+}
+</style>
   <div class="container">
     <% if(locals.message) { %>
     <p><%= message%></p>
@@ -9,7 +22,7 @@
           <h5 class="card-title">Edit Item</h5>
           <form method="post" action="/admin/updateitem/<%= item._id %>" id="form" enctype="multipart/form-data">
             <div class="form-group row">
-                <input type="hidden" name="id" value="<%= item._id %>">
+                <input type="hidden" id="itemId" name="id" value="<%= item._id %>">
                 <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
                 <div class="col-sm-10">
                   <input type="text" class="form-control" name="name"  placeholder="Name" value="<%= item.name%>" >
@@ -39,34 +52,16 @@
                     <input type="number" name="price" class="form-control" placeholder="Price" value="<%= item.price%>" >
                   </div>
                 </div>
-                <div class="form-group row">
-                  <label for="inputPassword3" class="col-sm-2 col-form-label">Size</label>
-                  <div class="col-sm-10">
-                    <input type="number" name="size" class="form-control" placeholder="Size" value="<%= item.size%>" >
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
-                  <div class="col-sm-10">
-                    <input type="text" name="color" class="form-control" placeholder="Color" value="<%=item.color%>" >
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
-                  <div class="col-sm-10">
-                    <input type="text" name="material" class="form-control" placeholder="Material" value="<%= item.material%>" >
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
-                  <div class="col-sm-10">
-                    <input type="text" name="material_type" class="form-control" placeholder="Material Type" value="<%= item.material_type%>" >
-                  </div>
-                </div>
+                              
                 <div class="form-group row">
                   <label for="inputPassword3" class="col-sm-2 col-form-label">Brand Name</label>
                   <div class="col-sm-10">
-                    <input type="text" name="brand" class="form-control" placeholder="Brand Name" value="<%= item.brand%>" >
+                    <select class="form-control" name="brand_id" aria-label="Default select example">
+                    
+                        <% filter.forEach(filterOne=>{ %>
+                          <option <% if(filterOne._id ==  item.brand_id ) selected %> value="<%= filterOne._id%>"><%= filterOne.name %></option>
+                       <% }) %>
+                    </select>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -83,12 +78,17 @@
                      
                       <% item.images.forEach((image)=> {%>
                         <div class="card-image-col col-3 p-1">
-                            <span class="close"></span> 
-                            <img class="card-image" src="/<%=image %>" alt="">
+                          <div class="img-wrap">
+                
+                             <button class="close " data-img="<%=image %>" data-id="<%=item._id%>">
+                              &times;</button> 
+                            <img class="card-image" src="/products/<%=image %>" alt="">
+                            <input type="hidden" name="old_image" value="<%= image%>">
+                          </div>
                         </div>
                         <%}) %>
                         
-                          <input type="hidden" name="old_image" value="<%= item.images%>">
+                       
                           <input type="file" class="form-control" id="images" name="images" multiple>
                     </div>
                   </div>
@@ -107,4 +107,17 @@
       }
     }
   </script> -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    $(function () {
+        $('.close').click(function(event) {
+         let id = $('#itemId').val()
+         console.log(id);
+         let image = $(this).data(img)
+         console.log(image);
+         let url = "/admin/delete-image/?id="+id+"&image="+image;
+         window.location.href = url;
+      });
+    });
+</script>
   <%-include("../layouts/admin-footer.ejs")-%>

@@ -1,0 +1,28 @@
+<%-include('../layouts/header')-%>
+<div class="container">
+    <%
+    if(typeof message !== 'undefined'){
+      %> 
+      <p style="color: red;"> <%= message %></p>
+      <%
+    }
+    %>
+    <div class="vh-100 d-flex justify-content-center align-items-center ">
+      <div class="col-md-5 p-5 shadow-sm border rounded-5 border-primary bg-white">
+          <h2 class="text-center mb-4 text-primary">Forgot Password</h2>
+          <form method="post" action="/forget">
+              <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Phone</label>
+                  <input type="text" name="phone" class="form-control border border-primary" aria-describedby="emailHelp">
+              </div>
+             
+              <div class="d-grid">
+                  <button class="btn btn-primary" type="submit">Send Reset Link</button>
+              </div>
+          </form>
+         
+      </div>
+  </div>
+</div>
+
+<%-include("../layouts/footer.ejs")-%>

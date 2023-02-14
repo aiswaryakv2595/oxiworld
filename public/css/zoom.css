@@ -1,0 +1,41 @@
+.image-holder{
+    width: 500px;
+    position: relative;
+    cursor: pointer;
+}
+.image-holder >img{
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+  
+  .image-preview{
+    width: 500px;
+    height: 500px;
+    overflow: hidden;
+    position: relative;
+  }
+  .image-preview >img{
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scale(2);
+      transform-origin: left top;
+    }
+  
+  .d-none{
+    display: none !important;
+  }
+  .magnifiying-glass{
+    width: 100px;
+    height: 100px;
+    border: 1px dashed black;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.2);
+  }
+  figure{
+    display: inline-block;
+    vertical-align: top;
+  }

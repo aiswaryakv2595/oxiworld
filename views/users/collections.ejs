@@ -1,0 +1,165 @@
+<%-include('../layouts/user-header.ejs')-%>
+<div class="breadcrumbs">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <p class="bread"><span><a href="index.html">Home</a></span> / <span>Items</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="colorlib-product">
+  <div class="container">
+   
+    <div class="row">
+      <div class="col-lg-3 col-xl-3">
+        <div class="row">
+          
+          <div class="col-sm-12">
+            <div class="side border mb-1">
+              <h3>Categories</h3>
+              <ul>
+                <% categories.forEach((row)=>{%>
+                <li><a href="/filter?category=<%= row._id%>"><%= row.name %></a></li>
+                <%})%>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="side border mb-1">
+              <h3>Size/Width</h3>
+              <div class="block-26 mb-2">
+                <h4>Size</h4>
+                     <ul>
+                      <% size.forEach((row)=>{%>
+                       
+                        <li><a href="#"><%= row %></a></li>
+                        <%})%>
+                        
+                       
+                     </ul>
+                  </div>
+                  
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="side border mb-1">
+              <h3>Price</h3>
+              <form action="" method="post">
+              <div class="row">
+                <div class="col-sm-6">
+                  <input type="text" class="mx-2 form-control input-sm">
+                </div>
+                <div class="col-sm-6">
+                  <input type="text" class="form-control input-sm">
+                </div>
+              </div>
+              <div>
+                <input type="button" value="Check" class="btn btn-primary mt-2">
+              </div>
+            </form>
+              
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="side border mb-1">
+              <h3>Colors</h3>
+              <ul>
+                <% color.forEach((row)=>{%>
+                  <li><a href="/filter?material=<%= row %>"><%= row %></a></li>
+                  <%})%>
+               
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="side border mb-1">
+              <h3>Material</h3>
+              <ul>
+                <%allProducts.forEach((row)=>{%>
+                  <li><a href="/filter?material=<%= row.material %>"><%= row.material %></a></li>
+                  <%})%>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="side border mb-1">
+              <h3>Material Type</h3>
+              <ul>
+                <%allProducts.forEach((row)=>{%>
+                  <li><a href="/filter?materialtype=<%= row.material_type %>"><%=row.material_type%></a></li>
+                  <%})%>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9 col-xl-9">
+        <div class="d-flex">
+          <div class="mb-2 p-2"><span>Sort By </span></div>
+          <div class="mb-2 p-2"><a href="/sort-decending">Price--High to Low</a></div>
+          <div class="mb-2 p-2"><a href="/sort-ascending">Price--Low to High</a></div>
+          
+          <form>
+              <div class="input-group d-flex">
+               
+                <input type="search" id="search" name="search" class="form-control rounded bg-light" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                <button type="button" class="btn btn-outline-primary btn-search">search</button>
+              
+              </div>
+            </form>
+            
+          
+          
+        </div>
+        <div class="row row-pb-md">
+          <% products.forEach((row,element)=>{%>
+          <div class="col-lg-4 mb-4 text-center">
+            <div class="product-entry border">
+              <a href="/productdetails/<%=row._id%>" class="prod-img">
+                <img src="/products/<%=row.images[0]%>" class="img-fluid" alt="Free html5 bootstrap 4 template">
+              </a>
+              <div class="desc">
+                <h2><a href="#"><%=row.name%></a></h2>
+                <span class="price"><%=row.price%></span>
+              </div>
+            </div>
+          </div>
+          <%})%>
+          <div class="w-100"></div>
+       
+        
+          
+         
+        </div>
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <div class="block-27">
+                   <ul>
+                     <li><a href="#"><i class="ion-ios-arrow-back"></i></a></li>
+                      <li class="active"><span>1</span></li>
+                      <li><a href="#">2</a></li>
+                      <li><a href="#">3</a></li>
+                      <li><a href="#">4</a></li>
+                      <li><a href="#">5</a></li>
+                      <li><a href="#"><i class="ion-ios-arrow-forward"></i></a></li>
+                   </ul>
+                </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+  $(function () {
+      $('.btn-search').click(function(event) {
+       let search = $('#search').val()
+       
+       let url = "/filter?search="+search;
+       window.location.href = url;
+    });
+  });
+</script>
+<%-include("../layouts/user-footer.ejs")-%>

@@ -1,0 +1,208 @@
+<%- include('../layouts/admin-header.ejs') %>
+
+<div class="modal" id="exampleModal">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content modal-content-demo">
+        <div class="modal-header">
+          <h6 class="modal-title">Add Coupon</h6><button aria-label="Close" class="close" data-dismiss="modal"  type="button"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <form action="/admin/admin-coupon" method="post" id="form">
+           
+            <div class="d-flex flex-row align-items-center mb-4">
+                <div class="form-outline flex-fill mb-0">
+                    <div class="form-group row">
+                      <label class="col-sm-3 col-form-label" for="form3Example3c">Enter New
+                        Coupon</label>
+                        <div class="col-sm-9">
+                    <input type="text" id="form3Example3c" class="form-control" name="name"
+                        required />
+                    </div>
+                 </div>
+                 <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="form3Example3c">Description</label>
+                        <div class="col-sm-9">
+                        <textarea name="description" id="" class="form-control" cols="10" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="form3Example3c">Enter Discount Type</label>
+                    <div class="col-sm-9">
+                    <select onchange="changeFn()" class="form-control select-search" id="type" name="discount_type" required>
+                        <option value="AMOUNT" class="text-capitalize">
+                            Fixed Amount Discount
+                        </option>
+                        <option value="PERCENTAGE" class="text-capitalize">
+                            Percentage Discount
+                        </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" id="discount_label" for="form3Example3c">Enter Discount</label>
+                    <div class="col-sm-9">
+                    <input type="number" id="form3Example3c" class="form-control"
+                        name="discount" required />
+                    </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="form3Example3c">Enter Minimum Value</label>
+                        <div class="col-sm-9">
+                    <input type="number" id="form3Example3c" class="form-control"
+                        name="min_value" required />
+                    </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-sm-3 col-form-label" for="form3Example3c">Enter Maximum Discount</label>
+                        <div class="col-sm-9">
+                        <input type="number" id="form3Example3c" class="form-control"
+                            name="max_discount" required />
+                        </div>
+                        </div>
+                </div>
+            </div>
+          
+                <% if(locals.message){%>
+                  <p class="text-danger"><%= message %></p>
+                 <%}%>
+          
+              </div>
+                <div class="modal-footer">
+                  <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+      </div>
+    </div>
+  </div>
+<div class="container">
+
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+      <div class="my-auto">
+        <div class="d-flex">
+          <h4 class="content-title mb-0 my-auto">Coupons</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Coupon List</span>
+        </div>
+      </div>
+      <div class="d-flex my-xl-auto right-content">
+        
+        <div class="mb-xl-0">
+          <button type="button" class="btn btn-primary modal-effect" data-toggle="modal"  data-target="#exampleModal">
+            Add Coupon
+           </button>
+        </div>
+      </div>
+    </div>
+    <!-- breadcrumb -->
+    <div class="container-fluid">
+        <!-- ============================================================== -->
+        <!-- Start Page Content -->
+        <!-- ============================================================== -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Coupons</h4>
+                        <!-- <h6 class="card-subtitle">Add <code>.table-hover</code> to enable a hover state on table
+                            rows within a <code>&lt;tbody&gt;</code>.</h6> -->
+
+                        <div class="table-responsive border-top userlist-table">
+                            <table class="table card-table table-striped table-vcenter text-nowrap mb-0 " style="table-layout: fixed;">
+                                <thead>
+                                    <tr>
+                                        <th class="wd-lg-20p"> <span>SI NO</span> </th>
+                                        <th class="wd-lg-20p"><span>Coupon Name</span> </th>
+                                        <th class="wd-lg-20p"><span>Coupon Type</span></th>
+                                        <th class="wd-lg-20p"><span>Discount</span> </th>
+                                        <th class="wd-lg-20p"><span>Status</span> </th>
+                                        <th class="wd-lg-20p"><span>Action</span> </th>
+                                       
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if( coupon.length> 0){ %>
+                                        <% for(let i=1;i <=coupon.length; i++){ %>
+                                            <tr>
+                                                <td>
+                                                    <%= i %>
+                                                </td>
+                                                <td>
+                                                    <%= coupon[i-1].name %>
+                                                </td>
+                                                <td>
+                                                    <%= coupon[i-1].discount_type %>
+                                                </td>
+                                                
+                                                <td>
+                                                    <% if(coupon[i-1].discount_type == 'PERCENTAGE'){%>
+                                                    <%= coupon[i-1].discount %>%
+                                                    <%} else{%>
+                                                        <%= coupon[i-1].discount %>
+                                                        <%}%>
+                                                </td>
+                                                <td>
+                                                    <% if(coupon[i-1].isAvailable==1){%>
+                                                        
+                                                        <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
+                                                        
+                                                     <%} else{%>
+                                                        
+                                                        <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
+                                                        
+                                                     <%}%>
+                                                </td>
+
+                                                <td>
+                                                     <input class="check-box mr-2" type="checkbox" data-id="<%=coupon[i-1]._id%>" <%if(coupon[i-1].isAvailable==1){%>checked="checked"<%}%> >
+                            
+                                                            <a href="/admin/edit-coupon/<%=coupon[i-1]._id%>" class="btn btn-sm btn-info">
+                                                                <i class="las la-pen"></i>
+                                                              </a>  
+    
+                                                </td>
+                                            </tr>
+                                            <% }} else { %>
+                                                <tr>
+                                                    <td colspan="5">Category Not Found</td>
+                                                </tr>
+                                                <% } %>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+    </div>
+    </div>
+    <script>
+        function changeFn(){
+        let type = document.getElementById('type');
+        let discount_label = document.getElementById('discount_label')
+
+        
+            if(type.value== 'PERCENTAGE'){
+            discount_label.innerText = 'Enter Discount Percentage'
+            }
+            else{
+                discount_label.innerText = 'Enter Discount'
+            }
+    }
+    </script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <script>
+        $(function () {
+            $('.check-box').click(function(event) {
+             let id = $(this).attr("data-id")
+             console.log(id);
+             let url = "/admin/togglecoupon/"+id;
+             window.location.href = url;
+          });
+        });
+    </script>
+<%- include('../layouts/admin-footer.ejs') %>

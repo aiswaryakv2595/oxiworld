@@ -21,43 +21,33 @@ const itemSchema = new mongoose.Schema({
       required: true,
       ref: 'Category'
      },
-     size: {
-      type: String,
-      required: true
-    },
-    color: {
-        type: String,
-        required: true
-     },
-
-    material: {
-       type: String,
-       required: true
-    },
-    material_type: {
-        type: String,
-        required: true
-     },
-     brand: {
-        type: String,
-        required: true
+    
+     brand_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Filter'
      },
 
     price: {
        type: Number,
        required: true
     },
-   
+    material: {
+      type: String,
+      required: true
+   },
+   material_type: {
+      type: String,
+      required: true
+   },
     is_available: {
       type: Boolean,
       default:true
    },
-    images: [
-      {
-      type: String,
-      required:true
+   images: {
+      type:Array,
+      required: true
     },
-   ],
     
     },
     

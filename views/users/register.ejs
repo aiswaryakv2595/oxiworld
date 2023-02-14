@@ -1,8 +1,8 @@
 <%-include('../layouts/header')-%>
 <div class="container">
   
-    <div class="d-flex justify-content-center">
-    <div class="card mt-3 w-75 ">
+  <div class="vh-100 d-flex justify-content-center align-items-center ">
+    <div class="col-md-5 p-5 shadow-sm border rounded-5 border-primary bg-white">
    
             <div class="card-body">
               <h5 class="card-title">Register</h5>
@@ -24,7 +24,16 @@
                   <div class="mb-3 row">
                     <label for="inputPassword" class="col-sm-3 col-form-label">Phone</label>
                     <div class="col-sm-9">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <select  name="country_code" class="form-control" id="">
+                            <%country_code.forEach((row,element)=>{%>
+                              <option value="<%=row.dial_code%>"><%=row.dial_code%> <%=row.name%></option>
+                              <%})%>
+                          </select>
+                        </div>
                       <input type="text" name="phone" class="form-control" id="phone" >
+                      </div>
                     </div>
                   </div>
                   <div class="mb-3 row">
@@ -60,6 +69,7 @@
                   <% if(locals.message){%>
                   <p class="text-danger"><%= message %></p>
                  <%}%>
+                 
                 <button type="submit" class="btn btn-primary" onclick="onSubmitFunction()">Submit</button>
               <p id="error"></p>
                       
@@ -71,8 +81,9 @@
     </div>
 </div>
 <script>
-  function onSubmitFunction(){
+ 
 
+  function onSubmitFunction(){
 const names = document.getElementById('name');
 const email = document.getElementById('email');
 const phone = document.getElementById('phone');
@@ -115,12 +126,10 @@ var messageHtml = "";
 errorMsg.forEach(function (message) {
     messageHtml += "<li style='color:red'>" + message + "</li>";
 });
-
 if(errorMsg.length > 0){
     
 document.getElementById("error").innerHTML = messageHtml;
 return false
-
 }
 if(errorMsg.length ==0){
 return true

@@ -1,0 +1,161 @@
+<%-include('../layouts/user-header.ejs')-%>
+<div id="page">
+   
+
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <p class="bread"><span><a href="index.html">Home</a></span> / <span>Shopping Cart</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="colorlib-product">
+        <div class="container">
+            <div class="row row-pb-lg">
+                <div class="col-md-10 offset-md-1">
+                    <div class="process-wrap">
+                        <div class="process text-center active">
+                            <p><span>01</span></p>
+                            <h3>Shopping Cart</h3>
+                        </div>
+                        <div class="process text-center">
+                            <p><span>02</span></p>
+                            <h3>Checkout</h3>
+                        </div>
+                        <div class="process text-center">
+                            <p><span>03</span></p>
+                            <h3>Order Complete</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-pb-lg">
+                <div class="col-md-12">
+                    <div class="product-name d-flex">
+                        <div class="one-forth text-left px-4">
+                            <span>Product Details</span>
+                        </div>
+                        <div class="one-eight text-center">
+                            <span>Price</span>
+                        </div>
+                        <div class="one-eight text-center">
+                            <span>Quantity</span>
+                        </div>
+                        <div class="one-eight text-center">
+                            <span>Total</span>
+                        </div>
+                        <div class="one-eight text-center px-4">
+                            <span>Remove</span>
+                        </div>
+                    </div>
+                    <% if(cartProducts){%>
+                        <% for(let key of cartProducts.item){%>
+                    <div class="product-cart d-flex">
+                        <div class="one-forth">
+                            <div class="product-img" style="background-image: url('/products/key.productId.images[0]');">
+                            </div>
+                            <div class="display-tc">
+                                <h3><%= key.productId.name %></h3>
+                            </div>
+                        </div>
+                        <div class="one-eight text-center">
+                            <div class="display-tc">
+                                <span class="price"> &#8377; <%= key.productId.price %></span>
+                            </div>
+                        </div>
+                        <div class="one-eight text-center">
+                            <div class="display-tc ">
+                               
+                                <input type="number" id="quantity" name="qty" class="form-control input-number text-center qty" value="<%= key.qty %>" min="1" max="<%= key.productId.quantity %>">
+                                
+                            </div>
+                        </div>
+                        <div class="one-eight text-center">
+                            <div class="display-tc">
+                                <span class="price">&#8377; <%= key.qty * key.productId.price %></span>
+                            </div>
+                        </div>
+                        <div class="one-eight text-center">
+                            <div class="display-tc">
+                                <a href="/removeItem?id=<%= key.productId._id %>" class="closed"></a>
+                            </div>
+                        </div>
+                    </div>
+                    <%}}%>
+                </div>
+            </div>
+            <div class="row row-pb-lg">
+                <div class="col-md-12">
+                    <div class="total-wrap">
+                       
+                           
+                            <div class="col-sm-4 text-center">
+                                <div class="total">
+                                    <%if(user._id){%>
+                                    <div class="sub">
+                                        <p><span>Subtotal:</span> <span id="totalCart"><%=cartProducts.totalprice%></span></p>
+                                        <p><span>Delivery:</span> <span>45</span></p>
+                                        
+                                    </div>
+                                    <%}%>
+                                    <div class="grand-total">
+                                        <p><span><strong>Total:</strong></span> <span id="totalart"><%=cartProducts.totalprice + 45%></span></p>
+                                    </div>
+                                </div>
+                                <form action="#">
+                                    <div class="row form-group">
+                                       
+                                        <div class="col-sm-3">
+                                            <input type="submit" value="Proceed to Checkout" class="btn btn-primary">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+   ]
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+
+    const qty = document.querySelectorAll('.qty')	
+    console.log(qty);	   
+  const qtyHandler = async(e)=>{
+  try {
+  const productId = e.target.parentElement.children[0].value
+  const data = {qty:e.target.value}
+  console.log(data);
+    const response = await fetch(`/editcart?id=${productId}`,{
+   method:'post',
+   headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(data)
+    })
+    const value = await response.json()
+  
+   document.querySelector('#totalCart','#totalart').innerText = value.totalprice
+    // document.querySelector('#tottaloff').innerText = value.totalPrice
+   e.target.parentElement.parentElement.nextElementSibling.innerText = value.price * e.target.value
+  } catch (error) {
+  console.log(error.message);
+  }
+  }
+  qty.forEach(q =>{
+  q.addEventListener('change',qtyHandler)
+  })
+  
+  
+   </script>
+
+<%-include("../layouts/user-footer.ejs")-%>

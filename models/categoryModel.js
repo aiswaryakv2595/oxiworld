@@ -12,14 +12,12 @@ const categorySchema = new mongoose.Schema({
       type: Boolean,
       default:true
    },
-    images:[ 
+    images:
       {
       type: String,
       required:true
     },
-   ],
    
-    
     }, {
     timestamps: true
     })
