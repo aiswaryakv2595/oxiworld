@@ -1,0 +1,266 @@
+<%-include('../layouts/user-header.ejs')-%>
+
+    <div class="colorlib-product">
+        <div class="container">
+            <div class="row row-pb-lg">
+                <div class="col-sm-10 offset-md-1">
+                    <div class="process-wrap">
+                        <div class="process text-center active">
+                            <p><span>01</span></p>
+                            <h3>Shopping Cart</h3>
+                        </div>
+                        <div class="process text-center active">
+                            <p><span>02</span></p>
+                            <h3>Checkout</h3>
+                        </div>
+                        <div class="process text-center">
+                            <p><span>03</span></p>
+                            <h3>Order Complete</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="row">
+             
+                <div class="col-lg-8">
+                    <div class="row">
+                        <h2>Shipping Address</h2>
+                       
+                            <div class="col-md-12">
+                                <% for (let i = 0; i < address.length; i++) { %>
+                                <div class="cart-detail">
+                                    <label>
+                                        <input type="radio" name="address" value="<%= address[i]._id %>"
+                                        class="address-radio" required>
+                                       
+                                        <%= address[i].name %><br>
+                                        <%= address[i].address %><br>
+                                       
+                                        <%= address[i].city %>, <%= address[i].state %> <%= address[i].zip %><br>
+                                        <%= address[i].country %>
+                                      </label>
+                                      
+                                </div>
+                                <% } %>
+                               
+                           </div>
+                          
+                           <div class="w-100"></div>
+                           <div class="col-lg-8">
+                           
+                                <div class="col-md-12">
+                                   
+                          
+                            <div class="d-flex">
+                           <input type="text" name="coupon" id="coupon-input" class="form-control">
+                           <button type="button" id="coupon-btn" class="btn btn-sm">Submit</button>
+                        </div>
+                          
+                        
+                          </div>
+                          </div>
+                          <div class="w-100"></div>
+                           <div class="col-md-12">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                  <div class="card-header" id="headingOne">
+                                    <h2 class="mb-0">
+                                      <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                       Add New Address
+                                      </button>
+                                    </h2>
+                                  </div>
+                              
+                                  <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                    <div class="card-body border">
+                                        <form id="addAddress" class="colorlib-form">
+                                            <h2>Billing Details</h2>
+                                          <div class="row">
+                                           <div class="col-md-12">
+                                              <div class="form-group">
+                                                  <label for="country">Select Country</label>
+                                                 <div class="form-field">
+                                                     <i class="icon icon-arrow-down3"></i>
+                                                    <select name="people" id="people" class="form-control" required>
+                                                          <option value="#">Select country</option>
+                                                          <% countries.forEach((country)=>{%>
+                                                            <option value="<%=country.name%>"><%=country.name%></option>
+                                                            <%})%>
+                                                    </select>
+                                                 </div>
+                                              </div>
+                                           </div>
+                    
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="fname"> Name</label>
+                                                        <input type="text" id="fname" name="name" class="form-control" placeholder="Your Name" required>
+                                                    </div>
+                                                </div>
+                                                
+                                               
+                    
+                                           <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="fname">Address</label>
+                                                    <textarea name="address" class="form-control" cols="20" rows="10" required></textarea>
+                                              </div>
+                                              
+                                           </div>
+                                        
+                                           <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="companyname">Town/City</label>
+                                                    <input type="text" name="city" id="towncity" class="form-control" placeholder="Town or City" required>
+                                              </div>
+                                           </div>
+                                        
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="stateprovince">State/Province</label>
+                                                        <input type="text" id="fname" name="state" class="form-control" placeholder="State Province" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="lname">Zip/Postal Code</label>
+                                                        <input type="number" id="zippostalcode" name="zip" class="form-control" placeholder="Zip / Postal" required>
+                                                    </div>
+                                                </div>
+                                            
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="email">Landmark</label>
+                                                        <input type="text" id="email" name="landmark" class="form-control" placeholder="Landmark">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="Phone">Phone Number</label>
+                                                        <input type="text" id="phone" name="phone" class="form-control" placeholder="Phone Number" required>
+                                                    </div>
+                                                </div>
+                    
+                                                
+                                       </div>
+                                       <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <button class="btn btn-primary" id="savebtn" type="submit">Submit</button>
+                                        </div>
+                                    </div>
+                                    </form>
+                                    </div>
+                                  </div>
+                                </div>
+                                </div>
+                            </div>
+                           
+                        </div>
+                </div>
+
+                <div class="col-lg-4">
+                <form action="/checkout" method="post">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="cart-detail">
+                                <input type="hidden" id="address-id" name="address_id">
+                                <h2>Cart Total</h2>
+                                <ul>
+                                    <li>
+                                        <span>Subtotal</span> <span id="grand-total"><%=totalPrice%></span>         
+                                    </li>
+                                </ul>
+                                <span id="message"></span>
+                                <h2>Payment Method</h2>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="radio">
+                                           <label><input type="radio" name="payment" checked value="Cash-On-Delivery"> Cash On Delivery</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="radio">
+                                           <label><input type="radio" name="payment" value="RazorPay"> Online Payment</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                               
+                            </div>
+                           
+                       </div>
+
+                       <div class="w-100"></div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                           <button class="btn btn-primary" type="submit">Place order</button>
+                        </div>
+                    </div>
+                </form>
+                </div>
+           
+            </div>
+       
+        </div>
+    </div>
+
+   
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $('.address-radio').on('click', function() {
+      var addressId = $(this).val();
+      $('#address-id').val(addressId);
+    });
+$('#coupon-btn').click(function(e) {
+  e.preventDefault(); // prevent the default form submission behavior
+  const coupon = $('#coupon-input').val();
+
+  $.ajax({
+    url: '/add-coupon',
+    type: 'POST',
+    data: { coupon },
+    success: function(data) {
+      // update subtotal and grand total
+      console.log(data);
+      $('#message').text(data.message);
+      $('#grand-total').text(data.updatedTotal);
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log(textStatus, errorThrown);
+    }
+  });
+});
+
+$('#savebtn').click(function(event) {
+      event.preventDefault(); // prevent default form submission behavior
+  
+      var formData = $('#addAddress').serialize(); // get form data
+  
+      // submit form data using AJAX
+      $.ajax({
+        url: '/saveaddress',
+        type: 'POST',
+        data: formData,
+        success: function(data) {
+         
+          window.location.reload()
+        },
+        error: function(error) {
+          
+          console.log(error); // log any errors
+        }
+      });
+    });
+
+</script>
+<%-include("../layouts/user-footer.ejs")-%>

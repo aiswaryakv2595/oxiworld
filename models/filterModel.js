@@ -8,41 +8,31 @@ const filterSchema = new mongoose.Schema({
         required:true
     },
    
-     filter:{
-       
-        brand:[
-           
-            {
-                name:{
-                    type:String,
-                    required:true,                    
-                },
-                size:{
-                    type:Array,
-                                     
-                },
-               
-                color: {
-                    type: Array,
-                    required: true
-                 },
-                 material: {
-                    type: Array,
-                    required: true
-                 },
-                 material_type: {
-                    type: Array,
-                    required: true
-                 },
-                 is_available:{
-                    type:Boolean,
-                    default:true
-                }
-               
-            }
-        ],
-       
+    brand:{
+        type:String,
+        required:true,                    
     },
+    size:{
+        type:Array,
+                         
+    },
+   
+    color: {
+        type: Array,
+        required: true
+     },
+     material: {
+        type: Array,
+        required: true
+     },
+     material_type: {
+        type: Array,
+        required: true
+     },
+     is_available: {
+        type: Boolean,
+        default:true
+     },
   
     }, {
     timestamps: true

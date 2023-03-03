@@ -57,21 +57,23 @@
 </aside>
 
 <div class="colorlib-product">
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <div class="col-sm-8 offset-sm-2 text-center colorlib-heading">
                 <h2>shop by categories</h2>
             </div>
-            <% categories.forEach((row,element)=>{%>
+           
+            <% for(let i=0;i<3;i++){%>
             <div class="col-sm-4 text-center">
                 
                 <div class="featured">
-                    <a href="#" class="featured-img" style="background-image: url(/uploads/<%=row.images%>); background-size: contain;"></a>
-                   <h3><a href="#"><%=row.name%> Collection</a></h3>
+                    <a href="#" class="featured-img" style="background-image: url(/uploads/<%=categories[i].images%>); background-size: contain;"></a>
+                   <h3><a href="#"><%=categories[i].name%> Collection</a></h3>
                    
                 </div>
             </div>
-            <%})%>
+            <%}%>
+        
         </div>
     </div>
 </div>
@@ -97,17 +99,11 @@
                 </div>
             </div>
             <%})%>
-           
-            <div class="w-100"></div>
-           
+         
             
            
         </div>
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <p><a href="#" class="btn btn-primary btn-lg">Shop All Products</a></p>
-            </div>
-        </div>
+       
     </div>
 </div>
 

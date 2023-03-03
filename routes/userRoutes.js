@@ -1,75 +1,84 @@
-const express = require('express')
-const user_route = express()
-const cookieParser = require("cookie-parser");
+const express = require("express");
+const user_route = express();
 
+const path = require("path");
 
-user_route.use(express.json())
-user_route.use(express.urlencoded({extended:true}))
-user_route.use(cookieParser());
-const path = require('path')
-
-user_route.set('view engine', 'ejs')
-user_route.set('views', './views/users');
+user_route.set("views", "./views/users");
 user_route.use(express.static(path.join(__dirname, "public")));
-const session = require('express-session');
 
-const config = require('../config/config')
+const userController = require("../controllers/userController");
 
-const oneDay = 1000 * 60 * 60 * 24;
-user_route.use(session({
-    secret:config.sessionSecret,
-    resave: true,
-    saveUninitialized: false,
-    cookie: { maxAge: oneDay },
-}))
-user_route.use(function(req, res, next) {
-    if (!req.user)
-        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-    next();
-});
+const userAuth = require("../middlewares/userAuth");
+const { db } = require("../models/userModel");
 
-const userController = require('../controllers/userController');
+user_route.get("/register", userAuth.isLogout, userController.register);
+user_route.post("/register", userController.saveUser, userController.loadOtp);
+user_route.get("/otp", userAuth.isLogout, userController.loadOtp);
+user_route.post("/otp", userAuth.isLogout, userController.verifyOtp);
 
-const userAuth = require('../middlewares/userAuth');
-const { db } = require('../models/userModel');
+user_route.get("/login", userAuth.isLogout, userController.loadLogin);
+user_route.post("/login", userController.verifyLogin);
 
-user_route.get('/register',userAuth.isLogout,userController.register);
-user_route.post('/register',userController.saveUser,userController.loadOtp);
-user_route.get('/otp',userAuth.isLogout,userController.loadOtp)
-user_route.post('/otp',userAuth.isLogout,userController.verifyOtp)
+user_route.get("/forget", userAuth.isLogout, userController.forgetLoad);
+user_route.post("/forget", userController.forgetVerify);
+user_route.get(
+  "/verify-otp",
+  userAuth.isLogout,
+  userController.forgetPasswordLoad
+);
+user_route.post("/verify-otp", userController.forgetPasswordLoad);
+user_route.post("/reset-password", userController.resetPassword);
 
-user_route.get('/login',userAuth.isLogout,userController.loadLogin)
-user_route.post('/login',userController.verifyLogin)
+user_route.get("/logout", userAuth.isLogin, userController.logout);
 
-user_route.get('/forget',userAuth.isLogout,userController.forgetLoad)
-user_route.post('/forget',userController.forgetVerify)
-// user_route.get('/verify-otp',userAuth.isLogout,userController.forgetPasswordLoad)
-user_route.post('/verify-otp',userController.forgetPasswordLoad)
-user_route.post('/reset-password',userController.resetPassword)
-// router.get('/otp',userAuth.isLogout,userController.getOtp)
-// router.post('/otp',userController.addUser)
+user_route.get("/", userController.profile);
+user_route.get("/profile", userAuth.isLogin, userController.profile);
 
-user_route.get('/logout',userAuth.isLogin,userController.logout)
+user_route.get("/collection", userAuth.isLogin, userController.showCollections);
 
-user_route.get('/',userController.profile)
-user_route.get('/profile',userAuth.authPage(["user"]),userAuth.isLogin,userController.profile)
+user_route.get("/add-to-cart", userAuth.isLogin, userController.showCart);
+user_route.get("/load-cart", userAuth.isLogin, userController.loadCart);
+user_route.get("/removeItem", userAuth.isLogin, userController.removeItem);
+user_route.post("/editcart", userAuth.isLogin, userController.editCart);
 
-user_route.get('/productdetails/:id',userAuth.isLogin,userController.productDetails)
+user_route.get("/addtowishlist/:id",userAuth.isLogin,userController.addtowishlist);
+user_route.get("/loaduserwishlist",userAuth.isLogin,userController.loaduserwishlist);
+user_route.get("/addcartdeletewishlist",userAuth.isLogin,userController.addcartDeletewishlist);
+user_route.get("/deletewishlist",userAuth.isLogin, userController.deletewishlist);
+user_route.post("/updateCartItem", userController.updateCartItem);
 
-user_route.get('/collection',userAuth.isLogin,userController.showCollections)
+user_route.get("/checkout", userAuth.isLogin, userController.loadCheckout);
+user_route.post("/checkout", userController.placeOrder);
+
+user_route.post("/saveaddress", userController.saveAddress);
+user_route.post("/editaddress", userController.editAddress);
+
+user_route.get("/view-profile", userController.userProfile);
+
+user_route.post("/add-coupon", userController.applyCoupon);
+user_route.get("/success", userController.orderSuccess);
+// user_route.post('/razorpay',userController.razorpayCheckout)
+
+user_route.post("/checkout/razorpay", userController.razorpayCheckout);
+
+user_route.get(
+  "/loadOrderDetails",
+  userAuth.isLogin,
+  userController.loadorderdetails
+);
+user_route.get("/cancelOrder", userAuth.isLogin, userController.cancelorder);
 
 
+user_route.get("/viewOrder", userAuth.isLogin, userController.vieworder);
 
-user_route.get('/add-to-cart',userAuth.isLogin,userController.showCart)
-user_route.get('/load-cart',userAuth.isLogin,userController.loadCart)
-user_route.get('/removeItem',userAuth.isLogin,userController.removeItem)
-user_route.post('/editcart',userAuth.isLogin,userController.editCart)
+//update - profile
+user_route.post("/update-profile", userController.updateProfile);
+//delete address
+user_route.post("/delete-address", userController.deleteAddress);
+//reset password
+user_route.post("/change-password", userController.changePassword);
 
-user_route.get('/addtowishlist/:id',userAuth.isLogin,userController.addtowishlist)
-user_route.get('/loaduserwishlist',userAuth.isLogin,userController.loaduserwishlist)
-user_route.get('/addcartdeletewishlist',userAuth.isLogin,userController.addcartDeletewishlist)
-user_route.get('/deletewishlist',userAuth.isLogin,userController.deletewishlist)
+//user review
+user_route.post("/add-review", userController.addReview);
+user_route.post("/update-review", userController.updateReview);
 module.exports = user_route;
-
-
-

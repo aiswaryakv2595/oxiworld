@@ -1,0 +1,310 @@
+<%-include('../layouts/user-header.ejs')-%>
+<style>
+  .star-widget input{
+   display: none; 
+  }
+  .star-widget label{
+    font-size: 20px;
+    color: #444;
+    padding-right: 10px;
+  float: right;
+   
+  }
+  input:not(:checked) ~ label:hover,
+input:not(:checked) ~ label:hover ~ label{
+    color: #fd4;
+  }
+  input:checked ~ label{
+    color: #fd4;
+  }
+</style>
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread"><span><a href="/profile">Home</a></span> / <span>View Order</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <section class="h-100 gradient-custom">
+        <div class="container py-5 h-100">
+          <div class="card-group">
+            <div class="card">
+              
+              <div class="card-body">
+                <h5 class="card-title">Shipping Address</h5>
+                <p class="card-text"><%=order.addressId.name%>, <%=order.addressId.address%>, <%=order.addressId.city%>, 
+                  <%=order.addressId.state%>,<br> Pin :<%=order.addressId.zip%></p>
+                <p class="card-text"><small class="text-muted">Phone: <%=order.addressId.phone%></small></p>
+              </div>
+            </div>
+            <div class="card">
+             
+              <div class="card-body">
+                <h5 class="card-title">Payment Method</h5>
+                <p class="card-text"><%=order.payment%></p>
+          
+              </div>
+            </div>
+            <div class="card">
+              
+              <div class="card-body">
+                <h5 class="card-title">Order Summary</h5>
+                <p class="text-muted mb-0">Item Total : <%=itemTotal%></p>
+                 <% if(order.discount){ %>
+                  <p class="text-muted mb-0"> <span class="fw-bold me-4">Discount :</span>₹<%= order.discount %></p>
+                  <% } else { %>
+                    <p class="text-muted mb-0"> <span class="fw-bold me-4">Discount :</span>Nill</p>
+                    <% } %>
+                    <p class="text-muted mb-0">Recepit Coupon : <%= order.offer %></p>
+                <p class="text-muted mb-0">Delivery Charge : 45</p>
+                <p class="text-muted mb-0">Item Total : <%=order.products.totalPrice%></p>
+                
+              </div>
+            </div>
+          </div>
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">Thanks for your Order, <span style="color: #ff0000;"><%= user.name %></span>!</h5>
+              <h4>Order is <%=order.status%></h4>
+              <% for(let i = 0;i<order.products.item.length;i++){ %>
+              <div class="card mb-3">
+                
+                <div class="row no-gutters">
+                 
+                   
+                  <div class="col-md-4">
+                    <img src="/products/<%= order.products.item[i].productId.images[0]%>" class="img-thumbnail"  style="height: 100px; width: 100px;" alt="...">
+                  </div>
+                 
+                  <div class="col-md-4">
+                    <div class="card-body">
+                     
+                      <p class="card-text">Quantity: <%= order.products.item[i].qty %></p>
+                     
+                    </div>
+                    
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card-body">
+                      <h5 class="card-title"><%=order.products.item[i].productId.name %></h5>
+                      
+                     
+                    </div>
+                    
+                  </div>
+                
+                  
+                </div>
+                <% if(order.status=='Delivered' ){ %>
+                  <% if(order.productReturned[i]==0){ %>
+                <!-- <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                    <p class="text-success mb-0 small"><a href="/returnProduct?id=<%= order.products.item[i].productId._id%>" class="btn btn-primary">Return Product</a>
+                    </p>
+                </div> -->
+                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                  <!-- <p class="text-success mb-0 small"><a href="/reviewProduct?id=<%= order.products.item[i].productId._id%>" class="btn btn-primary">Review Product</a>
+                  </p> -->
+                  <% if(!review.length>0){%>
+                  <button type="button" id="review" class="btn btn-primary  mb-0" data-toggle="modal" data-product-id="<%= order.products.item[i].productId._id%>" data-order-id="<%=order._id%>" data-target="#exampleModal">
+                    Review
+                  </button>
+                  <%}
+                  else{%>
+                   
+                    <button type="button" id="editreview" class="btn btn-primary  mb-0" data-toggle="modal" 
+                    data-product-id="<%= review[0].productId%>" data-review="<%=review[0].rating%>"
+                     data-description="<%=review[0].description%>" 
+                     data-review-id="<%=review[0]._id%>" data-target="#editReview">
+                      Edit Review
+                    </button>
+                    <%}%>
+                  <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Review</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <form action="/add-review" method="post">
+                <div class="modal-body">
+                  <input type="hidden" name="productId" id="productId">
+                  <input type="hidden" name="orderId" id="orderId">
+                  <div class="d-flex align-items-start">
+                    <div class="row">
+                      <div class="col-md-3">
+                <div class="p-2">
+                <label for="">Review:</label> 
+              </div>  
+            </div> 
+            <div class="col-md-9">
+                  <div class="star-widget">
+                    <input type="radio" value="5" name="rate" id="rate-5">
+                    <label for="rate-5" class="bi bi-star-fill"></label>
+                    <input type="radio" value="4" name="rate" id="rate-4">
+                    <label for="rate-4" class="bi bi-star-fill"></label>
+                    <input type="radio" value="3" name="rate" id="rate-3">
+                    <label for="rate-3" class="bi bi-star-fill"></label>
+                    <input type="radio" value="2" name="rate" id="rate-2">
+                    <label for="rate-2" class="bi bi-star-fill"></label>
+                    <input type="radio" value="1" name="rate" id="rate-1">
+                    <label for="rate-1" class="bi bi-star-fill"></label>
+</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-start">
+                
+                <label for="">Description</label>
+             
+                  <textarea class="form-control ml-2" name="description" id="" cols="5" rows="3"></textarea>
+                
+               </div>
+              </div>
+                <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+             </div>
+    </form>
+    </div>
+  </div>
+              </div>
+
+              <div class="modal fade" id="editReview" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Review</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <form id="editForm">
+                <div class="modal-body">
+                  <input type="hidden" name="productId" id="productId">
+                  <input type="hidden" name="reviewId" id="reviewId">
+                
+                  <div class="d-flex align-items-start">
+                    <div class="row">
+                      <div class="col-md-3">
+                <div class="p-2">
+                <label for="">Review:</label> 
+              </div>  
+            </div> 
+            <div class="col-md-9">
+                  <div class="star-widget">
+                    <input type="radio" value="5" name="rate" id="rate-5">
+                    <label for="rate-5" class="bi bi-star-fill"></label>
+                    <input type="radio" value="4" name="rate" id="rate-4">
+                    <label for="rate-4" class="bi bi-star-fill"></label>
+                    <input type="radio" value="3" name="rate" id="rate-3">
+                    <label for="rate-3" class="bi bi-star-fill"></label>
+                    <input type="radio" value="2" name="rate" id="rate-2">
+                    <label for="rate-2" class="bi bi-star-fill"></label>
+                    <input type="radio" value="1" name="rate" id="rate-1">
+                    <label for="rate-1" class="bi bi-star-fill"></label>
+</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-start">
+                
+                <label for="">Description</label>
+             
+                  <textarea class="form-control ml-2" name="description" id="" cols="5" rows="3"></textarea>
+                
+               </div>
+              </div>
+                <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" id="editBtn" class="btn btn-primary">Save changes</button>
+             </div>
+    </form>
+    </div>
+  </div>
+              </div>
+              </div>
+                <% }  else{%>
+                  <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                  <p class="text-warning mb-0 large">
+                      Product
+                      Returned</p>
+                    </div>
+                  </div>
+          <% } %>
+
+          <%}%>
+          <% }%>
+              </div>
+              
+            </div>
+          </div>
+         
+            </div>
+          </div>
+        </div>
+      
+    
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+ 
+  $('#review').on('click', function() {
+    let reviewModal = $('#exampleModal');
+// Get address values from data attributes
+let productId = $(this).data('product-id');
+let orderId = $(this).data('order-id');
+
+
+// Set values in modal inputs
+reviewModal.find('[name="productId"]').val(productId);
+reviewModal.find('[name="orderId"]').val(orderId);
+
+
+});
+$('#editreview').on('click', function(event) {
+  let reviewModal = $('#editReview');
+  let productId = $(this).data('product-id');
+  let reviewId = $(this).data('review-id');
+  let review = $(this).data('review');
+  let description = $(this).data('description');
+
+  reviewModal.find('[name="productId"]').val(productId);
+  reviewModal.find('[name="reviewId"]').val(reviewId);
+  reviewModal.find('[name="description"]').val(description);
+  $('.star-widget input[value="'+review+'"]').prop('checked', true);
+        });
+</script>
+<script>
+  $('#editBtn').click(function(event) {
+      event.preventDefault(); // prevent default form submission behavior
+  
+      var formData = $('#editForm').serialize(); // get form data
+  
+      // submit form data using AJAX
+      $.ajax({
+        url: '/update-review',
+        type: 'POST',
+        data: formData,
+        success: function(data) {
+          console.log(data);
+          $('#editReview').modal('hide');
+          alert(data.message);
+          window.location.reload()
+        },
+        error: function(error) {
+          
+          console.log(error); // log any errors
+        }
+      });
+    });
+
+</script>
+<%-include("../layouts/user-footer.ejs")-%>

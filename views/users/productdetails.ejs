@@ -1,4 +1,20 @@
 <%-include('../layouts/user-header.ejs')-%>
+<style>
+    .star-widget input{
+     display: none; 
+    }
+    .star-widget label{
+      font-size: 20px;
+      color: #444;
+      padding-right: 10px;
+    float: right;
+     
+    }
+  
+    input:checked ~ label{
+      color: #fd4;
+    }
+  </style>
 <link rel="stylesheet" href="/css/zoom.css">
 <div class="breadcrumbs">
     <div class="container">
@@ -11,21 +27,22 @@
 </div>
 <div class="colorlib-product">
     <div class="container">
-        <div class="row row-pb-lg product-detail-wrap">
+        <div class="row row-pb-lg product-detail-wrap" >
             <div class="col-sm-8">
                 <div class="owl-carousel">
                     <% product.images.forEach((row,element)=>{%>
-                    <div class="item" >
+                    <div class="item">
                         <figure class="image-holder">
-                        <div class="product-entry border" id="img-container">
+                        <div class="product-entry border" id="img-container" style="height: fit-content;" >
                             <a href="#" class="prod-img">
-                                <img src="/products/<%=row%>" class="img-fluid" alt="Free html5 bootstrap 4 template" style="object-fit: contain;">
+                                <!-- <img src="/products/<%=row%>" class="img-fluid img-center" alt="Free html5 bootstrap 4 template" style="height: 450px; object-fit: cover;"> -->
+                                <a href="/products/<%=row%>" class="img-fluid MagicZoom">
+                                    <img src="/products/<%=row%>" alt="">
+                                </a>
                             </a>
                         </div>
                     </figure>
-                    <figure class="image-preview d-none">
-                        <img src="/products/<%=row%>" id="image-preview">
-                    </figure>
+                    
                     </div>
                     <%})%>
                   
@@ -44,14 +61,10 @@
                         <div class="block-26 mb-2">
                             <h4>Size</h4>
                        <ul>
-                      
-                          
-                          
-                        <% filter.forEach(filterOne=>{ %>
-                            <%for(let i=0;i<filterOne.size.length;i++) {%>
-                            <li><a href="#"><%=filterOne.size[i]%></a></li>
+                      <% filter.size.forEach((row)=>{%>
+                            <li><a href="#"><%=row%></a></li>
                             
-                          <%}})%>
+                            <%})%>
                        </ul>
                     </div>
                     
@@ -121,16 +134,52 @@
                                 </tr>
                                 <tr>
                                     <td>Brand</td>
-                                    <td> <% filter.forEach(filterOne=>{ %>
-                                        <%= filterOne.name %>
-                                    <%}) %></td>
+                                    <td> 
+                                        <%= filter.brand %>
+                                   </td>
                                 </tr>
                                 
                              </table>
                             </div>
 
                             <div class="tab-pane border fade" id="pills-review" role="tabpanel" aria-labelledby="pills-review-tab">
-                              
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h3 class="head"><%=count%> Reviews</h3>
+                                        <div class="review">
+                                            <% if(review.length>0){
+                                            review.forEach((row)=>{%>
+                                            <div class="desc">
+                                                <h4>
+                                                    <span class="text-left"><%= row.userId.name %></span>
+                                                
+                                                </h4>
+                                                
+                                                    <input type="hidden" name="rate" value="<%=row.rating%>">
+                                                    
+                                                    <p class="star">
+                                                        <span>
+                                                           
+                                                            <% for(let i= 1; i<=5; i++){%>
+                                                                <% if(row.rating >= i){%>
+                                                            <i class="icon-star-full"></i>
+                                                            <%}else{%>
+                                                            <i class="icon-star-empty"></i>
+                                                            <%}}%>
+                                                            
+                                                          
+                                                        </span>
+                                                    
+                                                    </p>
+                                                 
+                                    <p><%=row.description%></p>
+                                            </div>
+                                            <%})}%>
+                                        </div>
+                                       
+                                    </div>
+                                   
+                                </div>
                             </div>
                           </div>
                         </div>
@@ -141,16 +190,31 @@
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $('#addtocart').click(function(event) {
+  event.preventDefault(); // Prevents the default form submission
+  let id = $(this).attr("data-id");
+  let quantity = $('#quantity').val();
+  $.ajax({
+    type: 'GET',
+    url: '/add-to-cart?id=' + id + '&qty=' + quantity,
+    success: function(response) {
+      console.log(response);
+      alert(response.message)
+    },
+    error: function(error) {
+      console.log(error.responseText);
+      // If you want to show an error message, you can add it here
+    }
+  });
+});
 
+
+</script>
 <script>
  $(function () {
-     $('#addtocart').click(function(event) {
-      let id = $(this).attr("data-id")
-      let quantity = $('#quantity').val()
-      console.log(id);
-      let url = "/add-to-cart?id="+id+"&qty="+quantity;
-      window.location.href = url;
-   });
+  
+
    $('#addtowishlist').click(function(event) {
       let wid = $(this).attr("data-wid")
       console.log(wid);
@@ -194,7 +258,10 @@
                 $('#quantity').val(quantity - 1);
                 }
         });
-        
+     
+        let review = $('[name="rate"]').val();
+        console.log(review);
+        $('.star-widget input[value="'+review+'"]').prop('checked', true);
     });
 </script>
 <script src="/js/magic-zoomCodepen.js"></script>

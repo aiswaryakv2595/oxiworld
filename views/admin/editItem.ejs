@@ -38,12 +38,18 @@
               <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Category</label>
                 <div class="col-sm-10">
-                  <select class="form-control" name="category" aria-label="Default select example">
+                  <select class="form-control" id="category" name="category" aria-label="Default select example">
                     
                     <% category.forEach(cate=>{ %>
                         <option <% if(cate._id ==  item.category_id ) selected %> value="<%= cate._id%>"><%= cate.name %></option>
                      <% }) %>
                   </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Stock</label>
+                <div class="col-sm-10">
+                  <input type="number" name="stock" class="form-control" placeholder="Stock" value="<%= item.stock%>" >
                 </div>
               </div>
               <div class="form-group row">
@@ -56,11 +62,56 @@
                 <div class="form-group row">
                   <label for="inputPassword3" class="col-sm-2 col-form-label">Brand Name</label>
                   <div class="col-sm-10">
-                    <select class="form-control" name="brand_id" aria-label="Default select example">
+                    <select class="form-control" id="brand" name="brand_id" aria-label="Default select example">
                     
                         <% filter.forEach(filterOne=>{ %>
-                          <option <% if(filterOne._id ==  item.brand_id ) selected %> value="<%= filterOne._id%>"><%= filterOne.name %></option>
+                          <option <% if(filterOne._id ==  item.brand_id ) selected %> value="<%= filterOne._id%>"><%= filterOne.brand %></option>
                        <% }) %>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" id="color" name="color" aria-label="Default select example">
+                      <% filter.forEach(filterOne => {
+                        for (let i = 0; i < filterOne.color.length; i++) {
+                          const selected = (filterOne.color[i] == item.color) ? 'selected' : '';
+                          %>
+                          <option value="<%= filterOne.color[i] %>" <%= selected %>><%= filterOne.color[i] %></option>
+                        <% }
+                      }) %>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" id="material" name="material" aria-label="Default select example">
+                      <% filter.forEach(filterOne => {
+                        for (let i = 0; i < filterOne.material.length; i++) {
+                          const selected = (filterOne.material[i] == item.material) ? 'selected' : '';
+                          %>
+                          <option value="<%= filterOne.material[i] %>" <%= selected %>><%= filterOne.material[i] %></option>
+                        <% }
+                      }) %>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-group row">
+                  <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" id="materialType" name="material_type" aria-label="Default select example">
+                    
+                      <% filter.forEach(filterOne => {
+                        for (let i = 0; i < filterOne.material_type.length; i++) {
+                          const selected = (filterOne.material_type[i] == item.material_type) ? 'selected' : '';
+                          %>
+                          <option value="<%= filterOne.material_type[i] %>" <%= selected %>><%= filterOne.material_type[i] %></option>
+                          <% }
+                        }) %>
                     </select>
                   </div>
                 </div>
@@ -76,20 +127,20 @@
                     <label for="Brand" class="col-sm-2 col-form-label">Image</label>
                     <div class="row g-0">
                      
-                      <% item.images.forEach((image)=> {%>
+                      <% item.images.forEach((image, index) => { %>
                         <div class="card-image-col col-3 p-1">
                           <div class="img-wrap">
-                
-                             <button class="close " data-img="<%=image %>" data-id="<%=item._id%>">
-                              &times;</button> 
+                            <button class="close delete-btn" data-img="<%=image %>" data-id="<%=item._id%>">
+                              &times;
+                            </button> 
                             <img class="card-image" src="/products/<%=image %>" alt="">
-                            <input type="hidden" name="old_image" value="<%= image%>">
                           </div>
                         </div>
-                        <%}) %>
+                      <% }) %>
                         
                        
-                          <input type="file" class="form-control" id="images" name="images" multiple>
+                        <input type="file" class="form-control-file" name="images" multiple>
+                        <input type="hidden" name="old_images" value="<%= item.images.join(',') %>">
                     </div>
                   </div>
           
@@ -119,5 +170,82 @@
          window.location.href = url;
       });
     });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+ $(document).ready(function() {
+  // Listen for changes to the category dropdown
+ 
+  $('#category').on('change', function() {
+    var categoryId = $(this).val();
+    // Make an AJAX request to retrieve the filters for the selected category
+    $.ajax({
+      url: '/admin/getFilters',
+      type: 'GET',
+      data: { categoryId: categoryId },
+      success: function(response) {
+        // Clear the brand dropdown and add options for each filter
+        $('#brand').empty();
+        response.filters.forEach(function(filter) {
+          $('#brand').append('<option value="' + filter._id + '">' + filter.brand + '</option>');
+        });
+        $('#brand').trigger('change');
+      },
+      error: function(xhr, status, error) {
+        console.log('Error retrieving filters: ' + error);
+      }
+    });
+  });
+
+
+  
+  $('#brand').on('change', function() {
+  var brandId = $(this).val();
+
+  // Get the materials and material types for the selected brand
+  $.ajax({
+  url: '/admin/brandsDetails',
+  data: { brandId: brandId },
+  success: function(data) {
+    $('#material').empty();
+  $('#materialType').empty();
+  var materials = data.materials;
+  var materialTypes = data.materialTypes;
+
+  // Add each material to the materials dropdown
+  materials.forEach(function(material) {
+    for(let i=0;i<material.length;i++)
+    $('#material').append('<option value="' + material[i] + '">' + material[i] + '</option>');
+  });
+
+  // Add each material type to the material types dropdown
+  materialTypes.forEach(function(materialType) {
+    for(let i=0;i<materialType.length;i++)
+    $('#materialType').append('<option value="' + materialType[i] + '">' + materialType[i] + '</option>');
+  });
+},
+  error: function() {
+    alert('Error retrieving materials and material types');
+  }
+});
+});
+
+
+$(document).on('click', '.delete-btn', function() {
+  const itemId = $(this).data('id');
+  const imageName = $(this).data('img');
+
+  $.ajax({
+    url: `/admin/delete-image/${itemId}/${imageName}`,
+    type: 'DELETE',
+    success: function(response) {
+      if (response.success) {
+        location.reload();
+      }
+    }
+  });
+});
+
+});
 </script>
   <%-include("../layouts/admin-footer.ejs")-%>

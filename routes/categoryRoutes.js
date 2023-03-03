@@ -1,35 +1,26 @@
 const express = require('express')
 const category_route = express()
-const cookieParser = require("cookie-parser");
-const Filter = require('../models/filterModel')
 
-
-category_route.use(express.json())
-category_route.use(express.urlencoded({extended:true}))
-
-category_route.use(cookieParser());
-
-category_route.set('view engine', 'ejs')
 category_route.set('views', './views/admin');
 category_route.use(express.static('public'));
 
 
-
-const session = require('express-session');
-
-const config = require('../config/config')
-const oneDay = 1000 * 60 * 60 * 24;
-category_route.use(session({
-    secret:config.sessionSecret,
-    resave: true,
-    saveUninitialized: false,
-    cookie: { maxAge: oneDay },
-}))
-// category_route.use(fileUpload())
-
 const multer = require('../middlewares/multer')
-category_route.use(function(req, res, next) {
-    if (!req.user)
-        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-    next();
-});
+const adminLoginAuth = require('../middlewares/adminLoginAuth');
+
+const categoryController = require('../controllers/categoryController')
+
+category_route.get('/addcategory',adminLoginAuth.isLogin,categoryController.addCategory)
+category_route.post('/addcategory',multer.upload.single('image'),categoryController.addCategorySave)
+
+category_route.get('/editCategory/:categoryid',adminLoginAuth.isLogin,categoryController.editCategory)
+category_route.post('/updateCategory',multer.upload.single('image'),categoryController.updateCategory)
+category_route.get('/togglecategory/:id',adminLoginAuth.isLogin,categoryController.deleteCategory)
+
+category_route.get('/filter-category',adminLoginAuth.isLogin,categoryController.addFilter)
+category_route.post('/filter-category',categoryController.addFilterSave)
+category_route.get('/edit-filter',adminLoginAuth.isLogin,categoryController.editFilter)
+category_route.post('/update-filter',categoryController.updateFilter)
+category_route.get('/togglefilter/:id',adminLoginAuth.isLogin,categoryController.deleteFilter)
+
+module.exports = category_route

@@ -32,6 +32,10 @@ const itemSchema = new mongoose.Schema({
        type: Number,
        required: true
     },
+    color: {
+      type: String,
+      required: true
+   },
     material: {
       type: String,
       required: true
@@ -43,6 +47,10 @@ const itemSchema = new mongoose.Schema({
     is_available: {
       type: Boolean,
       default:true
+   },
+   stock: {
+      type: Number,
+      default:0
    },
    images: {
       type:Array,

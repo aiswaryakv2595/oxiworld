@@ -1,6 +1,27 @@
 <%-include('../layouts/user-header.ejs')-%>
-<div id="page">
-   
+
+  <style>
+    .input-group .quantity-input {
+  text-align: center;
+  font-weight: bold;
+  border: none;
+}
+
+.input-group .decrement-btn,
+.input-group .increment-btn {
+  padding: 5px;
+  font-weight: bold;
+}
+
+.input-group .decrement-btn {
+  border-right: none;
+}
+
+.input-group .increment-btn {
+  border-left: none;
+}
+
+  </style> 
 
     <div class="breadcrumbs">
         <div class="container">
@@ -11,8 +32,35 @@
             </div>
         </div>
     </div>
-
-
+<%if(cartProducts.totalprice==0){%>
+  <div class="container-fluid  mt-100">
+    <div class="row">
+    
+     <div class="col-md-12">
+     
+         <div class="card">
+       <div class="card-header">
+       <h5>Cart</h5>
+       </div>
+       <div class="card-body cart">
+           <div class="col-sm-12 empty-cart-cls text-center">
+             <img src="https://i.imgur.com/dCdflKN.png" width="130" height="130" class="img-fluid mb-4 mr-3">
+             <h3><strong>Your Cart is Empty</strong></h3>
+             <h4>Add something to make me happy :)</h4>
+             <a href="/collection" class="btn btn-primary cart-btn-transform m-3" data-abc="true">continue shopping</a>
+             
+           
+           </div>
+       </div>
+   </div>
+       
+     
+     </div>
+    
+    </div>
+   
+   </div>
+  <%}else{%>
     <div class="colorlib-product">
         <div class="container">
             <div class="row row-pb-lg">
@@ -35,82 +83,94 @@
             </div>
             <div class="row row-pb-lg">
                 <div class="col-md-12">
-                    <div class="product-name d-flex">
-                        <div class="one-forth text-left px-4">
-                            <span>Product Details</span>
-                        </div>
-                        <div class="one-eight text-center">
-                            <span>Price</span>
-                        </div>
-                        <div class="one-eight text-center">
-                            <span>Quantity</span>
-                        </div>
-                        <div class="one-eight text-center">
-                            <span>Total</span>
-                        </div>
-                        <div class="one-eight text-center px-4">
-                            <span>Remove</span>
-                        </div>
+                  <div class="product-name d-flex">
+                    <div class="one-forth text-left px-4">
+                      <span>Product Details</span>
                     </div>
-                    <% if(cartProducts){%>
-                        <% for(let key of cartProducts.item){%>
-                    <div class="product-cart d-flex">
-                        <div class="one-forth">
-                            <div class="product-img" style="background-image: url('/products/key.productId.images[0]');">
-                            </div>
-                            <div class="display-tc">
-                                <h3><%= key.productId.name %></h3>
-                            </div>
-                        </div>
-                        <div class="one-eight text-center">
-                            <div class="display-tc">
-                                <span class="price"> &#8377; <%= key.productId.price %></span>
-                            </div>
-                        </div>
-                        <div class="one-eight text-center">
-                            <div class="display-tc ">
-                               
-                                <input type="number" id="quantity" name="qty" class="form-control input-number text-center qty" value="<%= key.qty %>" min="1" max="<%= key.productId.quantity %>">
-                                
-                            </div>
-                        </div>
-                        <div class="one-eight text-center">
-                            <div class="display-tc">
-                                <span class="price">&#8377; <%= key.qty * key.productId.price %></span>
-                            </div>
-                        </div>
-                        <div class="one-eight text-center">
-                            <div class="display-tc">
-                                <a href="/removeItem?id=<%= key.productId._id %>" class="closed"></a>
-                            </div>
-                        </div>
+                    <div class="one-eight text-center">
+                      <span>Price</span>
                     </div>
-                    <%}}%>
+                    <div class="one-eight text-center">
+                      <span>Quantity</span>
+                    </div>
+                    <div class="one-eight text-center">
+                      <span>Total</span>
+                    </div>
+                    <div class="one-eight text-center px-4">
+                      <span>Remove</span>
+                    </div>
+                  </div>
+                  <% if(cartProducts){ %>
+                  <% for(let key of cartProducts.item){ %>
+                  <div class="product-cart d-flex">
+                    <div class="one-forth">
+                      <div class="product-img" style="background-image: url('/products/<%= key.productId.images[0] %>');">
+                      </div>
+                      <div class="display-tc">
+                        <h3><%= key.productId.name %></h3>
+                      </div>
+                    </div>
+                    <div class="one-eight text-center">
+                      <div class="display-tc">
+                        <span class="price" id="productPrice">&#8377; <%= key.productId.price %></span>
+                      </div>
+                    </div>
+                    <div class="one-eight text-center">
+                      <div class="display-tc">
+                        <div class="input-group">
+                          <span class="input-group-btn">
+                            <button class="btn btn-default decrement-btn" type="button" data-product-id="<%= key.productId._id %>">
+                              <i class="icon-minus"></i>
+                            </button>
+                          </span>
+                          <input type="number" name="qty" id="qty" class="form-control input-number text-center" value="<%= key.qty %>" min="1" max="100" data-product-id="<%= key.productId._id %>">
+                         
+
+
+                          <span class="input-group-btn">
+                            <button class="btn btn-default increment-btn" type="button" data-product-id="<%= key.productId._id %>">
+                              <i class="icon-plus"></i>
+                            </button>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="one-eight text-center">
+                      <div class="display-tc">
+                        <span id="price" class="price">&#8377; <%= key.qty * key.productId.price %></span>
+                      </div>
+                    </div>
+                    <div class="one-eight text-center">
+                      <div class="display-tc">
+                        <a href="/removeItem?id=<%= key.productId._id %>" class="closed"></a>
+                      </div>
+                    </div>
+                  </div>
+                  <% } %>
+                  <% } %>
                 </div>
-            </div>
-            <div class="row row-pb-lg">
+              </div>
+              <div class="row row-pb-lg">
                 <div class="col-md-12">
-                    <div class="total-wrap">
-                       
-                           
-                            <div class="col-sm-4 text-center">
-                                <div class="total">
-                                    <%if(user._id){%>
-                                    <div class="sub">
-                                        <p><span>Subtotal:</span> <span id="totalCart"><%=cartProducts.totalprice%></span></p>
-                                        <p><span>Delivery:</span> <span>45</span></p>
-                                        
-                                    </div>
-                                    <%}%>
+                  <div class="total-wrap">
+                    <div class="col-sm-4 text-center">
+                      <div class="total">
+                      
+                        <div class="sub">
+                          <p><span>Subtotal:</span> <span id="subtotal">&#8377; <%= totalprice %></span></p>
+                          <p><span>Delivery:</span> <span>&#8377; 45</span></p>
+                        </div>
+                     
+              
                                     <div class="grand-total">
-                                        <p><span><strong>Total:</strong></span> <span id="totalart"><%=cartProducts.totalprice + 45%></span></p>
+                                        <p><span><strong>Total:</strong></span> <span id="totalart"><%=grandTotal %></span></p>
                                     </div>
                                 </div>
                                 <form action="#">
                                     <div class="row form-group">
                                        
                                         <div class="col-sm-3">
-                                            <input type="submit" value="Proceed to Checkout" class="btn btn-primary">
+                                           <button class="btn btn-secondary mt-2"><a href="/checkout" class="text-white">Proceed to Checkout</a></button>
                                         </div>
                                     </div>
                                 </form>
@@ -122,40 +182,74 @@
 
             
         </div>
+       
     </div>
+    <%}%>  
 
-   ]
-</div>
+   
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 <script>
-
-    const qty = document.querySelectorAll('.qty')	
-    console.log(qty);	   
-  const qtyHandler = async(e)=>{
-  try {
-  const productId = e.target.parentElement.children[0].value
-  const data = {qty:e.target.value}
-  console.log(data);
-    const response = await fetch(`/editcart?id=${productId}`,{
-   method:'post',
-   headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(data)
-    })
-    const value = await response.json()
-  
-   document.querySelector('#totalCart','#totalart').innerText = value.totalprice
-    // document.querySelector('#tottaloff').innerText = value.totalPrice
-   e.target.parentElement.parentElement.nextElementSibling.innerText = value.price * e.target.value
-  } catch (error) {
-  console.log(error.message);
+    $(document).ready(function() {
+    // increment button
+// increment button
+// increment button
+// increment button
+$('.increment-btn').click(function(e) {
+  e.preventDefault();
+  var inputEl = $('#qty');
+  var productId = $('#qty').data('product-id');
+  var qty = parseInt(inputEl.val());
+  console.log(qty);
+  console.log(productId);
+  var maxQty = inputEl.attr('max');
+  console.log(maxQty);
+  if (qty < maxQty) {
+    qty++;
+    inputEl.val(qty);
+    updateCartItem(productId, qty);
   }
-  }
-  qty.forEach(q =>{
-  q.addEventListener('change',qtyHandler)
-  })
-  
-  
-   </script>
+});
 
+// decrement button
+$('.decrement-btn').click(function(e) {
+  e.preventDefault();
+  var inputEl = $('#qty');
+  var productId = inputEl.data('product-id');
+  var qty = parseInt(inputEl.val());
+  if (qty > 1) {
+    qty--;
+    inputEl.val(qty);
+    updateCartItem(productId, qty);
+  }
+});
+
+
+
+    
+      // function to update cart item quantity using AJAX
+      function updateCartItem(productId, qty) {
+        $.ajax({
+          url: '/updateCartItem',
+          type: 'POST',
+          data: { productId: productId, qty: qty },
+          success: function(data) {
+            // update subtotal and grand total
+            console.log(data);
+            const productPrice = data.productPrice;
+            const newPrice = productPrice * qty;
+            $('#price').text(newPrice);
+            $('#subtotal').text(data.subtotal);
+            $('#totalart').text(data.grandTotal);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus, errorThrown);
+          }
+        });
+      }
+    });
+    </script>
+    
 <%-include("../layouts/user-footer.ejs")-%>

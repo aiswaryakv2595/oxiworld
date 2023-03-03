@@ -1,0 +1,202 @@
+<%-include('../layouts/admin-header.ejs')-%>
+ 
+    <!-- breadcrumb -->
+    <div class="container">
+      <% if(locals.message) { %>
+        <p><%= message%></p>
+        <%}%>
+  <div class="breadcrumb-header justify-content-between">
+    <div class="my-auto">
+      <div class="d-flex">
+        <h4 class="content-title mb-0 my-auto">Brand Details</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Edit Brand</span>
+      </div>
+    </div>
+   
+  </div>
+  <!-- breadcrumb -->
+    <!-- row -->
+  <div class="row row-sm">
+ 
+    <!-- Col -->
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+         
+          <form class="form-horizontal" action="/admin/update-filter" method="post" id="form">
+            
+              <input type="hidden" value="<%= filter._id %>" name="id">
+         
+            <div class="form-group ">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label"> Brand Name</label>
+                </div>
+                <div class="col-md-9">
+                  <input type="text" class="form-control"  placeholder="Brand Name" value="<%= filter.brand%>" name="brand">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">Sizes</label>
+                </div>
+                <div class="col-md-9">
+                 
+                    <% filter.size.forEach(cate => { %>
+                    
+                        <input type="text" class="form-control" name="size" value="<%= cate %>">
+                        <input type="hidden" name="oldSize" value="<%= cate %>">
+                     
+                    <% }) %>
+                    <div id="newinput"></div>
+                <button id="rowAdder" type="button"
+                        class="btn btn-dark">
+                        <span class="bi bi-plus-square-dotted">
+                        </span> ADD
+                    </button>
+                  
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">Colors</label>
+                </div>
+                <div class="col-md-9">
+                 
+                    <% filter.color.forEach(cate => { %>
+                     
+                        <input type="text" class="form-control" name="color" value="<%= cate %>">
+                        <input type="hidden" name="oldColor" value="<%= cate %>">
+                    <% }) %>
+                    <div id="newinputColor"></div>
+                    <button id="colorAdded" type="button"
+                            class="btn btn-dark">
+                            <span class="bi bi-plus-square-dotted">
+                            </span> ADD
+                        </button>
+                  
+                </div>
+              </div>
+            </div>
+         
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">Material</label>
+                </div>
+                <div class="col-md-9">
+                 
+                    <% filter.material.forEach(cate => { %>
+                      
+                        <input type="text" class="form-control" name="material" value="<%= cate %>">
+                        <input type="hidden" name="oldMaterial" value="<%= cate %>">
+                    <% }) %>
+                    <div id="newinputMaterial"></div>
+                <button id="materialAdded" type="button"
+                        class="btn btn-dark">
+                        <span class="bi bi-plus-square-dotted">
+                        </span> ADD
+                    </button>
+                  
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="form-label">Material Type</label>
+                </div>
+                <div class="col-md-9">
+                 
+                    <% filter.material_type.forEach(cate => { %>
+                      
+                        <input type="text" class="form-control" name="material_type" value="<%= cate %>">
+                        <input type="hidden" name="oldMaterialType" value="<%= cate %>">
+                    <% }) %>
+                    <div id="newinputMaterialType"></div>
+                <button id="materialTypeAdded" type="button"
+                        class="btn btn-dark">
+                        <span class="bi bi-plus-square-dotted">
+                        </span> ADD
+                    </button>
+                  
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary waves-effect waves-light"> Update </button>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+    <!-- /Col -->
+  </div>
+  <!-- row closed -->
+  </div>
+  
+  <script>
+    function checker() {
+      if (window.alert("Category Updated !!")) {
+        document.getElementById("form").submit();
+        return
+      }
+    }
+  </script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+ 
+    $("#rowAdder").click(function () {
+        newRowAdd =
+        '<div id="row"><div class="input-group ">' +
+              '<div class="input-group-prepend">' +
+              '<button class="btn btn-danger" id="DeleteRow" type="button">' +
+              '<i class="bi bi-trash"></i> Delete</button> </div>' +
+              '<input type="text" name ="size" class="form-control m-input"> </div> ';
+  
+        $('#newinput').append(newRowAdd);
+    });
+  
+    $("#colorAdded").click(function () {
+        newRowAdd =
+        '<div id="row"> <div class="input-group">' +
+              '<div class="input-group-prepend">' +
+              '<button class="btn btn-danger" id="DeleteRow" type="button">' +
+              '<i class="bi bi-trash"></i> Delete</button> </div>' +
+              '<input type="text" name ="color" class="form-control m-input"> </div> ';
+  
+        $('#newinputColor').append(newRowAdd);
+    });
+  
+    $("#materialAdded").click(function () {
+        newRowAdd =
+        '<div id="row"> <div class="input-group">' +
+              '<div class="input-group-prepend">' +
+              '<button class="btn btn-danger" id="DeleteRow" type="button">' +
+              '<i class="bi bi-trash"></i> Delete</button> </div>' +
+              '<input type="text" name ="material" class="form-control m-input"> </div> ';
+  
+        $('#newinputMaterial').append(newRowAdd);
+    });
+  
+    $("#materialTypeAdded").click(function () {
+        newRowAdd =
+        '<div id="row"> <div class="input-group mt-3">' +
+              '<div class="input-group-prepend">' +
+              '<button class="btn btn-danger" id="DeleteRow" type="button">' +
+              '<i class="bi bi-trash"></i> Delete</button> </div>' +
+              '<input type="text" name ="material_type" class="form-control m-input"> </div> </div>';
+  
+        $('#newinputMaterialType').append(newRowAdd);
+    });
+   
+    $("body").on("click", "#DeleteRow", function () {
+              $(this).parents("#row").remove();
+          })
+    </script>
+  <%-include("../layouts/admin-footer.ejs")-%>

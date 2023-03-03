@@ -14,6 +14,7 @@ const sendMessage = function (mobile, res, next) {
   fast2sms
     .sendMessage(options)
     .then((response) => {
+      console.log(response);
       console.log("otp sent successfully");
     })
     .catch((error) => {

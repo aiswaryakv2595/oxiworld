@@ -32,11 +32,11 @@
               <label for="inputPassword3" class="col-sm-2 col-form-label">Category</label>
               <div class="col-sm-10">
               
-                <select class="form-control" name="category" id="category-select" aria-label="Default select example">
-                  <option selected>--Select--</option>
-                  <% category.forEach(cate=>{ %>
-                  <option value="<%= cate._id%>"><%= cate.name %></option>
-               <% }) %>
+                <select name="category" id="category" class="form-control">
+                  <option>--Select--</option>
+                  <% categories.forEach(category => { %>
+                    <option value="<%= category._id %>"><%= category.name %></option>
+                  <% }) %>
                 </select>
               </div>
             </div>
@@ -46,12 +46,10 @@
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Brand </label>
                 <div class="col-sm-10">
 
-                  <select id="brand-select" name="brand_id" class="form-control">
-                    <% filter.forEach(function(brand) { %>
-                      <option value="<%= brand._id %>"><%= brand.name %></option>
-                    <% }) %>
+                  <select id="brand" name="brand_id" class="form-control">
+                    <option>--Select--</option>
                   </select>
-                
+                  
                 </div>
               </div>
               
@@ -63,22 +61,32 @@
                 </div>
               </div>
               <div class="form-group row">
-                <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Stock</label>
                 <div class="col-sm-10">
-                  <select id="brand-material" name="material" class="form-control">
-                    <% filter.forEach(function(brand) { %>
-                      <option value="<%= brand.material %>"><%= brand.material %></option>
-                    <% }) %>
+                  <input type="number" name="stock" class="form-control" placeholder="Stock" >
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Color</label>
+                <div class="col-sm-10">
+                  <select id="color" name="color" class="form-control">
+                   
                   </select>
                 </div>
               </div>
               <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Material</label>
                 <div class="col-sm-10">
-                  <select id="brand-materialtype" name="material_type" class="form-control">
-                    <% filter.forEach(function(brand) { %>
-                      <option value="<%= brand.material_type %>"><%= brand.material_type %></option>
-                    <% }) %>
+                  <select id="material" name="material" class="form-control">
+                   
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Material Type</label>
+                <div class="col-sm-10">
+                  <select id="materialType" name="material_type" class="form-control">
+                   
                   </select>
                 </div>
               </div>
@@ -136,8 +144,8 @@
           
         </div>
         <div class="card-body">
-          <div class="table-responsive border-top userlist-table">
-            <table class="table card-table table-striped table-vcenter text-nowrap mb-0">
+          <div class="table-responsive border-top userlist-table" >
+            <table id="userTable" class="table card-table table-striped table-vcenter text-nowrap mb-0">
               <thead>
                 <tr>
                   <th class="wd-lg-8p"><span>Image</span></th>
@@ -149,56 +157,54 @@
                   <th class="wd-lg-20p">Action</th>
                 </tr>
               </thead>
-              <tbody>
-                <% if( item.length> 0){ %>
-                  <% for(let i=0;i < item.length; i++){ %>
-                <tr>
-                  <td>
-                    <img alt="avatar" class=" avatar-md mr-2" src="products/<%=item[i].images[0]%>">
-                  </td>
-                  <td><%=item[i].name%></td>
-                  <td>
-                    <%= item[i].category_id.name %>
-                  </td>
-                  <td><%=item[i].price%></td>
-                  <td class="text-center">
-                   <% if(item[i].is_available==true){%>
-                    <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
-                    <%} else{%>
-                    <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
-                    <%}%>
-                  </td>
-                  
-                  <td>
-                      <input class="check-box mr-2" type="checkbox" data-id="<%=item[i]._id%>" <%if(item[i].is_available==1){%>checked="checked"<%}%> >
-                      <a href="/admin/edit_item/<%=item[i]._id%>" class="btn btn-sm btn-info">
-                        <i class="las la-pen"></i>
-                      </a>
-                   
-                    
-                  </td>
-                </tr>
-                <% }} else { %>
-                  <tr>
-                      <td colspan="5">Item Not Found</td>
-                  </tr>
-                  <% } %>
-              </tbody>
+              <!-- userTable.ejs -->
+<tbody>
+  <% if (item.length > 0) { %>
+    <% for (let i = 0; i < item.length; i++) { %>
+      <tr>
+        <td>
+          <img alt="avatar" class="avatar-md mr-2" src="products/<%=item[i].images[0]%>">
+        </td>
+        <td><%=item[i].name%></td>
+        <td>
+          <%= item[i].category_id.name %>
+        </td>
+        <td><%=item[i].price%></td>
+        <td class="text-center">
+          <% if (item[i].is_available) { %>
+            <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
+          <% } else { %>
+            <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
+          <% } %>
+        </td>
+        <td>
+          <input class="check-box mr-2" type="checkbox" data-id="<%=item[i]._id%>" <% if (item[i].is_available) { %>checked="checked"<% } %> >
+          <a href="/admin/edit_item/<%=item[i]._id%>" class="btn btn-sm btn-info">
+            <i class="las la-pen"></i>
+          </a>
+        </td>
+      </tr>
+    <% } %>
+  <% } else { %>
+    <tr>
+      <td colspan="5">Item Not Found</td>
+    </tr>
+  <% } %>
+</tbody>
+
             </table>
+            <% if(currentPage>1){%>
+            <a href="?page=<%=prev%>">Previous</a>
+            <%}%>
+            <% for(j=1; j<= totalPages; j++){%>
+            <a href="?page=<%=j%>"><%=j%></a>
+             <% } %>
+             <% if(next<=totalPages){%>
+             <a href="?page=<%=next%>">Next</a>
+             <%}%>
           </div>
-          <ul class="pagination mt-4 mb-0 float-right">
-            <li class="page-item page-prev disabled">
-              <a class="page-link" href="#" tabindex="-1">Prev</a>
-            </li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">4</a></li>
-            <li class="page-item"><a class="page-link" href="#">5</a></li>
-            <li class="page-item page-next">
-              <a class="page-link" href="#">Next</a>
-            </li>
-          </ul>
+    
+
         </div>
       </div>
     </div><!-- COL END -->
@@ -228,6 +234,7 @@ function checker(){
   $(function () {
       $('.check-box').click(function(event) {
        let id = $(this).attr("data-id")
+       let page = $('#page').attr("data-page")
        console.log(id);
        let url = "/admin/toggleitem/"+id;
        window.location.href = url;
@@ -240,60 +247,91 @@ function checker(){
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  $(document).ready(function() {
-    $("#category-select").change(function() {
-      var selectedCategory = $(this).val();
-      $.ajax({
-        type: "POST",
-        url: "/admin/brands",
-        data: { category: selectedCategory },
-        success: function(brands) {
-          $("#brand-select").empty();
-         
-          $.each(brands, function(i, brand) {
-            $("#brand-select").append(
-              $("<option></option>").val(brand._id).text(brand.name)
-            );
-          
-          });
-         
-        }
-      });
-    });
-   
-    $("#brand-select").change(function() {
-      var selectedbrand = $(this).val();
-      $.ajax({
-        type: "POST",
-        url: "/admin/brandsDetails",
-        data: { brand_id: selectedbrand },
-        success: function(brands) {
-         
-          $("#brand-material").empty();
-          $("#brand-materialtype").empty();
-          $.each(brands, function(i, brand) {
-           
-            brands.forEach(brand => {
-            brand.material.forEach(material => {
-           $("#brand-material").append(
-            $("<option></option>").val(material).text(material)
-             );
-              });
-            });
-
-            brands.forEach(brand => {
-            brand.material_type.forEach(material_type => {
-           $("#brand-materialtype").append(
-            $("<option></option>").val(material_type).text(material_type)
-             );
-              });
-            });
-          });
-         
-        }
-      });
+ $(document).ready(function() {
+ 
+ 
+  $('#category').on('change', function() {
+    var categoryId = $(this).val();
+    // Make an AJAX request to retrieve the filters for the selected category
+    $.ajax({
+      url: '/admin/getFilters',
+      type: 'GET',
+      data: { categoryId: categoryId },
+      success: function(response) {
+        // Clear the brand dropdown and add options for each filter
+        $('#brand').empty();
+        response.filters.forEach(function(filter) {
+          $('#brand').append('<option value="' + filter._id + '">' + filter.brand + '</option>');
+        });
+        $('#brand').trigger('change');
+      },
+      error: function(xhr, status, error) {
+        console.log('Error retrieving filters: ' + error);
+      }
     });
   });
- 
+
+
+   $('#category').on('change', function() {
+    var categoryId = $(this).val();
+    // Make an AJAX request to retrieve the filters for the selected category
+    $.ajax({
+      url: '/admin/getFilters',
+      type: 'GET',
+      data: { categoryId: categoryId },
+      success: function(response) {
+        // Clear the brand dropdown and add options for each filter
+        $('#brand').empty();
+        response.filters.forEach(function(filter) {
+          $('#brand').append('<option value="' + filter._id + '">' + filter.brand + '</option>');
+        });
+       
+      },
+      error: function(xhr, status, error) {
+        console.log('Error retrieving filters: ' + error);
+      }
+    });
+  });
+  $('#brand').on('change', function() {
+  var brandId = $(this).val();
+
+  // Get the materials and material types for the selected brand
+  $.ajax({
+  url: '/admin/brandsDetails',
+  data: { brandId: brandId },
+  success: function(data) {
+  $('#material').empty();
+  $('#materialType').empty();
+  $('#color').empty();
+  var materials = data.materials;
+  var materialTypes = data.materialTypes;
+  var colors = data.colors;
+
+  // Add each material to the materials dropdown
+  materials.forEach(function(material) {
+    for(let i=0;i<material.length;i++)
+    $('#material').append('<option value="' + material[i] + '">' + material[i] + '</option>');
+  });
+
+  // Add each material type to the material types dropdown
+  materialTypes.forEach(function(materialType) {
+    for(let i=0;i<materialType.length;i++)
+    $('#materialType').append('<option value="' + materialType[i] + '">' + materialType[i] + '</option>');
+  });
+  colors.forEach(function(color) {
+    for(let i=0;i<color.length;i++)
+    $('#color').append('<option value="' + color[i] + '">' + color[i] + '</option>');
+  });
+},
+  error: function() {
+    alert('Error retrieving materials and material types');
+  }
+});
+});
+});
+
+
+
+
 </script>
 <%-include("../layouts/admin-footer.ejs")-%>

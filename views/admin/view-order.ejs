@@ -1,0 +1,153 @@
+<%-include('../layouts/admin-header.ejs')-%>
+<div class="container">
+<!-- row -->
+    <div class="row row-sm">
+        <!-- Col -->
+         <!-- Col -->
+         <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header tx-medium bd-0 tx-white bg-primary">
+                   <h5 class="text-uppercase" id="orderId"> <%=orders._id%> </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mg-b-0">Order is <%=orders.status%> </p>
+                    <hr>
+                    <h5 class="card-title">customer details</h5>
+                    <p class="mg-b-0"> Name: <%=orders.userId.name%></p>
+                    <p class="mg-b-0"> Email: <%=orders.userId.email%></p>
+                    <p class="mg-b-0"> Phone: <%=orders.addressId.phone%></p>
+                    <hr>
+                    <h5 class="card-title">Address</h5>
+                    <p class="mg-b-0"><%=orders.addressId.address%>, <%=orders.addressId.city%>, <%=orders.addressId.state%></p>
+                    <p class="mg-b-0">Pincode: <%=orders.addressId.zip%></p>
+                </div>
+                <%orders.products.item.forEach((items)=>{%>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                          <img src="/products/<%=items.productId.images[0]%>" class="img-thumbnail" alt="">
+                        </div>
+                        <div class="col-md-4">
+                            <%=items.productId.name%>
+                        </div>
+                        <div class="col-md-2">
+                            <%=items.qty%>
+                        </div>
+                        <div class="col-md-4">
+                            <%=items.price%>
+                        </div>
+                    </div>
+                   
+               </div>
+               <%})%>
+               <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted"> Delivery Charge :Rs 45</h6>
+                <h6 class="card-subtitle mb-2 text-muted"> SubTotal : Rs <%=orders.products.totalPrice%></h6>
+               </div>
+               
+            </div>
+        </div>
+        <!-- /Col -->
+        <div class="col-lg-4">
+           
+            <div class="card mg-b-20">
+                <div class="card-body">
+                    <div class="main-content-label tx-13 mg-b-25">
+                        update Status
+                    </div>
+                    <div class="main-profile-contact-list">
+                        
+                        <div class="media">
+                      
+                            <div class="media-body">
+                               
+                                <div>
+                                    <form id="changeStatus">
+                                        <input type="hidden" name="id" value="<%=orders._id%>">
+                                       
+                                    Status : <select name="status" id="" class="form-control">
+                                        <option value="Placed">Placed</option>
+                                        <option value="Shipped">Shipped</option> 
+                                        <option value="Delivered">Delivered</option>
+                                    </select>
+                                <button class="btn btn-success" id="statusBtn" type="submit">Change status</button>
+                            </form>
+                            </div>
+                        </div>
+                    </div><!-- main-profile-contact-list -->
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="card mg-b-20">
+            <div class="card-body">
+                <div class="main-content-label tx-13 ">
+                    <%if(orders.status !='Canceled'){%>
+                    <button class="btn btn-danger"data-id="<%=orders._id%>" id="cancelOrder" type="submit">Cancel Order</button>
+                    <%} else{%>
+                        <span>Order is canceled</span>
+                        <%}%>
+                </div>
+               
+        </div>
+        
+        
+    </div>
+
+       
+    </div>
+    <!-- row closed -->
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $('#cancelOrder').click(function(event) {
+    event.preventDefault(); // prevent default form submission behavior
+
+    // show confirmation dialog box
+    if (confirm("Are you sure you want to cancel this order?")) {
+        var orderId = $(this).data("id");
+
+        // disable the cancel button to prevent multiple clicks
+        $(this).prop('disabled', true);
+
+        // submit form data using AJAX
+        $.ajax({
+            url: '/admin/cancelOrder',
+            type: 'POST',
+            data: {orderId},
+            success: function(data) {
+                alert('Order canceled successfully');
+                window.location.reload();
+            },
+            error: function(error) {
+                console.log(error); // log any errors
+            }
+        });
+    }
+});
+
+$('#statusBtn').click(function(event) {
+      event.preventDefault(); // prevent default form submission behavior
+  
+      var formData = $('#changeStatus').serialize(); // get form data
+       
+      // submit form data using AJAX
+      $.ajax({
+        url: '/admin/change-status',
+        type: 'POST',
+        data: formData,
+        success: function(data) {
+         
+          window.location.reload()
+        },
+        error: function(error) {
+          
+          console.log(error); // log any errors
+        }
+      });
+    });
+
+</script>
+<%-include("../layouts/admin-footer.ejs")-%>

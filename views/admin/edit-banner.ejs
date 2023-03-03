@@ -88,7 +88,7 @@
                    
                     
                    <%})%>
-                   <input type="hidden" name="old_image" value="<%=banner.bannerImage %>">
+                   <input type="hidden" name="old_images" value="<%=banner.bannerImage.join(',') %>">
                    
                     <input type="file" name="BannerImage" multiple class="form-control" id="formFile" accept="image/*" >
                 </div>

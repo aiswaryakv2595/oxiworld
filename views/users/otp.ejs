@@ -15,8 +15,8 @@
                   <label for="Otp" class="form-label">Enter OTP</label>
                   <input type="text" id="otp" name="otp" class="form-control border border-primary" id="exampleInputEmail1" aria-describedby="emailHelp">
               </div>
-              <h6 class="m-0 text-dark mt-3">Time Left: <span id="timer"></span></h6>
-             
+              <span id="timer">1:00</span>
+              <a href="/otp" id="resend-link" class="d-none">Resend OTP</a>
               <div class="d-grid">
                   <button class="btn btn-primary" type="submit">Login</button>
               </div>
@@ -33,35 +33,30 @@
   </div>
 </div>
 <script>
-     document.getElementById('timer').innerHTML = '2:00';
-
-     startTimer();
-        function startTimer() {
-            var presentTime = document.getElementById('timer').innerHTML;
-            var timeArray = presentTime.split(/[:]+/);
-            var m = timeArray[0];
-            var s = checkSecond((timeArray[1] - 1));
-            if (s == 59) { m = m - 1 };
-            if (m < 0) {
-                window.location.reload()
-                return;
-            }
-
-            if (s < 10 && m == "00") {
-                document.getElementById("clicable1").disabled = true;
-                document.getElementById("clicable2").disabled = true;
-                document.getElementById("insert").disabled = true;
-            }
-
-            document.getElementById('timer').innerHTML = m + ":" + s;
-            setTimeout(startTimer, 1000);
-        }
-
-        function checkSecond(sec) {
-            if (sec < 10 && sec >= 0) { sec = "0" + sec };
-            if (sec < 0) { sec = "59" };
-            return sec;
-        }
-</script>
-
+    // Set the countdown duration in seconds
+    const countdownDuration = 60;
+    
+    // Get the timer element
+    const timerElement = document.getElementById('timer');
+    
+    // Start the countdown timer
+    let countdown = countdownDuration;
+    const intervalId = setInterval(() => {
+      countdown--;
+      const minutes = Math.floor(countdown / 60);
+      const seconds = countdown % 60;
+      timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      if (countdown === 0) {
+        // Stop the countdown timer
+        clearInterval(intervalId);
+    
+        // Hide the timer element
+        timerElement.style.display = 'none';
+    
+        // Show the "Resend OTP" link
+        const resendLinkElement = document.getElementById('resend-link');
+        resendLinkElement.classList.remove('d-none');
+      }
+    }, 1000);
+    </script>
 <%-include("../layouts/footer.ejs")-%>

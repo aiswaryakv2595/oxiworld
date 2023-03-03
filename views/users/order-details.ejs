@@ -1,0 +1,79 @@
+<%-include('../layouts/user-header.ejs')-%>
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread"><span><a href="/profile">Home</a></span> / <span>Orders</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dashboard">
+    <div class="container">
+        <div class="row">
+          <div class="col-12 col-lg-12 col col-md-8 col-sm-6 col-xs-2">
+        
+        <h3 class="h3order">Order Details</h3>
+        <br>
+          <table id="myTable" class="table">
+              <thead>
+                <tr>
+                  
+                  <th scope="col" >OrderId</th>
+                 
+                  <th scope="col">Time</th>
+                  <th scope="col">Payment</th>
+                  <th scope="col">Status</th>
+                  
+                  <th scope="col" >Actions</th>  
+                
+                  <th scope="col">View Order</th>
+                </tr>
+              </thead>
+              <% if(id){ %> 
+              <% for(let key of userorders){ %>
+                <% if(userorders){ %> 
+                
+              <tbody>  
+                <tr>
+                  
+                    <td><%= key._id %></td>
+                    
+                    <td><%= key.createdAt.toDateString() %></td>
+                    <td><%= key.payment %></td>
+                    <td><%= key.status %></td>
+                    <% if(key.status != 'Canceled'){%>
+                      <% if(key.status != 'Delivered'){%>
+                  <td><a href="/cancelOrder?id=<%= key._id %>" class="btn btn-danger" onclick="deletecontent()">Cancel Order</a></td>
+                  <%}
+                  else{%>
+                    <td>Order Already <%=key.status%></td>
+                    <%}%>
+               <% } else{%>
+                    <td>Order Already <%=key.status%></td>
+                    <%}%>
+            
+                  <td><a href="/viewOrder?id=<%= key._id %>" class="btn btn-info">View Details</a></td>
+                </tr>
+              </tbody>
+              <% }else{ %> 
+                <p>No order has been made yet.</p>
+                <% } %> 
+              <% } %>
+            </table>
+      
+
+    
+
+        <% }else{ %> 
+            <h4>please login....</h4>
+        <% } %> 
+        <a href="/collection" class="btn btn-primary"><span>GO SHOP</span><i class="icon-long-arrow-right"></i></a>
+    </div>
+</div>
+</div>
+
+</div>
+
+
+<%-include("../layouts/user-footer.ejs")-%>

@@ -17,7 +17,7 @@
         <form action="/admin/filter-category" method="post" id="form">
          
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Brand Name</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Category</label>
               <div class="col-sm-10">
                <select name="categoryId" id="categoryId" class="form-control" onchange="display()">
                 <% category.forEach((row,element)=>{%>
@@ -31,7 +31,7 @@
               <label for="inputEmail3" class="col-sm-2 col-form-label">Brand Name</label>
               <div class="col-sm-10">
                
-                <input type="text" class="form-control" name="brand_name"  placeholder="Brand Name" required>
+                <input type="text" class="form-control" name="brand"  placeholder="Brand Name" required>
                 
               </div>
              
@@ -158,32 +158,34 @@
                     <tr>
                       <td> <%= filter[i].categoryId.name %></td>
                       <td> <%= filter[i].createdAt.toDateString() %></td>
-                      <% filter[i].filter.brand.forEach((row,element)=>{%>
+                      
                       <td> 
-                          <%=row.name%>
+                          <%=filter[i].brand%>
                      </td>
                      <td class="text-center">
-                      <% if(row.is_available==true){%>
-                       <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
-                       <%} else{%>
-                       <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
-                       <%}%>
-                     </td>
-                     <td>
-                     <input class="check-box mr-2" type="checkbox" data-id="<%=row._id%>" <%if(row.is_available==1){%>checked="checked"<%}%> >
-                     <% })%>
+                      <div class="label-container" data-id="<%=filter[i]._id%>">
+                        <% if(filter[i].is_available==true){%>
+                          <span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>
+                        <%} else{%>
+                          <span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>
+                        <%}%>
+                      </div>
+                    </td>
+                    <td>
+                     <input class="check-box mr-2" type="checkbox" data-id="<%=filter[i]._id%>" <%if(filter[i].is_available==1){%>checked="checked"<%}%> >
+                    
                      
                     
                    
                       
-                      <a href="/admin/editfilter/<%=filter[i]._id%>" class="btn btn-sm btn-info">
+                      <a href="/admin/edit-filter?id=<%=filter[i]._id%>" class="btn btn-sm btn-info">
                         <i class="las la-pen"></i>
                       </a>
                    
                       </td>
                     
                     </tr>
-                 <% }}%>
+                    <% }}%>
               </tbody>
               
             </table>
@@ -277,16 +279,32 @@
 }
 
      </script>
-     <script>
-      $(function () {
-          $('.check-box').click(function(event) {
-           let id = $(this).attr("data-id")
-           console.log(id);
-           let url = "/admin/togglecategory/"+id;
-           window.location.href = url;
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <script>
+    
+    $(function () {
+      $('.check-box').click(function(event) {
+        let id = $(this).attr("data-id");
+        let url = "/admin/togglefilter/"+id;
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: function (response) {
+            console.log(response);
+            let container = $(".label-container[data-id='" + id + "']");
+            if (response.is_available) {
+              container.html('<span class="label text-muted d-flex"><div class="dot-label bg-primary mr-1"></div>Active</span>');
+            } else {
+              container.html('<span class="label text-muted d-flex"><div class="dot-label bg-danger mr-1"></div>Not Available</span>');
+            }
+          },
+          error: function (xhr, status, error) {
+            console.log(error);
+          }
         });
       });
-  </script>
+    });
+    </script>
    
 
 <%-include("../layouts/admin-footer.ejs")-%>

@@ -1,4 +1,12 @@
 <%-include('../layouts/user-header.ejs')-%>
+<style>
+  .active {
+  
+  color: #000; /* Set text color to white */
+  font-weight: bold; /* Set font weight to bold */
+}
+
+</style>
 <div class="breadcrumbs">
   <div class="container">
     <div class="row">
@@ -19,45 +27,48 @@
             <div class="side border mb-1">
               <h3>Categories</h3>
               <ul>
+                <li><a href="#" class="category-link" data-category-id="1">All</a></li>
                 <% categories.forEach((row)=>{%>
-                <li><a href="/filter?category=<%= row._id%>"><%= row.name %></a></li>
+                  <li><a href="#" class="category-link" data-category-id="<%= row._id %>"><%= row.name %></a></li>
+
                 <%})%>
               </ul>
             </div>
           </div>
+
           <div class="col-sm-12">
-            <div class="side border mb-1">
-              <h3>Size/Width</h3>
-              <div class="block-26 mb-2">
-                <h4>Size</h4>
-                     <ul>
-                      <% size.forEach((row)=>{%>
-                       
-                        <li><a href="#"><%= row %></a></li>
-                        <%})%>
-                        
-                       
-                     </ul>
-                  </div>
-                  
+            <div class="side border mb-1" >
+              <h3>Brands</h3>
+              <ul id="brand-name">
+                <% uniqueBrands.forEach((brand) => { %>             
+                <li>
+                <label>
+                <input type="checkbox" class="brand-checkbox" data-brand-name="<%= brand %>">
+                  <%= brand %>
+                  </label>
+                </li>
+                <% }); %>
+              </ul>
+
             </div>
           </div>
+          
           <div class="col-sm-12">
             <div class="side border mb-1">
               <h3>Price</h3>
-              <form action="" method="post">
-              <div class="row">
-                <div class="col-sm-6">
-                  <input type="text" class="mx-2 form-control input-sm">
+              <form id="price-filter-form" action="" method="post">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <input type="text" name="min" placeholder="min" class="mx-2 form-control" >
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="text" name="max" placeholder="max" class="form-control border border-secondary">
+                  </div>
                 </div>
-                <div class="col-sm-6">
-                  <input type="text" class="form-control input-sm">
+                <div>
+                  <input type="button" value="Check" class="btn btn-primary mt-2">
                 </div>
-              </div>
-              <div>
-                <input type="button" value="Check" class="btn btn-primary mt-2">
-              </div>
-            </form>
+              </form>
               
             </div>
           </div>
@@ -65,10 +76,9 @@
             <div class="side border mb-1">
               <h3>Colors</h3>
               <ul>
-                <% color.forEach((row)=>{%>
-                  <li><a href="/filter?material=<%= row %>"><%= row %></a></li>
-                  <%})%>
-               
+                <% uniqueColors.forEach((color,index) => { %>
+                  <li><a href="#" class="color-link" data-color="<%= color %>"><%= color %></a></li>
+                <% }); %>
               </ul>
             </div>
           </div>
@@ -76,90 +86,362 @@
             <div class="side border mb-1">
               <h3>Material</h3>
               <ul>
-                <%allProducts.forEach((row)=>{%>
-                  <li><a href="/filter?material=<%= row.material %>"><%= row.material %></a></li>
-                  <%})%>
+                <% uniqueMaterials.forEach((material,index) => { %>                
+                  <li><a href="#" class="material-link" data-material="<%= material %>"><%= material %></a></li>
+                <% }); %>
               </ul>
             </div>
           </div>
-          <div class="col-sm-12">
-            <div class="side border mb-1">
-              <h3>Material Type</h3>
-              <ul>
-                <%allProducts.forEach((row)=>{%>
-                  <li><a href="/filter?materialtype=<%= row.material_type %>"><%=row.material_type%></a></li>
-                  <%})%>
-              </ul>
-            </div>
-          </div>
+          
         </div>
       </div>
       <div class="col-lg-9 col-xl-9">
         <div class="d-flex">
           <div class="mb-2 p-2"><span>Sort By </span></div>
-          <div class="mb-2 p-2"><a href="/sort-decending">Price--High to Low</a></div>
-          <div class="mb-2 p-2"><a href="/sort-ascending">Price--Low to High</a></div>
+          <div class="mb-2 p-2 high-low"><a href="#">Price--High to Low</a></div>
+          <div class="mb-2 p-2 low-high"><a href="#">Price--Low to High</a></div>
           
-          <form>
-              <div class="input-group d-flex">
-               
-                <input type="search" id="search" name="search" class="form-control rounded bg-light" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
-                <button type="button" class="btn btn-outline-primary btn-search">search</button>
-              
-              </div>
-            </form>
+        
+          <div class="mb-2">
+            <form id="search-form" action="" method="post">
+            <input type="text" id="search-input" name="search"  placeholder="Search for products">
+            <input type="button" value="Search" class="btn btn-primary mt-2">
+          </form>
+          </div>
             
           
           
         </div>
-        <div class="row row-pb-md">
-          <% products.forEach((row,element)=>{%>
-          <div class="col-lg-4 mb-4 text-center">
-            <div class="product-entry border">
-              <a href="/productdetails/<%=row._id%>" class="prod-img">
-                <img src="/products/<%=row.images[0]%>" class="img-fluid" alt="Free html5 bootstrap 4 template">
-              </a>
-              <div class="desc">
-                <h2><a href="#"><%=row.name%></a></h2>
-                <span class="price"><%=row.price%></span>
-              </div>
-            </div>
-          </div>
-          <%})%>
-          <div class="w-100"></div>
-       
         
-          
+          <div id="products-container" class="row row-pb-md">
+            <% products.forEach(product => { %>
+              <div class="col-lg-4 mb-4 text-center">
+                <div class="product-entry border">
+                  <a href="/productdetails/<%= product._id %>" class="prod-img">
+                    <img src="/products/<%= product.images[0] %>" class="img-fluid" alt="<%= product.name %>" style="height: 300px; width: 100%; object-fit: fill;" >
+                  </a>
+                  <div class="desc">
+                    <h2><a href="#"><%= product.name %></a></h2>
+                    <span class="price"><%= product.price %></span>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+          <% if(currentPage>1){%>
+            <a href="?page=<%=prev%>">Previous</a>
+            <%}%>
+            <% for(j=1; j<= totalPages; j++){%>
+            <a href="?page=<%=j%>"><%=j%></a>
+             <% } %>
+             <% if(next<=totalPages){%>
+             <a href="?page=<%=next%>">Next</a>
+             <%}%>
          
         </div>
-        <div class="row">
-          <div class="col-md-12 text-center">
-            <div class="block-27">
-                   <ul>
-                     <li><a href="#"><i class="ion-ios-arrow-back"></i></a></li>
-                      <li class="active"><span>1</span></li>
-                      <li><a href="#">2</a></li>
-                      <li><a href="#">3</a></li>
-                      <li><a href="#">4</a></li>
-                      <li><a href="#">5</a></li>
-                      <li><a href="#"><i class="ion-ios-arrow-forward"></i></a></li>
-                   </ul>
-                </div>
-          </div>
-        </div>
+       
       </div>
     </div>
   </div>
 </div>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- filter checkbox -->
+
 <script>
-  $(function () {
-      $('.btn-search').click(function(event) {
-       let search = $('#search').val()
-       
-       let url = "/filter?search="+search;
-       window.location.href = url;
+  // filter category wise
+  $('.category-link').click(function(e) {
+  e.preventDefault();
+  $('.category-link').removeClass('active');
+  $(this).addClass('active');
+  const categoryId = $(this).data('category-id');
+  let checkedBrands = $('.brand-checkbox:checked').map(function() {
+    return $(this).data('brand-name');
+  }).get();
+  console.log(checkedBrands);
+  $.ajax({
+    url: `/category/products`,
+    method: 'POST',
+    data: { categoryId: categoryId, brands: checkedBrands },
+    success: function(data) {
+      console.log('Response data:', data);
+      const products = data.products;
+      const filters = data.filters;
+      const filterHtml =filters.map((filter)=>`
+                  <ul>
+                    <li>
+                      <label>
+                        <input type="checkbox" class="brand-checkbox" data-brand-name="${filter.brand}" data-category-id="${categoryId}">
+                        ${filter.brand}
+                      </label>
+                    </li>
+                  </ul>
+               `).join('')
+      const productsHtml = products.map(product => `
+        <div class="col-lg-4 mb-4 text-center">
+          <div class="product-entry border">
+            <a href="/productdetails/${product._id}" class="prod-img">
+              <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+            </a>
+            <div class="desc">
+              <h2><a href="#">${product.name}</a></h2>
+              <span class="price">${product.price}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+  
+      $('#products-container').html(productsHtml);
+      $('#brand-name').html(filterHtml);
+    },
+    error: function(xhr, status, error) {
+      console.error('Error fetching products:', error);
+    }
+  });
+});
+
+//filter brand wise
+$('#brand-name').on('change', '.brand-checkbox', function(e) {
+  const checkedBrands = $('.brand-checkbox:checked').map(function() {
+    return $(this).data('brand-name');
+  }).get();
+  const categoryIds = $('.brand-checkbox').data('category-id')
+  console.log('categoryIds: '+categoryIds);
+  console.log(checkedBrands);
+  $.ajax({
+    url: `/brands/products`,
+    method: 'POST',
+    data: { brands: checkedBrands, categoryId:categoryIds },
+    success: function(data) {
+      console.log('Response data:', data);
+      const products = data;
+      const productsHtml = products.map(product => `
+        <div class="col-lg-4 mb-4 text-center">
+          <div class="product-entry border">
+            <a href="/productdetails/${product._id}" class="prod-img">
+              <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+            </a>
+            <div class="desc">
+              <h2><a href="#">${product.name}</a></h2>
+              <span class="price">${product.price}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+  
+      $('#products-container').html(productsHtml);
+    },
+    error: function(xhr, status, error) {
+      console.error('Error fetching products:', error);
+    }
+  });
+});
+
+//color wise
+$('.color-link').click(function(e) {
+  e.preventDefault();
+  // $('.color-link').removeClass('active');
+  // $(this).addClass('active');
+  const color = $(this).data('color');
+  
+  $.ajax({
+  url: `/color/${color}/products`,
+  method: 'GET',
+  success: function(data) {
+  console.log('Response data:', data); // Add this line to log the data variable
+  const products = data;
+  const productsHtml = products.map(product => `
+    <div class="col-lg-4 mb-4 text-center">
+      <div class="product-entry border">
+        <a href="/productdetails/${product._id}" class="prod-img">
+          <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+        </a>
+        <div class="desc">
+          <h2><a href="#">${product.name}</a></h2>
+          <span class="price">${product.price}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  $('#products-container').html(productsHtml);
+  },
+
+
+  error: function(xhr, status, error) {
+    console.error('Error fetching products:', error);
+  }
+  });
+
+});
+
+//material wise
+$('.material-link').click(function(e) {
+  e.preventDefault();
+  // $('.material-link').removeClass('active');
+  // $(this).addClass('active');
+  const material = $(this).data('material');
+  
+  $.ajax({
+  url: `/material/${material}/products`,
+  method: 'GET',
+  success: function(data) {
+  console.log('Response data:', data); // Add this line to log the data variable
+  const products = data;
+  const productsHtml = products.map(product => `
+    <div class="col-lg-4 mb-4 text-center">
+      <div class="product-entry border">
+        <a href="/productdetails/${product._id}" class="prod-img">
+          <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+        </a>
+        <div class="desc">
+          <h2><a href="#">${product.name}</a></h2>
+          <span class="price">${product.price}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  $('#products-container').html(productsHtml);
+  },
+
+
+  error: function(xhr, status, error) {
+    console.error('Error fetching products:', error);
+  }
+  });
+
+});
+
+$('.high-low').click(function(e) {
+  e.preventDefault();
+  // $('.high-low').removeClass('active');
+  // $(this).addClass('active');
+  const material = $(this).data('material');
+  
+  $.ajax({
+  url: `/sort-decending`,
+  method: 'GET',
+  success: function(data) {
+  console.log('Response data:', data); // Add this line to log the data variable
+  const products = data;
+  const productsHtml = products.map(product => `
+    <div class="col-lg-4 mb-4 text-center">
+      <div class="product-entry border">
+        <a href="/productdetails/${product._id}" class="prod-img">
+          <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+        </a>
+        <div class="desc">
+          <h2><a href="#">${product.name}</a></h2>
+          <span class="price">${product.price}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  $('#products-container').html(productsHtml);
+  },
+
+
+  error: function(xhr, status, error) {
+    console.error('Error fetching products:', error);
+  }
+  });
+
+});
+
+$('.low-high').click(function(e) {
+  e.preventDefault();
+ 
+  const material = $(this).data('material');
+  
+  $.ajax({
+  url: `/sort-ascending`,
+  method: 'GET',
+  success: function(data) {
+  console.log('Response data:', data); // Add this line to log the data variable
+  const products = data;
+  const productsHtml = products.map(product => `
+    <div class="col-lg-4 mb-4 text-center">
+      <div class="product-entry border">
+        <a href="/productdetails/${product._id}" class="prod-img">
+          <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+        </a>
+        <div class="desc">
+          <h2><a href="#">${product.name}</a></h2>
+          <span class="price">${product.price}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  $('#products-container').html(productsHtml);
+  },
+
+
+  error: function(xhr, status, error) {
+    console.error('Error fetching products:', error);
+  }
+  });
+
+});
+
+$('#price-filter-form input[type="button"]').click(function() {
+    var min = $('#price-filter-form input[name="min"]').val();
+    var max = $('#price-filter-form input[name="max"]').val();
+
+    $.post('/products/filter/price', { min: min, max: max }, function(data) {
+      // Update the products container with the filtered results
+      var productsHtml = '';
+      if (data.length > 0) {
+        productsHtml = data.map(product => `
+          <div class="col-lg-4 mb-4 text-center">
+            <div class="product-entry border">
+              <a href="/productdetails/${product._id}" class="prod-img">
+                <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+              </a>
+              <div class="desc">
+                <h2><a href="#">${product.name}</a></h2>
+                <span class="price">${product.price}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        productsHtml = '<p>No items found with the selected price range</p>';
+      }
+      $('#products-container').html(productsHtml);
     });
   });
+ 
+$('#search-form input[type="button"]').click(function() {
+    var search = $('#search-form input[name="search"]').val();
+    
+
+    $.post('/products/search', { search: search}, function(data) {
+      // Update the products container with the filtered results
+      var productsHtml = '';
+      if (data.length > 0) {
+        productsHtml = data.map(product => `
+          <div class="col-lg-4 mb-4 text-center">
+            <div class="product-entry border">
+              <a href="/productdetails/${product._id}" class="prod-img">
+                <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+              </a>
+              <div class="desc">
+                <h2><a href="#">${product.name}</a></h2>
+                <span class="price">${product.price}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        productsHtml = '<p>No items found </p>';
+      }
+      $('#products-container').html(productsHtml);
+    });
+  });
+ 
 </script>
+
 <%-include("../layouts/user-footer.ejs")-%>

@@ -1,0 +1,120 @@
+<%- include('../layouts/admin-header.ejs') %>
+<div class="container">
+    <!-- breadcrumb -->
+    <div class="breadcrumb-header justify-content-between">
+        <div class="my-auto">
+            <div class="d-flex">
+                <h4 class="content-title mb-0 my-auto">Orders</h4><span class="text-muted mt-1 tx-13 ml-2 mb-0">/ Order Table</span>
+            </div>
+        </div>
+       
+    </div>
+    <!-- breadcrumb -->
+    <div class="card">
+        <div class="card-body">
+            <form id="getSales" action="" method="post">
+        <div class="row">
+            <div class="col-sm-3">
+                <input type="date" name="from" class="form-control" >
+            </div>
+            <div class="col-sm-3">
+                <input type="date" class="form-control" name="to" >
+            </div>
+            <div class="col-sm-3">
+                <select name="status" id="" class="form-control">
+                    <option value="Placed">Placed</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Canceled">Canceled</option>
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <input type="button" value="Action" class="btn btn-primary mt-2">
+            </div>
+        </div>
+    </form>
+    </div>
+    </div>
+<!-- row opened -->
+<div class="row row-sm">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header pb-0">
+                <div class="d-flex justify-content-between">
+                    <h4 class="card-title mg-b-0">SALES</h4>
+                    <i class="mdi mdi-dots-horizontal text-gray"></i>
+                </div>
+               
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table text-md-nowrap" id="ordersTable">
+                        <thead>
+                          <tr>
+                            <th class="wd-15p border-bottom-0">product</th>
+                            <th class="wd-15p border-bottom-0">Category</th>
+                            <th class="wd-20p border-bottom-0">total Item sold</th>
+                            <th class="wd-15p border-bottom-0">Total Price</th>
+                           
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% if(products.length>0){
+                            products.forEach((row)=>{%>
+                              <tr>
+                                <td>
+                                  <%= row.name%>
+                                </td>
+                                <td> <%= row.category_id.name%> </td>
+                                <td><%= row.stock%></td>
+                              </tr>
+
+                          <%  }) }%>
+                          <tr>
+                            
+                          </tr>
+                        </tbody>
+                       
+                      </table>
+                      
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/div-->
+
+
+</div>
+<!-- /row -->
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$('#getSales input[type="button"]').click(function() {
+    var status = $('#getSales input[name="status"]').val();
+    var from = $('#getSales input[name="from"]').val();
+    var to = $('#getSales input[name="to"]').val();
+
+    $.post('/admin/search-orders', { status: status, from: from, to:to }, function(data) {
+      // Update the products container with the filtered results
+      var productsHtml = '';
+      if (data.length > 0) {
+        productsHtml = data.map(order => `
+        <tr>
+                              <td> ${order._id}</td>
+                              
+                            </tr>
+        `).join('');
+      } else {
+        productsHtml = '<p>No items found with the selected price range</p>';
+      }
+      $('#ordersTable').html(productsHtml);
+    });
+  });
+ 
+</script>
+<%- include('../layouts/admin-footer.ejs') %>

@@ -7675,7 +7675,7 @@ h1, h2, h3, h4, h5,
 .colorlib-partner,
 .colorlib-intro,
 .colorlib-product {
-  padding: 7em 0;
+  padding: 2em 0;
   clear: both; }
 
 .colorlib-intro {
@@ -8402,9 +8402,9 @@ input[type="text"] {
         font-size: 20px; }
 
 .colorlib-heading {
-  margin-bottom: 5em; }
+  margin-bottom: 2em; }
   .colorlib-heading h2 {
-    font-size: 40px;
+    font-size: 30px;
     margin-bottom: 20px;
     line-height: 1.5;
     font-weight: 700;
@@ -8426,7 +8426,7 @@ input[type="text"] {
     max-width: 50%; } }
 
 #colorlib-footer {
-  padding: 7em 0 0 0; }
+  padding: 0; }
   #colorlib-footer .colorlib-footer-links {
     padding: 0;
     margin: 0; }

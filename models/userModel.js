@@ -79,26 +79,29 @@ const userSchema = mongoose.Schema({
 },{
     timestamps:true
 });
-userSchema.methods.addToCart = function(product,quantity){
-    const cart = this.cart
-    
-    console.log('quanty'+quantity);
-    const isExisting = cart.item.findIndex((objInItems) =>{
-        return  (
-            new String(objInItems.productId).trim()== new String(product._id).trim()
-        )
-    })
+userSchema.methods.addToCart = function(product, quantity) {
+  const cart = this.cart;
 
-    if(isExisting>=0){
-        cart.item[isExisting].qty += 1
-    }else{
-        cart.item.push({productId:product._id, qty:quantity, price:product.price})
-    }
-    cart.totalprice += product.price
-    console.log('user in schema:',this);
-    return this.save();
+  const existingItem = cart.item.find(item => {
+    return new String(item.productId).trim() === new String(product._id).trim();
+  });
 
- }
+  if (existingItem) {
+    // If the product already exists in the cart, increment its quantity
+    existingItem.qty += quantity;
+  } else {
+    // Otherwise, add the product to the cart with the specified quantity
+    cart.item.push({ productId: product._id, qty: quantity, price: product.price });
+  }
+
+  // Update the total price to reflect the quantity being added
+  cart.totalprice += product.price * quantity;
+
+  console.log('user in schema:', this.cart);
+  return this.save();
+};
+
+  
 
 
   userSchema.methods.removefromCart = async function(productId){
@@ -109,10 +112,10 @@ userSchema.methods.addToCart = function(product,quantity){
             if(isExisting >=0){
                 const prod = await Product.findById(productId)
                 cart.totalprice -= prod.price* cart.item[isExisting].qty
-                if(cart.totalprice<=0)
-                cart.totalprice =0;
+                if(cart.totalprice<0)
+                cart.totalprice = 0
                 cart.item.splice(isExisting, 1)
-                console.log('user in schema:',this);
+                // console.log('user in schema:',this);
                 return this.save();
             }   
   }
@@ -135,12 +138,30 @@ userSchema.methods.addToCart = function(product,quantity){
 
 
   userSchema.methods.removefromWishlist = async function(productId){
-    const wishlist = this.wishlist
-    const isExisting = wishlist.item.findIndex(objInItems => new String(objInItems.productId).trim() === new String(productId).trim())
+    const wishlist = this.wishlist;
+    const isExisting = wishlist.item.findIndex(item => new String(item.productId).trim() === new String(productId).trim());
     if(isExisting >= 0){
-        await Product.findById(productId)
-        wishlist.item.splice(isExisting,1)
-        return this.save()
+        // Remove the item from the wishlist
+        wishlist.item.splice(isExisting, 1);
+
+        // Save the updated wishlist
+        await this.save();
+
+        // Check if the product exists in the user's cart
+        const existingCartItem = this.cart.item.find(item => new String(item.productId).trim() === new String(productId).trim());
+
+        // If the product exists in the cart, do not add it again
+        if (existingCartItem) {
+          console.log('Product already exists in cart:', existingCartItem);
+          return;
+        }
+
+        // Otherwise, add the product to the cart with quantity 1
+        const product = await Product.findById(productId);
+        console.log('product'+product);
+        this.addToCart(product, 1);
     }
-  }
+};
+
+
 module.exports = mongoose.model('User',userSchema)
