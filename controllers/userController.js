@@ -259,49 +259,64 @@ function getUniqueValues(filters, fieldName) {
 
   return Array.from(values);
 }
-const showCollections = async (req, res) => {
-  var page = 1;
-  if (req.query.page) {
-    page = req.query.page;
+const showCollections = async (req, res, next) => {
+  try {
+    var page = 1;
+    if (req.query.page) {
+      page = req.query.page;
+    }
+    const limit = 6;
+    const categories = await Category.find({});
+    const filters = await Filter.find({});
+    const categoryId = req.query.categoryId;
+    const brands = req.query.brands || [];
+
+    // Add category filter to Item.find() query
+    const query = categoryId ? { category_id: categoryId } : {};
+    if (brands.length) {
+      query.brand = { $in: brands };
+    }
+    const products = await Item.find(query)
+      .populate("brand_id")
+      .populate("category_id")
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+    const count = await Item.countDocuments(query);
+    let totalPages = Math.ceil(count / limit);
+    console.log(count);
+    if (page <= 0) {
+      prev = 1;
+    } else prev = page - 1;
+
+    next = parseInt(page) + 1;
+    const userData = await User.findById({ _id: req.session.user_id });
+
+    const uniqueBrands = getUniqueValues(filters, "brand");
+    const uniqueColors = getUniqueValues(products, "color");
+    const uniqueMaterials = getUniqueValues(products, "material");
+    const uniqueMaterialTypes = getUniqueValues(filters, "material_type");
+
+    res.locals.categories = categories;
+    res.locals.user = userData;
+    res.locals.products = products;
+    res.locals.uniqueBrands = uniqueBrands;
+    res.locals.uniqueColors = uniqueColors;
+    res.locals.uniqueMaterials = uniqueMaterials;
+    res.locals.uniqueMaterialTypes = uniqueMaterialTypes;
+    res.locals.totalPages = totalPages;
+    res.locals.currentPage = page;
+    res.locals.next = next;
+    res.locals.prev = prev;
+
+    
+    res.status(200).render("collections");
+  } catch (err) {
+    next(err);
   }
-  const limit = 6;
-  const categories = await Category.find({});
-  const filters = await Filter.find({});
-  const products = await Item.find({})
-    .populate("brand_id")
-    .populate("category_id")
-    .limit(limit * 1)
-    .skip((page - 1) * limit)
-    .exec();
-  const count = await Item.countDocuments();
-  let totalPages = Math.ceil(count / limit);
-  console.log(count);
-  if (page <= 0) {
-    prev = 1;
-  } else prev = page - 1;
-
-  next = parseInt(page) + 1;
-  const userData = await User.findById({ _id: req.session.user_id });
-
-  const uniqueBrands = getUniqueValues(filters, "brand");
-  const uniqueColors = getUniqueValues(filters, "color");
-  const uniqueMaterials = getUniqueValues(filters, "material");
-  const uniqueMaterialTypes = getUniqueValues(filters, "material_type");
-
-  res.status(200).render("collections", {
-    categories,
-    user: userData,
-    products,
-    uniqueBrands,
-    uniqueColors,
-    uniqueMaterials,
-    uniqueMaterialTypes,
-    totalPages: Math.ceil(count / limit),
-    currentPage: page,
-    next: next,
-    prev: prev,
-  });
 };
+
+
 
 const showCart = async (req, res) => {
   try {

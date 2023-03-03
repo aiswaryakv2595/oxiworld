@@ -63,10 +63,20 @@
                             products.forEach((row)=>{%>
                               <tr>
                                 <td>
-                                  <%= row.name%>
+                                  <%= row.product.name%>
                                 </td>
-                                <td> <%= row.category_id.name%> </td>
-                                <td><%= row.stock%></td>
+
+                                <td>
+                                  <%= row.product.category_id.name%>
+                                </td>
+                                <td>
+                                  <%= row.count%>
+                                </td>
+                                <td>
+                                  <%= row.product.price * row.count%>
+                                </td>
+
+                                
                               </tr>
 
                           <%  }) }%>

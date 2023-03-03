@@ -51,6 +51,6 @@ admin_route.post('/cancelOrder',adminController.cancelOrder);
 admin_route.post('/change-status',adminController.changeStatus);
 
 //report
-admin_route.get('/sales',adminLoginAuth.isLogin,adminController.viewSales);
+admin_route.get('/sales',adminController.viewSales);
 admin_route.post('/search-orders',adminLoginAuth.isLogin,adminController.getSales);
 module.exports = admin_route

@@ -5,6 +5,10 @@
   color: #000; /* Set text color to white */
   font-weight: bold; /* Set font weight to bold */
 }
+.selected {
+    background-color: yellow;
+    font-weight: bold;
+  }
 
 </style>
 <div class="breadcrumbs">
@@ -27,7 +31,7 @@
             <div class="side border mb-1">
               <h3>Categories</h3>
               <ul>
-                <li><a href="#" class="category-link" data-category-id="1">All</a></li>
+                <li><a href="#" class="category-link">All</a></li>
                 <% categories.forEach((row)=>{%>
                   <li><a href="#" class="category-link" data-category-id="<%= row._id %>"><%= row.name %></a></li>
 
@@ -75,9 +79,16 @@
           <div class="col-sm-12">
             <div class="side border mb-1">
               <h3>Colors</h3>
-              <ul>
+              <ul id="color-name">
                 <% uniqueColors.forEach((color,index) => { %>
-                  <li><a href="#" class="color-link" data-color="<%= color %>"><%= color %></a></li>
+                  <li>
+                  
+                    <label>
+                      <input type="checkbox" class="color-checkbox" data-color="<%= color %>">
+                      <%= color %>
+                        </label>
+                  </li>
+                  
                 <% }); %>
               </ul>
             </div>
@@ -128,16 +139,26 @@
               </div>
             <% }) %>
           </div>
-          <% if(currentPage>1){%>
-            <a href="?page=<%=prev%>">Previous</a>
-            <%}%>
-            <% for(j=1; j<= totalPages; j++){%>
-            <a href="?page=<%=j%>"><%=j%></a>
-             <% } %>
-             <% if(next<=totalPages){%>
-             <a href="?page=<%=next%>">Next</a>
-             <%}%>
-         
+          <nav aria-label="Page navigation example">
+            <ul class="pagination" id="pagination-container">
+            <% if (prev) { %>
+              <li class="page-item"><a class="page-link" href="?page=<%= prev %>">Previous</a></li>
+            <% } %>
+            <% for (let num = 1; num <= totalPages; num++) { %>
+              <% if (num === currentPage) { %>
+                <li class="page-item"><span class="page-link" class="selected"><%= num %></span></li>
+              <% } else { %>
+                <li class="page-item"><a class="page-link" href="?page=<%= num %>"><%= num %></a></li>
+              <% } %>
+            <% } %>
+            <% if (next <= totalPages) { %>
+              <li class="page-item"><a href="?page=<%= next %>">Next</a></li>
+            <% } %>
+          </ul>
+            </nav>
+          
+       
+          
         </div>
        
       </div>
@@ -149,6 +170,7 @@
 <!-- filter checkbox -->
 
 <script>
+  
   // filter category wise
   $('.category-link').click(function(e) {
   e.preventDefault();
@@ -190,7 +212,7 @@
           </div>
         </div>
       `).join('');
-  
+      const paginationHtml = ``
       $('#products-container').html(productsHtml);
       $('#brand-name').html(filterHtml);
     },
@@ -237,43 +259,80 @@ $('#brand-name').on('change', '.brand-checkbox', function(e) {
   });
 });
 
-//color wise
-$('.color-link').click(function(e) {
-  e.preventDefault();
-  // $('.color-link').removeClass('active');
-  // $(this).addClass('active');
-  const color = $(this).data('color');
-  
+
+//clr
+$('#color-name').on('change', '.color-checkbox', function(e) {
+  const checkedColors = $('.color-checkbox:checked').map(function() {
+    return $(this).data('color');
+  }).get();
+ 
+  console.log(checkedColors);
   $.ajax({
-  url: `/color/${color}/products`,
-  method: 'GET',
-  success: function(data) {
-  console.log('Response data:', data); // Add this line to log the data variable
-  const products = data;
-  const productsHtml = products.map(product => `
-    <div class="col-lg-4 mb-4 text-center">
-      <div class="product-entry border">
-        <a href="/productdetails/${product._id}" class="prod-img">
-          <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
-        </a>
-        <div class="desc">
-          <h2><a href="#">${product.name}</a></h2>
-          <span class="price">${product.price}</span>
+    url: `/color/products`,
+    method: 'POST',
+    data: { color: checkedColors},
+    success: function(data) {
+      console.log('Response data:', data);
+      const products = data;
+      const productsHtml = products.map(product => `
+        <div class="col-lg-4 mb-4 text-center">
+          <div class="product-entry border">
+            <a href="/productdetails/${product._id}" class="prod-img">
+              <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+            </a>
+            <div class="desc">
+              <h2><a href="#">${product.name}</a></h2>
+              <span class="price">${product.price}</span>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  `).join('');
+      `).join('');
   
-  $('#products-container').html(productsHtml);
-  },
-
-
-  error: function(xhr, status, error) {
-    console.error('Error fetching products:', error);
-  }
+      $('#products-container').html(productsHtml);
+    },
+    error: function(xhr, status, error) {
+      console.error('Error fetching products:', error);
+    }
   });
-
 });
+
+// //color wise
+// $('.color-link').click(function(e) {
+//   e.preventDefault();
+//   // $('.color-link').removeClass('active');
+//   // $(this).addClass('active');
+//   const color = $(this).data('color');
+  
+//   $.ajax({
+//   url: `/color/${color}/products`,
+//   method: 'GET',
+//   success: function(data) {
+//   console.log('Response data:', data); // Add this line to log the data variable
+//   const products = data;
+//   const productsHtml = products.map(product => `
+//     <div class="col-lg-4 mb-4 text-center">
+//       <div class="product-entry border">
+//         <a href="/productdetails/${product._id}" class="prod-img">
+//           <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+//         </a>
+//         <div class="desc">
+//           <h2><a href="#">${product.name}</a></h2>
+//           <span class="price">${product.price}</span>
+//         </div>
+//       </div>
+//     </div>
+//   `).join('');
+  
+//   $('#products-container').html(productsHtml);
+//   },
+
+
+//   error: function(xhr, status, error) {
+//     console.error('Error fetching products:', error);
+//   }
+//   });
+
+// });
 
 //material wise
 $('.material-link').click(function(e) {

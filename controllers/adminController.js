@@ -5,7 +5,8 @@ const Coupon = require("../models/couponModel");
 const Order = require("../models/orderModel");
 const fs = require("fs");
 const path = require("path");
-const Item = require('../models/itemModel')
+const Item = require('../models/itemModel');
+const itemModel = require("../models/itemModel");
 
 
 const securePassword = async (password) => {
@@ -471,21 +472,38 @@ const changeStatus = async (req, res) => {
 
 const viewSales = async (req, res) => {
   const products = await Item.find({}).populate('category_id');
- 
- let counts
-  const qty =await  Order.aggregate([
-    {$unwind:'$products.item'},
-    {$group:{_id:"$products.item.productId",count:{$sum:1}}}
-  ]).then((result)=>{
-     counts = result.map(({_id,count})=>({productId:_id,count}))
-    console.log('Counts',counts);
-  })
+ let counts 
+  // const qty =await  Order.aggregate([
+  //   {$unwind:'$products.item'},
+  //   {$group:{_id:"$products.item.productId",count:{$sum:1}}}
+  // ]).then((result)=>{
+  //    counts = result.forEach(({_id,count})=>({  
+  //     productId:_id,count,
+  //   }))
+  //   // console.log('Counts',counts);
+  // })
+  
+   counts = await Order.aggregate([
+    { $unwind: '$products.item' },
+    { $group: { _id: '$products.item.productId', count: { $sum: 1 } } },
+  ]).then(async (result) => {
+    const counts = [];
+    for (const { _id, count } of result) {
+      const product = await itemModel.findById(_id).populate('category_id');
+      counts.push({ productId: _id, count, product });
+    }
+    return counts;
+  });
+  
+  console.log('Counts', counts);
 
-
-console.log('counts details',counts);
 
   
-  res.status(200).render("sales", { products: products });
+
+
+
+  
+  res.status(200).render("sales", { products: counts });
 };
 
 const getSales = async (req, res) => {

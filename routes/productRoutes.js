@@ -19,7 +19,7 @@ product_route.get('/productdetails/:id',userAuth.isLogin,productController.produ
 product_route.get('/searchitems',userAuth.isLogin,productController.searchItems)
 product_route.post('/category/products', userAuth.isLogin,productController.searchCategory)
 product_route.post('/brands/products', userAuth.isLogin,productController.searchBrand)
-product_route.get('/color/:color/products', userAuth.isLogin,productController.searchColor)
+product_route.post('/color/products', userAuth.isLogin,productController.searchColor)
 product_route.get('/material/:material/products', userAuth.isLogin,productController.searchMaterial)
 product_route.post('/products/filter/price', userAuth.isLogin,productController.searchPrice)
 product_route.post('/products/search', userAuth.isLogin,productController.searchProducts)
