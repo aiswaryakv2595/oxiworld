@@ -12,7 +12,7 @@
     <!-- breadcrumb -->
     <div class="card">
         <div class="card-body">
-            <form id="getSales" action="" method="post">
+            <form id="getSales">
         <div class="row">
             <div class="col-sm-3">
                 <input type="date" name="from" class="form-control" >
@@ -21,7 +21,7 @@
                 <input type="date" class="form-control" name="to" >
             </div>
             <div class="col-sm-3">
-                <select name="status" id="" class="form-control">
+                <select name="status" id="selectStatus" class="form-control">
                     <option value="Placed">Placed</option>
                     <option value="Shipped">Shipped</option>
                     <option value="Delivered">Delivered</option>
@@ -105,26 +105,33 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $('#getSales input[type="button"]').click(function() {
-    var status = $('#getSales input[name="status"]').val();
-    var from = $('#getSales input[name="from"]').val();
-    var to = $('#getSales input[name="to"]').val();
+  var status = $('#selectStatus').val();
+  var from = $('#getSales input[name="from"]').val();
+  var to = $('#getSales input[name="to"]').val();
 
-    $.post('/admin/search-orders', { status: status, from: from, to:to }, function(data) {
-      // Update the products container with the filtered results
-      var productsHtml = '';
-      if (data.length > 0) {
-        productsHtml = data.map(order => `
+  $.post('/admin/search-orders', { status: status, from: from, to:to }, function(data) {
+    // Update the products container with the filtered results
+    var productsHtml = '';
+    
+
+    var dataArray = Array.isArray(data) ? data : Object.values(data);
+    console.log(dataArray);
+
+    if (data.length > 0) {
+      productsHtml = data.map(row => `
         <tr>
-                              <td> ${order._id}</td>
-                              
-                            </tr>
-        `).join('');
-      } else {
-        productsHtml = '<p>No items found with the selected price range</p>';
-      }
-      $('#ordersTable').html(productsHtml);
-    });
+          <td>${row.product.name}</td>
+          <td>${row.product.category_id.name}</td>
+          <td>${row.count}</td>
+          <td>${row.product.price * row.count}</td>
+        </tr>
+      `).join('');
+    } else {
+      productsHtml = '<tr><td colspan="4">No items found with the selected price range</td></tr>';
+    }
+    $('#ordersTable tbody').html(productsHtml);
   });
- 
+});
+
 </script>
 <%- include('../layouts/admin-footer.ejs') %>

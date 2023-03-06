@@ -12,6 +12,7 @@ let userSession;
 
 const productDetails = async (req, res) => {
   try {
+    
     const id = req.params.id;
     const userData = await User.findOne({ _id: req.session.user_id });
     const allCategories = await Category.find({});
@@ -43,17 +44,51 @@ const productDetails = async (req, res) => {
 
 const sortAscending = async (req, res) => {
   try {
-    const products = await Item.find({}).sort({ price: 1 });
-    res.json(products);
+    const pageSize = 6; // Number of items per page
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+    let count
+    // Create a new query object to include pagination parameters
+    const queryPage = { ...req.query };
+    delete queryPage.page;
+    
+    const products = await Item.find({}).sort({ price: 1 })
+    .skip(startIndex)
+    .limit(pageSize);
+       count = await Item.countDocuments();
+       const pagination = {
+        currentPage: page,
+        totalPages: Math.ceil(count / pageSize),
+        totalItems: count,
+      };
+    res.json({ products: products, pagination:pagination });
   } catch (error) {
     console.log(error.message);
   }
 };
 const sortDescending = async (req, res) => {
   try {
-    const products = await Item.find({}).sort({ price: -1 });
+    const pageSize = 6; // Number of items per page
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
 
-    res.json(products);
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+    let count
+    // Create a new query object to include pagination parameters
+    const queryPage = { ...req.query };
+    delete queryPage.page;
+    const products = await Item.find({}).sort({ price: -1 })
+    .skip(startIndex)
+    .limit(pageSize);
+       count = await Item.countDocuments();
+       const pagination = {
+        currentPage: page,
+        totalPages: Math.ceil(count / pageSize),
+        totalItems: count,
+      };
+    res.json({ products: products, pagination:pagination });
   } catch (error) {
     console.log(error.message);
   }
@@ -162,27 +197,41 @@ const searchItems = async (req, res) => {
 // };
 const searchCategory = async (req, res) => {
   try {
-    var page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
-    const limit = 6;
+    
+    const pageSize = 6; // Number of items per page
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+    let count
+    // Create a new query object to include pagination parameters
+    const queryPage = { ...req.query };
+    delete queryPage.page;
     const categoryId = req.body.categoryId;
     console.log("categoryId " + categoryId);
     let products;
     let filters;
     if (categoryId) {
-      products = await Item.find({ category_id: categoryId }).limit(limit * 1)
-      .skip((page - 1) * limit)
-      .exec();
+      products = await Item.find({ category_id: categoryId })
+      
+      .skip(startIndex)
+      .limit(pageSize);
+       count = await Item.countDocuments({ category_id: categoryId });
       filters = await Filter.find({ categoryId: categoryId });
     }
     else {
       products = await Item.find({});
+       count = await Item.countDocuments();
       filters = await Filter.find({});
       }
+      
+    const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(count / pageSize),
+      totalItems: count,
+    };
      
-    res.json({ products: products, filters: filters });
+    res.json({ products: products, filters: filters,pagination:pagination });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Error fetching products");
@@ -194,6 +243,7 @@ const searchBrand = async (req, res) => {
     const selectedBrands = req.body.brands; // array of selected brands
     const categoryId = req.body.categoryId;
     console.log(selectedBrands);
+    
     let products;
 
     const filter = await Filter.find({ brand: { $in: selectedBrands } }); // find filters for selected brands
@@ -201,12 +251,20 @@ const searchBrand = async (req, res) => {
 
     const filterIds = filter.map((f) => f._id); // get the filter ids
     if (categoryId) {
-      if (selectedBrands)
+      if (selectedBrands){
         products = await Item.find({
           brand_id: { $in: filterIds },
+          category_id:categoryId
         }); // find items for the selected brands
+      }
       else products = await Item.find({ category_id: categoryId });
-    } else products = await Item.find({});
+    }
+    else{
+      products = await Item.find({
+        brand_id: { $in: filterIds },
+        
+      });
+    }
     res.json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -254,12 +312,31 @@ const searchPrice = async (req, res) => {
 };
 const searchProducts = async (req, res) => {
   const query = req.body.search;
+  const pageSize = 6; // Number of items per page
+  const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
+
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
+  let count
+  // Create a new query object to include pagination parameters
+  const queryPage = { ...req.query };
+  delete queryPage.page;
   console.log(query);
   const products = await Item.find({
     name: { $regex: query, $options: "i" },
-  }).populate("category_id");
-  console.log(products);
-  res.json(products);
+  }).populate("category_id")
+  .skip(startIndex)
+    .limit(pageSize);
+       count = await Item.countDocuments({
+        name: { $regex: query, $options: "i" },
+      });
+       const pagination = {
+        currentPage: page,
+        totalPages: Math.ceil(count / pageSize),
+        totalItems: count,
+      };
+  // console.log(products);
+  res.json({ products: products, pagination:pagination });
 };
 module.exports = {
   productDetails,

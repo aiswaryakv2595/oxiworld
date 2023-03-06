@@ -57,7 +57,7 @@ user_route.get("/view-profile", userController.userProfile);
 
 user_route.post("/add-coupon", userController.applyCoupon);
 user_route.get("/success", userController.orderSuccess);
-// user_route.post('/razorpay',userController.razorpayCheckout)
+
 
 user_route.post("/checkout/razorpay", userController.razorpayCheckout);
 
@@ -70,6 +70,8 @@ user_route.get("/cancelOrder", userAuth.isLogin, userController.cancelorder);
 
 
 user_route.get("/viewOrder", userAuth.isLogin, userController.vieworder);
+
+user_route.get('/returnProduct',userAuth.isLogin,userController.returnproduct)
 
 //update - profile
 user_route.post("/update-profile", userController.updateProfile);

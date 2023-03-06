@@ -20,7 +20,7 @@
 
         <!-- row -->
         <div class="row row-sm">
-            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+            <div class="col-xl-4 col-lg-6 col-md-6 col-xm-12">
                 <div class="card overflow-hidden sales-card bg-primary-gradient">
                     <div class="pl-3 pt-3 pr-3 pb-2 pt-0">
                         <div class="">
@@ -30,14 +30,14 @@
                             <div class="d-flex">
                                 <div class="">
                                     <h4 class="tx-20 font-weight-bold mb-1 text-white">
-                                        <%=count%>
+                                     <%= result[0].totalOrders%>
                                      
                                     </h4>
                                     <p class="mb-0 tx-12 text-white op-7"></p>
                                 </div>
                                 <span class="float-right my-auto ml-auto">
                                     <i class="fas fa-arrow-circle-up text-white"></i>
-                                    <span class="text-white op-7"> +427</span>
+                                    
                                 </span>
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                     <span id="compositeline" class="pt-1">5,9,5,6,4,12,18,14,10,15,12,5,8,5,12,5,12,10,16,12</span>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+            <div class="col-xl-4 col-lg-6 col-md-6 col-xm-12">
                 <div class="card overflow-hidden sales-card bg-danger-gradient">
                     <div class="pl-3 pt-3 pr-3 pb-2 pt-0">
                         <div class="">
@@ -54,7 +54,9 @@
                         <div class="pb-0 mt-0">
                             <div class="d-flex">
                                 <div class="">
-                                    <h4 class="tx-20 font-weight-bold mb-1 text-white"></h4>
+                                    <h4 class="tx-20 font-weight-bold mb-1 text-white">
+                                        <%= result[0].totalSales%>
+                                    </h4>
                                     <p class="mb-0 tx-12 text-white op-7"></p>
                                 </div>
                                 <span class="float-right my-auto ml-auto">
@@ -67,29 +69,8 @@
                     <span id="compositeline2" class="pt-1">3,2,4,6,12,14,8,7,14,16,12,7,8,4,3,2,2,5,6,7</span>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
-                <div class="card overflow-hidden sales-card bg-success-gradient">
-                    <div class="pl-3 pt-3 pr-3 pb-2 pt-0">
-                        <div class="">
-                            <h6 class="mb-3 tx-12 text-white">TOTAL EARNINGS</h6>
-                        </div>
-                        <div class="pb-0 mt-0">
-                            <div class="d-flex">
-                                <div class="">
-                                    <h4 class="tx-20 font-weight-bold mb-1 text-white"></h4>
-                                    <p class="mb-0 tx-12 text-white op-7"></p>
-                                </div>
-                                <span class="float-right my-auto ml-auto">
-                                    <i class="fas fa-arrow-circle-up text-white"></i>
-                                    <span class="text-white op-7"> </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <span id="compositeline3" class="pt-1">5,10,5,20,22,12,15,18,20,15,8,12,22,5,10,12,22,15,16,10</span>
-                </div>
-            </div>
-            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+            
+            <div class="col-xl-4 col-lg-6 col-md-6 col-xm-12">
                 <div class="card overflow-hidden sales-card bg-warning-gradient">
                     <div class="pl-3 pt-3 pr-3 pb-2 pt-0">
                         <div class="">
@@ -98,7 +79,9 @@
                         <div class="pb-0 mt-0">
                             <div class="d-flex">
                                 <div class="">
-                                    <h4 class="tx-20 font-weight-bold mb-1 text-white"></h4>
+                                    <h4 class="tx-20 font-weight-bold mb-1 text-white">
+                                      <%=result[0].totalProductsSold%>
+                                    </h4>
                                     <p class="mb-0 tx-12 text-white op-7"></p>
                                 </div>
                                 <span class="float-right my-auto ml-auto">
@@ -123,24 +106,12 @@
                             <h4 class="card-title mb-0">Order status</h4>
                             <i class="mdi mdi-dots-horizontal text-gray"></i>
                         </div>
-                        <p class="tx-12 text-muted mb-0">Order Status and Tracking. Track your order from ship date to arrival. To begin, enter your order number.</p>
+                        <p class="tx-12 text-muted mb-0">Order Status and Tracking. </p>
                     </div>
                     <div class="card-body">
-                        <div class="total-revenue">
-                            <div>
-                              <h4></h4>
-                              <label><span class="bg-primary"></span>success</label>
-                            </div>
-                            <div>
-                              <h4></h4>
-                              <label><span class="bg-danger"></span>Pending</label>
-                            </div>
-                            <div>
-                              <h4></h4>
-                              <label><span class="bg-warning"></span>Failed</label>
-                            </div>
-                          </div>
-                        <div id="bar" class="sales-bar mt-4"></div>
+                      
+                        <canvas id="orderStatusChart" style="width:100%;max-width:600px"></canvas>
+                        <input type="hidden" id="data" value="<%= JSON.stringify(chartData) %>">
                     </div>
                 </div>
             </div>
@@ -154,6 +125,34 @@
     </div>
 </div>
 <!-- Container closed -->
-   
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script>
+  const chartData = JSON.parse(document.getElementById("data").value);
+  const ctx = document.getElementById('orderStatusChart').getContext('2d');
+  const myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartData.labels,
+      datasets: [{
+        label: 'Number of Orders',
+        data: chartData.datasets[0].data,
+        backgroundColor: chartData.datasets[0].backgroundColor,
+        borderColor: chartData.datasets[0].borderColor,
+        borderWidth: chartData.datasets[0].borderWidth
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+  console.log(myChart);
+</script>
 
 <%-include("../layouts/admin-footer.ejs")-%>

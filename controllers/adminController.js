@@ -5,9 +5,8 @@ const Coupon = require("../models/couponModel");
 const Order = require("../models/orderModel");
 const fs = require("fs");
 const path = require("path");
-const Item = require('../models/itemModel');
+const Item = require("../models/itemModel");
 const itemModel = require("../models/itemModel");
-
 
 const securePassword = async (password) => {
   try {
@@ -73,7 +72,7 @@ const verifyLogin = async (req, res) => {
 
     if (userData) {
       if (userData.password == password) {
-        req.session.user_id = userData._id;
+        req.session.admin_id = userData._id;
         req.session.role = userData.role;
         res.status(200).redirect("/admin/dashboard");
       } else {
@@ -89,14 +88,57 @@ const verifyLogin = async (req, res) => {
 
 const dashboard = async (req, res) => {
   try {
-    const userData = await Admin.findOne({ _id: req.session.user_id });
-    const orderData = await Order.find({ status: "Delivered" });
-    const count = await Order.count({ status: "Delivered" });
+    const userData = await Admin.findOne({ _id: req.session.admin_id });
+    const orderData = await Order.find({});
+    const chartData = {
+      labels: ["Placed", "Shipped", "Delivered"],
+      datasets: [
+        {
+          label: "Orders",
+          data: [
+            orderData.filter(order => order.status === "Placed").length,
+            orderData.filter(order => order.status === "Shipped").length,
+            orderData.filter(order => order.status === "Delivered").length
+          ],
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(75, 192, 192, 0.2)"
+          ],
+          borderColor: [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(75, 192, 192, 1)"
+          ],
+          borderWidth: 1
+        }
+      ]
+    };
 
-    console.log(count);
+    const result = await Order.aggregate([
+      {
+        $match: {
+          status: "Delivered"
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          totalSales: { $sum: "$products.totalPrice" },
+          totalProductsSold: { $sum: { $size: "$products.item" } }
+        }
+      }
+    ]);
+    
+    // console.log(chartData);
+    
+    
+  
+    
     res
       .status(200)
-      .render("dashboard", { user: userData, orders: orderData, count: count });
+      .render("dashboard", { user: userData, orders: orderData,result:result,chartData });
   } catch (error) {
     console.log(error.message);
   }
@@ -471,71 +513,64 @@ const changeStatus = async (req, res) => {
 };
 
 const viewSales = async (req, res) => {
-  const products = await Item.find({}).populate('category_id');
- let counts 
-  // const qty =await  Order.aggregate([
-  //   {$unwind:'$products.item'},
-  //   {$group:{_id:"$products.item.productId",count:{$sum:1}}}
-  // ]).then((result)=>{
-  //    counts = result.forEach(({_id,count})=>({  
-  //     productId:_id,count,
-  //   }))
-  //   // console.log('Counts',counts);
-  // })
+ 
+  let counts;
   
-   counts = await Order.aggregate([
-    { $unwind: '$products.item' },
-    { $group: { _id: '$products.item.productId', count: { $sum: 1 } } },
+  counts = await Order.aggregate([
+    { $unwind: "$products.item" },
+    { $group: { _id: "$products.item.productId", count: { $sum: 1 } } },
   ]).then(async (result) => {
     const counts = [];
     for (const { _id, count } of result) {
-      const product = await itemModel.findById(_id).populate('category_id');
+      const product = await itemModel.findById(_id).populate("category_id");
       counts.push({ productId: _id, count, product });
     }
     return counts;
   });
-  
-  console.log('Counts', counts);
 
+  // console.log("Counts", counts);
 
-  
-
-
-
-  
   res.status(200).render("sales", { products: counts });
 };
 
 const getSales = async (req, res) => {
   try {
-
-    const startdate = new Date(req.body.from)
-    const enddate = new Date(req.body.to)
+    const startdate = new Date(req.body.from);
+    const enddate = new Date(req.body.to);
+    const status = req.body.status
 
     console.log(startdate);
     console.log(enddate);
+    console.log(status);
 
-    const orders = await Order.aggregate([
+    const counts = await Order.aggregate([
+      { $unwind: "$products.item" },
       {
-          $match:{
-              createdAt:{
-                  $gte: startdate,
-                  $lt: enddate
-              },
-              status:'Delivered',
+        $match: {
+          createdAt: {
+            $gte: startdate,
+            $lt: enddate,
+           
           },
+          status: status,
+        },
       },
-      
-  ])
-    
-    console.log(orders);
+      { $group: { _id: "$products.item.productId", count: { $sum: 1 } } },
+    ]).then(async (result) => {
+      const counts = [];
+      for (const { _id, count } of result) {
+        const product = await itemModel.findById(_id).populate("category_id");
+        counts.push({ productId: _id, count, product });
+      }
+      return counts;
+    });
 
-    res.json(orders); // include the orders array in the response data
+    console.log('counts  ', counts);
+    res.json(counts); // include the orders array in the response data
   } catch (error) {
     console.log(error.message);
   }
-}
-
+};
 
 
 module.exports = {
@@ -566,5 +601,5 @@ module.exports = {
   cancelOrder,
   changeStatus,
   viewSales,
-  getSales
+  getSales,
 };

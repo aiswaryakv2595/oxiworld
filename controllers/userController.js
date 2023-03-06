@@ -261,11 +261,16 @@ function getUniqueValues(filters, fieldName) {
 }
 const showCollections = async (req, res, next) => {
   try {
-    var page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
-    const limit = 6;
+    const pageSize = 6; // Number of items per page
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+
+    // Create a new query object to include pagination parameters
+    const queryPage = { ...req.query };
+    delete queryPage.page;
+
     const categories = await Category.find({});
     const filters = await Filter.find({});
     const categoryId = req.query.categoryId;
@@ -279,17 +284,15 @@ const showCollections = async (req, res, next) => {
     const products = await Item.find(query)
       .populate("brand_id")
       .populate("category_id")
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .exec();
+      .skip(startIndex)
+      .limit(pageSize);
     const count = await Item.countDocuments(query);
-    let totalPages = Math.ceil(count / limit);
-    console.log(count);
-    if (page <= 0) {
-      prev = 1;
-    } else prev = page - 1;
 
-    next = parseInt(page) + 1;
+    const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(count / pageSize),
+      totalItems: count,
+    };
     const userData = await User.findById({ _id: req.session.user_id });
 
     const uniqueBrands = getUniqueValues(filters, "brand");
@@ -304,19 +307,16 @@ const showCollections = async (req, res, next) => {
     res.locals.uniqueColors = uniqueColors;
     res.locals.uniqueMaterials = uniqueMaterials;
     res.locals.uniqueMaterialTypes = uniqueMaterialTypes;
-    res.locals.totalPages = totalPages;
-    res.locals.currentPage = page;
-    res.locals.next = next;
-    res.locals.prev = prev;
+    // res.locals.totalPages = totalPages;
+    // res.locals.currentPage = page;
+    // res.locals.next = next;
+    // res.locals.prev = prev;
 
-    
-    res.status(200).render("collections");
+    res.status(200).render("collections", { pagination });
   } catch (err) {
     next(err);
   }
 };
-
-
 
 const showCart = async (req, res) => {
   try {
@@ -326,25 +326,27 @@ const showCart = async (req, res) => {
     const userData = await User.findById({ _id: req.session.user_id });
 
     userData.addToCart(singleProduct, quantity);
-    res.status(200).json({message: 'Item added to cart successfully'});
+    res.status(200).json({ message: "Item added to cart successfully" });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({error: error.message});
+    res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const loadCart = async (req, res) => {
   try {
     const userData = await User.findById({ _id: req.session.user_id });
     const completeUser = await userData.populate("cart.item.productId");
-    console.log(completeUser.cart);
+    // console.log(completeUser.cart);
+    console.log(completeUser.cart.item);
     const totalprice = completeUser.cart.item.reduce(
       (acc, item) => acc + item.price,
       0
     );
+    console.log('totoal price in cart', totalprice);
+    
     completeUser.cart.totalprice = totalprice;
+
     const grandTotal = totalprice + 45;
 
     res.status(200).render("cart", {
@@ -514,13 +516,15 @@ const loadCheckout = async (req, res) => {
   const countries = country.getCountries();
 
   const completeUser = await user.populate("cart.item.productId");
+  
   const totalprice = completeUser.cart.item.reduce(
     (acc, item) => acc + item.price,
     0
   );
+  // console.log('completeUser.cart.totalprice',completeUser.cart.totalprice);
   completeUser.cart.totalprice = totalprice;
   const grandTotal = totalprice + 45;
-
+  console.log('user in checkout',completeUser);
   res.render("checkout", {
     totalPrice: grandTotal,
     user: user,
@@ -631,11 +635,7 @@ const razorpayCheckout = async (req, res) => {
       key_id: process.env.key_id,
       key_secret: process.env.key_secret,
     });
-    // Fetch the order details from the database
-    // const order = await Orders.findById(order_id).populate(
-    //   "products.item.productId"
-    // );
-    // Debugging statement
+
     console.log("Order: ", order);
 
     // Check if the order exists and belongs to the current user
@@ -663,6 +663,57 @@ const razorpayCheckout = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+const returnproduct = async(req,res)=>{
+  try {
+      const userSession = req.session;
+      console.log('session--->', userSession);
+      const orderId = userSession.currentorder;
+      const itemId = req.query.id;
+      
+      // Find the order and item
+      const order = await Orders.findOne({_id: orderId, userId: userSession.user_id});
+      const item = await Item.findById(itemId);
+
+      if (!order || !item) {
+        // Handle case where order or item cannot be found
+        return res.status(404).send("Order or item not found");
+      }
+
+      // Find the item in the order
+      const orderItem = order.products.item.find(item => item.productId.toString() === itemId);
+      
+      if (!orderItem) {
+        // Handle case where item is not in the order
+        return res.status(404).send("Item not found in order");
+      }
+
+      if (order.status !== 'Delivered' || orderItem.productReturned === 1) {
+        // Handle case where order is not delivered or item is already returned
+        return res.status(400).send("Cannot return item");
+      }
+
+      // Update the quantity of the item and set productReturned to 1
+      item.quantity += orderItem.qty;
+      orderItem.productReturned = 1;
+
+      // Check if all items in the order have been returned
+      const allItemsReturned = order.products.item.every(item => item.productReturned === 1);
+      if (allItemsReturned) {
+        order.status = 'Returned';
+      }
+
+      // Save changes to the order and item
+      await Promise.all([order.save(), item.save()]);
+
+      // Redirect the user to the profile page
+      res.redirect('/profile');
+      
+  } catch (error) {
+      console.log(error);
+      res.status(500).send("An error occurred");
+  }
+}
+
 
 const saveAddress = async (req, res) => {
   const address = new Address({
@@ -758,9 +809,6 @@ const applyCoupon = async (req, res) => {
       throw new Error("Coupon not found");
     }
 
-    //  if(user.cart.totalprice < couponData.min_value){
-    //     res.render('check')
-    //  }
     req.session.offer = {
       name: couponData.name,
       type: couponData.discount_type,
@@ -768,21 +816,35 @@ const applyCoupon = async (req, res) => {
     };
 
     let totalPrice = Number(user.cart.totalprice);
+    console.log('total price in coupon', totalPrice);
 
     if (isNaN(totalPrice)) {
       throw new Error("Total price is NaN");
     }
 
     let updatedTotal;
+    let discount_value;
+    
     if (couponData.usedBy.includes(user_id)) {
       message = "Coupon Already used";
       delete req.session.offer;
       // throw new Error('Coupon has already been used');
     } else if (user.cart.totalprice > couponData.min_value) {
+      console.log(user.cart.totalprice);
+      
       if (couponData.discount_type === "AMOUNT") {
-        updatedTotal = totalPrice - couponData.discount;
-      } else if (couponData.discount_type === "PERCENTAGE") {
-        updatedTotal = totalPrice * (1 - couponData.discount / 100);
+        discount_value = couponData.discount
+        updatedTotal = totalPrice - discount_value + 45;
+      } 
+      else if (couponData.discount_type === "PERCENTAGE") {
+        const max_discount = couponData.max_discount 
+       
+        discount_value = totalPrice * (couponData.discount / 100)
+        if(discount_value>=max_discount)
+        discount_value = max_discount;
+        updatedTotal = totalPrice - discount_value +45
+        // if(updatedTotal>max_discount)
+        // updatedTotal = max_discount
       } else {
         throw new Error("Invalid discount type");
       }
@@ -790,7 +852,7 @@ const applyCoupon = async (req, res) => {
       message += "Minimum Order value is " + couponData.min_value;
       // throw new Error('Coupon has already been used');
     }
-    console.log("message" + message);
+    console.log("updated total" + updatedTotal);
     req.session.couponTotal = updatedTotal;
 
     res.json({ updatedTotal, message });
@@ -999,21 +1061,23 @@ const addReview = async (req, res) => {
 const updateReview = async (req, res) => {
   try {
     const userId = req.session.user_id;
-  const { rate, description, productId, reviewId } = req.body;
+    const { rate, description, productId, reviewId } = req.body;
 
-  const reviewData = await Review.findByIdAndUpdate({_id:reviewId},{
-    $set:{
-      userId:userId,
-      productId:productId,
-      description:description,
-      rating:rate
+    const reviewData = await Review.findByIdAndUpdate(
+      { _id: reviewId },
+      {
+        $set: {
+          userId: userId,
+          productId: productId,
+          description: description,
+          rating: rate,
+        },
+      }
+    );
+
+    if (reviewData) {
+      res.status(200).json({ message: "review updated successfully" });
     }
-  })
-
-  if(reviewData){
-    res.status(200).json({message:'review updated successfully'})
-  }
-    
   } catch (error) {
     console.log(error.message);
   }
@@ -1052,6 +1116,7 @@ module.exports = {
   loadorderdetails,
   cancelorder,
   vieworder,
+  returnproduct,
   updateProfile,
   deleteAddress,
   changePassword,

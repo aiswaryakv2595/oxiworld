@@ -22,7 +22,10 @@ const isLogout = async(req,res,next)=>{
                 res.redirect('/profile')
           
         }  
-        next();
+        else{
+            next();
+        }
+       
     } catch (error) {
         console.log(error.message);
     }

@@ -101,10 +101,10 @@ input:not(:checked) ~ label:hover ~ label{
                 </div>
                 <% if(order.status=='Delivered' ){ %>
                   <% if(order.productReturned[i]==0){ %>
-                <!-- <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                     <p class="text-success mb-0 small"><a href="/returnProduct?id=<%= order.products.item[i].productId._id%>" class="btn btn-primary">Return Product</a>
                     </p>
-                </div> -->
+                </div>
                 <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
                   <!-- <p class="text-success mb-0 small"><a href="/reviewProduct?id=<%= order.products.item[i].productId._id%>" class="btn btn-primary">Review Product</a>
                   </p> -->

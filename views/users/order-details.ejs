@@ -44,7 +44,11 @@
                     <td><%= key.status %></td>
                     <% if(key.status != 'Canceled'){%>
                       <% if(key.status != 'Delivered'){%>
+                        <% if(key.status != 'Returned') {%>  
                   <td><a href="/cancelOrder?id=<%= key._id %>" class="btn btn-danger" onclick="deletecontent()">Cancel Order</a></td>
+                  <%} else{%>
+                    <td>Order Already <%=key.status%></td>
+                    <%}%>
                   <%}
                   else{%>
                     <td>Order Already <%=key.status%></td>

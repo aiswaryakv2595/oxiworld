@@ -11,7 +11,7 @@
     <form method="POST" action="/checkout/razorpay">
         <input type="hidden" name="userId" value="<%= userId %>">
         <input type="hidden" name="total" value="<%= total %>">
-        <input type="text" name="order_id" value="<%= orderId %>">
+        <input type="hidden" name="order_id" value="<%= orderId %>">
         <input type="hidden" name="key_id" value="<%= key_id %>">
         <input type="hidden" name="order" value="<%= JSON.stringify(order) %>">
         <input type="hidden" name="user" value="<%= JSON.stringify(user) %>">
