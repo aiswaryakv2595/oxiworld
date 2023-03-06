@@ -343,8 +343,8 @@ const loadCart = async (req, res) => {
       (acc, item) => acc + item.price,
       0
     );
-    console.log('totoal price in cart', totalprice);
-    
+    console.log("totoal price in cart", totalprice);
+
     completeUser.cart.totalprice = totalprice;
 
     const grandTotal = totalprice + 45;
@@ -475,6 +475,7 @@ const updateCartItem = async (req, res) => {
     const cartItem = user.cart.item.find(
       (item) => item.productId._id.toString() === productId.toString()
     );
+    console.log(cartItem);
 
     const productPrice = cartItem.productId.price;
 
@@ -516,7 +517,7 @@ const loadCheckout = async (req, res) => {
   const countries = country.getCountries();
 
   const completeUser = await user.populate("cart.item.productId");
-  
+
   const totalprice = completeUser.cart.item.reduce(
     (acc, item) => acc + item.price,
     0
@@ -524,7 +525,7 @@ const loadCheckout = async (req, res) => {
   // console.log('completeUser.cart.totalprice',completeUser.cart.totalprice);
   completeUser.cart.totalprice = totalprice;
   const grandTotal = totalprice + 45;
-  console.log('user in checkout',completeUser);
+  console.log("user in checkout", completeUser);
   res.render("checkout", {
     totalPrice: grandTotal,
     user: user,
@@ -663,57 +664,62 @@ const razorpayCheckout = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-const returnproduct = async(req,res)=>{
+const returnproduct = async (req, res) => {
   try {
-      const userSession = req.session;
-      console.log('session--->', userSession);
-      const orderId = userSession.currentorder;
-      const itemId = req.query.id;
-      
-      // Find the order and item
-      const order = await Orders.findOne({_id: orderId, userId: userSession.user_id});
-      const item = await Item.findById(itemId);
+    const userSession = req.session;
+    console.log("session--->", userSession);
+    const orderId = userSession.currentorder;
+    const itemId = req.query.id;
 
-      if (!order || !item) {
-        // Handle case where order or item cannot be found
-        return res.status(404).send("Order or item not found");
-      }
+    // Find the order and item
+    const order = await Orders.findOne({
+      _id: orderId,
+      userId: userSession.user_id,
+    });
+    const item = await Item.findById(itemId);
 
-      // Find the item in the order
-      const orderItem = order.products.item.find(item => item.productId.toString() === itemId);
-      
-      if (!orderItem) {
-        // Handle case where item is not in the order
-        return res.status(404).send("Item not found in order");
-      }
+    if (!order || !item) {
+      // Handle case where order or item cannot be found
+      return res.status(404).send("Order or item not found");
+    }
 
-      if (order.status !== 'Delivered' || orderItem.productReturned === 1) {
-        // Handle case where order is not delivered or item is already returned
-        return res.status(400).send("Cannot return item");
-      }
+    // Find the item in the order
+    const orderItem = order.products.item.find(
+      (item) => item.productId.toString() === itemId
+    );
 
-      // Update the quantity of the item and set productReturned to 1
-      item.quantity += orderItem.qty;
-      orderItem.productReturned = 1;
+    if (!orderItem) {
+      // Handle case where item is not in the order
+      return res.status(404).send("Item not found in order");
+    }
 
-      // Check if all items in the order have been returned
-      const allItemsReturned = order.products.item.every(item => item.productReturned === 1);
-      if (allItemsReturned) {
-        order.status = 'Returned';
-      }
+    if (order.status !== "Delivered" || orderItem.productReturned === 1) {
+      // Handle case where order is not delivered or item is already returned
+      return res.status(400).send("Cannot return item");
+    }
 
-      // Save changes to the order and item
-      await Promise.all([order.save(), item.save()]);
+    // Update the quantity of the item and set productReturned to 1
+    item.quantity += orderItem.qty;
+    orderItem.productReturned = 1;
 
-      // Redirect the user to the profile page
-      res.redirect('/profile');
-      
+    // Check if all items in the order have been returned
+    const allItemsReturned = order.products.item.every(
+      (item) => item.productReturned === 1
+    );
+    if (allItemsReturned) {
+      order.status = "Returned";
+    }
+
+    // Save changes to the order and item
+    await Promise.all([order.save(), item.save()]);
+
+    // Redirect the user to the profile page
+    res.redirect("/profile");
   } catch (error) {
-      console.log(error);
-      res.status(500).send("An error occurred");
+    console.log(error);
+    res.status(500).send("An error occurred");
   }
-}
-
+};
 
 const saveAddress = async (req, res) => {
   const address = new Address({
@@ -816,7 +822,7 @@ const applyCoupon = async (req, res) => {
     };
 
     let totalPrice = Number(user.cart.totalprice);
-    console.log('total price in coupon', totalPrice);
+    console.log("total price in coupon", totalPrice);
 
     if (isNaN(totalPrice)) {
       throw new Error("Total price is NaN");
@@ -824,27 +830,23 @@ const applyCoupon = async (req, res) => {
 
     let updatedTotal;
     let discount_value;
-    
+
     if (couponData.usedBy.includes(user_id)) {
       message = "Coupon Already used";
       delete req.session.offer;
       // throw new Error('Coupon has already been used');
     } else if (user.cart.totalprice > couponData.min_value) {
       console.log(user.cart.totalprice);
-      
+
       if (couponData.discount_type === "AMOUNT") {
-        discount_value = couponData.discount
+        discount_value = couponData.discount;
         updatedTotal = totalPrice - discount_value + 45;
-      } 
-      else if (couponData.discount_type === "PERCENTAGE") {
-        const max_discount = couponData.max_discount 
-       
-        discount_value = totalPrice * (couponData.discount / 100)
-        if(discount_value>=max_discount)
-        discount_value = max_discount;
-        updatedTotal = totalPrice - discount_value +45
-        // if(updatedTotal>max_discount)
-        // updatedTotal = max_discount
+      } else if (couponData.discount_type === "PERCENTAGE") {
+        const max_discount = couponData.max_discount;
+
+        discount_value = totalPrice * (couponData.discount / 100);
+        if (discount_value >= max_discount) discount_value = max_discount;
+        updatedTotal = totalPrice - discount_value + 45;
       } else {
         throw new Error("Invalid discount type");
       }

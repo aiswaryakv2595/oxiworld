@@ -27,7 +27,7 @@
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <p class="bread"><span><a href="index.html">Home</a></span> / <span>Shopping Cart</span></p>
+                    <p class="bread"><span><a href="/profile">Home</a></span> / <span>Shopping Cart</span></p>
                 </div>
             </div>
         </div>
@@ -101,53 +101,51 @@
                     </div>
                   </div>
                   <% if(cartProducts){ %>
-                  <% for(let key of cartProducts.item){ %>
-                  <div class="product-cart d-flex">
-                    <div class="one-forth">
-                      <div class="product-img" style="background-image: url('/products/<%= key.productId.images[0] %>');">
-                      </div>
-                      <div class="display-tc">
-                        <h3><%= key.productId.name %></h3>
-                      </div>
-                    </div>
-                    <div class="one-eight text-center">
-                      <div class="display-tc">
-                        <span class="price" id="productPrice">&#8377; <%= key.productId.price %></span>
-                      </div>
-                    </div>
-                    <div class="one-eight text-center">
-                      <div class="display-tc">
-                        <div class="input-group">
-                          <span class="input-group-btn">
-                            <button class="btn btn-default decrement-btn" type="button" data-product-id="<%= key.productId._id %>">
-                              <i class="icon-minus"></i>
-                            </button>
-                          </span>
-                          <input type="number" name="qty" id="qty" class="form-control input-number text-center" value="<%= key.qty %>" min="1" max="100" data-product-id="<%= key.productId._id %>">
-                         
-
-
-                          <span class="input-group-btn">
-                            <button class="btn btn-default increment-btn" type="button" data-product-id="<%= key.productId._id %>">
-                              <i class="icon-plus"></i>
-                            </button>
-                          </span>
+                    <% for(let key of cartProducts.item){ %>
+                      <div class="product-cart d-flex">
+                        <div class="one-forth">
+                          <div class="product-img" style="background-image: url('/products/<%= key.productId.images[0] %>');">
+                          </div>
+                          <div class="display-tc">
+                            <h3><%= key.productId.name %></h3>
+                          </div>
+                        </div>
+                        <div class="one-eight text-center">
+                          <div class="display-tc">
+                            <span class="price" id="productPrice-<%= key.productId._id %>">&#8377; <%= key.productId.price %></span>
+                          </div>
+                        </div>
+                        <div class="one-eight text-center">
+                          <div class="display-tc">
+                            <div class="input-group">
+                              <span class="input-group-btn">
+                                <button class="btn btn-default decrement-btn" type="button" data-product-id="<%= key.productId._id %>">
+                                  <i class="icon-minus"></i>
+                                </button>
+                              </span>
+                              <input type="number" disabled name="qty" id="qty-<%= key.productId._id %>" class="form-control input-number text-center" value="<%= key.qty %>" min="1" max="100" data-product-id="<%= key.productId._id %>">
+                              <span class="input-group-btn">
+                                <button class="btn btn-default increment-btn" type="button" data-product-id="<%= key.productId._id %>">
+                                  <i class="icon-plus"></i>
+                                </button>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="one-eight text-center">
+                          <div class="display-tc">
+                            <span id="price-<%= key.productId._id %>" class="price-total">&#8377; <%= key.qty * key.productId.price %></span>
+                          </div>
+                        </div>
+                        <div class="one-eight text-center">
+                          <div class="display-tc">
+                            <a href="/removeItem?id=<%= key.productId._id %>" class="closed"></a>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="one-eight text-center">
-                      <div class="display-tc">
-                        <span id="price" class="price">&#8377; <%= key.qty * key.productId.price %></span>
-                      </div>
-                    </div>
-                    <div class="one-eight text-center">
-                      <div class="display-tc">
-                        <a href="/removeItem?id=<%= key.productId._id %>" class="closed"></a>
-                      </div>
-                    </div>
-                  </div>
+                    <% } %>
                   <% } %>
-                  <% } %>
+                  
                 </div>
               </div>
               <div class="row row-pb-lg">
@@ -197,59 +195,53 @@
 // increment button
 // increment button
 // increment button
+// increment button
 $('.increment-btn').click(function(e) {
   e.preventDefault();
-  var inputEl = $('#qty');
-  var productId = $('#qty').data('product-id');
+  var inputEl = $(this).closest('.product-cart').find('input.input-number');
+  var productId = inputEl.data('product-id');
   var qty = parseInt(inputEl.val());
-  console.log(qty);
-  console.log(productId);
   var maxQty = inputEl.attr('max');
-  console.log(maxQty);
   if (qty < maxQty) {
     qty++;
     inputEl.val(qty);
-    updateCartItem(productId, qty);
+    updateCartItem(productId, qty, inputEl);
   }
 });
-
+   
 // decrement button
 $('.decrement-btn').click(function(e) {
   e.preventDefault();
-  var inputEl = $('#qty');
+  var inputEl = $(this).closest('.product-cart').find('input.input-number');
   var productId = inputEl.data('product-id');
   var qty = parseInt(inputEl.val());
   if (qty > 1) {
     qty--;
     inputEl.val(qty);
-    updateCartItem(productId, qty);
+    updateCartItem(productId, qty, inputEl);
   }
 });
 
+});
+function updateCartItem(productId, qty, inputEl) {
+  $.ajax({
+    url: '/updateCartItem',
+    type: 'POST',
+    data: { productId: productId, qty: qty },
+    success: function(data) {
+      // update subtotal and grand total
+      const productPrice = data.productPrice;
+      const newPrice = productPrice * qty;
+      inputEl.closest('.product-cart').find('.price-total').text(` ${newPrice}`);
+      $('#subtotal').text(` ${data.subtotal}`);
+      $('#totalart').text(`${data.grandTotal}`);
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log(textStatus, errorThrown);
+    }
+  });
+}
 
-
-    
-      // function to update cart item quantity using AJAX
-      function updateCartItem(productId, qty) {
-        $.ajax({
-          url: '/updateCartItem',
-          type: 'POST',
-          data: { productId: productId, qty: qty },
-          success: function(data) {
-            // update subtotal and grand total
-            console.log(data);
-            const productPrice = data.productPrice;
-            const newPrice = productPrice * qty;
-            $('#price').text(newPrice);
-            $('#subtotal').text(data.subtotal);
-            $('#totalart').text(data.grandTotal);
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            console.log(textStatus, errorThrown);
-          }
-        });
-      }
-    });
     </script>
     
 <%-include("../layouts/user-footer.ejs")-%>
