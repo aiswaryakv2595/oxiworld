@@ -1,30 +1,104 @@
 <!-- razorpay.ejs -->
+<%-include('../layouts/user-header.ejs')-%>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Razorpay Payment Gateway Integration</title>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-</head>
-<body>
-    <h1>Pay with Razorpay</h1>
-    <form method="POST" action="/checkout/razorpay">
-        <input type="hidden" name="userId" value="<%= userId %>">
-        <input type="hidden" name="total" value="<%= total %>">
-        <input type="hidden" name="order_id" value="<%= orderId %>">
-        <input type="hidden" name="key_id" value="<%= key_id %>">
-        <input type="hidden" name="order" value="<%= JSON.stringify(order) %>">
-        <input type="hidden" name="user" value="<%= JSON.stringify(user) %>">
-                <input type="hidden" name="payment_id" id="payment_id_input">
-        <button class="btn btn-primary" id="razorpay-button">Pay Now</button>
-    </form>
 
+<style>
+    .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 290px;
+  padding: 20px 1px;
+  margin: 10px 0;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  opacity: 0.5;
+  box-shadow: 0 10px 15px -3px rgba(33,150,243,.4),0 4px 6px -4px rgba(33,150,243,.4);
+  border-radius: 10px;
+  background-color: #6B6ECC;
+  background: linear-gradient(45deg, #04051dea 0%, #2b566e 100%);
+}
+
+.content {
+  padding: 20px;
+}
+
+.content .price {
+  color: white;
+  font-weight: 800;
+  font-size: 50px;
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.42);
+}
+
+.content .description {
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.content .title {
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.64);
+  margin-top: 10px;
+  font-size: 25px;
+  letter-spacing: 1px;
+}
+
+button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  border: none;
+  outline: none;
+  color: rgb(255 255 255);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: .75rem;
+  padding: 0.75rem 1.5rem;
+  background-color: rgb(33 150 243);
+  border-radius: 0.5rem;
+  width: 90%;
+  text-shadow: 0px 4px 18px #2c3442;
+}
+
+
+</style>
+
+  <section style="height: 100vh;" >
+    <div class="d-flex justify-content-center">
+        <div class="card">
+            <div class="content">
+                <form method="POST" action="/checkout/razorpay">
+              
+              <div class="price"><%= total %></div>
+              <input type="hidden" name="userId" value="<%= userId %>">
+            <input type="hidden" name="total" value="<%= total %>">
+            <input type="hidden" name="order_id" value="<%= orderId %>">
+            <input type="hidden" name="key_id" value="<%= key_id %>">
+            <input type="hidden" name="order" value="<%= JSON.stringify(order) %>">
+            <input type="hidden" name="user" value="<%= JSON.stringify(user) %>">
+                    <input type="hidden" name="payment_id" id="payment_id_input">
+            </form>
+            </div>
+              <button id="razorpay-button">
+                Pay now
+              </button>
+        </div>
+    </div>
+   
+
+</section>
     <script>
         var options = {
             "key": "<%= key_id %>",
             "amount": "<%= total %>00",
             "currency": "INR",
-            "name": "My Website",
+            "name": "Oxiworld",
             "description": "Payment for your order",
             "image": "/logo.png",
             "order_id": "<%= order_id %>",
@@ -55,5 +129,5 @@
             e.preventDefault();
         }
     </script>
-</body>
-</html>
+
+<%-include("../layouts/user-footer.ejs")-%>

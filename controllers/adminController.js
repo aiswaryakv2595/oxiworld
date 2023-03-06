@@ -552,7 +552,7 @@ const getSales = async (req, res) => {
             $lt: enddate,
            
           },
-          status: status,
+          status: "Delivered",
         },
       },
       { $group: { _id: "$products.item.productId", count: { $sum: 1 } } },
