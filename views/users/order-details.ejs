@@ -42,19 +42,12 @@
                     <td><%= key.createdAt.toDateString() %></td>
                     <td><%= key.payment %></td>
                     <td><%= key.status %></td>
-                    <% if(key.status != 'Canceled'){%>
-                      <% if(key.status != 'Delivered'){%>
-                        <% if(key.status != 'Returned') {%>  
+                    <% if(key.status == 'Placed' || key.status == 'Shipped'){%>
+                     
+                         
                   <td><a href="/cancelOrder?id=<%= key._id %>" class="btn btn-danger" onclick="deletecontent()">Cancel Order</a></td>
                   <%} else{%>
-                    <td>Order Already <%=key.status%></td>
-                    <%}%>
-                  <%}
-                  else{%>
-                    <td>Order Already <%=key.status%></td>
-                    <%}%>
-               <% } else{%>
-                    <td>Order Already <%=key.status%></td>
+                    <td>Order  <%=key.status%></td>
                     <%}%>
             
                   <td><a href="/viewOrder?id=<%= key._id %>" class="btn btn-info">View Details</a></td>

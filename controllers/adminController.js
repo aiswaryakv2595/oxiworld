@@ -465,7 +465,7 @@ const viewOrders = async (req, res) => {
   })
     .populate("userId")
     .populate("addressId")
-    .populate("products.item.productId");
+    .populate("products.item.productId").sort({createdAt:-1});
 
   if (orders) {
     res.status(200).render("view-order", {

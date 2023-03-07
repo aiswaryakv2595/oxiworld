@@ -42,7 +42,7 @@ const productDetails = async (req, res) => {
   }
 };
 
-const sortAscending = async (req, res) => {
+const getFilters = async (req, res) => {
   try {
     const pageSize = 6; // Number of items per page
     const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
@@ -53,36 +53,31 @@ const sortAscending = async (req, res) => {
     // Create a new query object to include pagination parameters
     const queryPage = { ...req.query };
     delete queryPage.page;
+     
+    const filterType = req.query.filterType
+    let products
+    const material = req.query.material;
+    console.log(material);
+    count = await Item.countDocuments();
+    if(filterType == 'high'){
+     products = await Item.find({}).sort({ price: -1 })
+    .skip(startIndex)
+    .limit(pageSize);
     
-    const products = await Item.find({}).sort({ price: 1 })
-    .skip(startIndex)
+    }
+    else if(filterType == 'low'){
+       products = await Item.find({}).sort({ price: 1 })
+      .skip(startIndex)
+      .limit(pageSize);
+    }
+    else if(filterType == 'material'){
+      
+       products = await Item.find({ material: material })
+       .skip(startIndex)
     .limit(pageSize);
-       count = await Item.countDocuments();
-       const pagination = {
-        currentPage: page,
-        totalPages: Math.ceil(count / pageSize),
-        totalItems: count,
-      };
-    res.json({ products: products, pagination:pagination });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-const sortDescending = async (req, res) => {
-  try {
-    const pageSize = 6; // Number of items per page
-    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
-
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = page * pageSize;
-    let count
-    // Create a new query object to include pagination parameters
-    const queryPage = { ...req.query };
-    delete queryPage.page;
-    const products = await Item.find({}).sort({ price: -1 })
-    .skip(startIndex)
-    .limit(pageSize);
-       count = await Item.countDocuments();
+       count = await Item.countDocuments({ material: material });
+    }
+       
        const pagination = {
         currentPage: page,
         totalPages: Math.ceil(count / pageSize),
@@ -104,10 +99,6 @@ const filterCollections = async (req, res) => {
 
     const filters = await Filter.find({});
 
-    //filter
-    // const brandIds = await Filter.find({ 'filter.brand.name': { $in: [b_name] } }, 'filter.brand._id')
-
-    // console.log("filter"+brandIds);
     let brands = [];
 
     let colorArray = [];
@@ -179,22 +170,7 @@ const searchItems = async (req, res) => {
   }
 };
 
-//   try {
-//     const categoryId = req.query.categoryId;
 
-//     const products = await Item.find({ category_id: categoryId });
-//     let filters;
-//     if(categoryId != 1)
-//      filters = await Filter.find({categoryId:categoryId})
-//      else
-//      filters = await Filter.find({})
-//     console.log(products);
-//     res.json({products,filters});
-//   } catch (error) {
-//     console.error('Error fetching products:', error);
-//     res.status(500).send('Error fetching products');
-//   }
-// };
 const searchCategory = async (req, res) => {
   try {
     
@@ -284,18 +260,7 @@ const searchColor = async (req, res) => {
   }
 };
 
-const searchMaterial = async (req, res) => {
-  try {
-    const material = req.params.material;
 
-    const products = await Item.find({ material: material });
-
-    res.json(products);
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).send("Error fetching products");
-  }
-};
 const searchPrice = async (req, res) => {
   try {
     const minPrice = req.body.min || 0;
@@ -340,14 +305,12 @@ const searchProducts = async (req, res) => {
 };
 module.exports = {
   productDetails,
-  sortAscending,
-  sortDescending,
+  getFilters,
   filterCollections,
   searchItems,
   searchCategory,
   searchBrand,
   searchColor,
-  searchMaterial,
   searchPrice,
   searchProducts,
 };

@@ -668,53 +668,24 @@ const returnproduct = async (req, res) => {
   try {
     const userSession = req.session;
     console.log("session--->", userSession);
-    const orderId = userSession.currentorder;
-    const itemId = req.query.id;
+    const orderId = req.query.id;
+    
 
     // Find the order and item
-    const order = await Orders.findOne({
+    const order = await Orders.findByIdAndUpdate({
       _id: orderId,
-      userId: userSession.user_id,
-    });
-    const item = await Item.findById(itemId);
-
-    if (!order || !item) {
-      // Handle case where order or item cannot be found
-      return res.status(404).send("Order or item not found");
+    },
+      {$set: {
+        status: "ReturnRequestReceived",
+      }
     }
-
-    // Find the item in the order
-    const orderItem = order.products.item.find(
-      (item) => item.productId.toString() === itemId
     );
-
-    if (!orderItem) {
-      // Handle case where item is not in the order
-      return res.status(404).send("Item not found in order");
-    }
-
-    if (order.status !== "Delivered" || orderItem.productReturned === 1) {
-      // Handle case where order is not delivered or item is already returned
-      return res.status(400).send("Cannot return item");
-    }
-
-    // Update the quantity of the item and set productReturned to 1
-    item.quantity += orderItem.qty;
-    orderItem.productReturned = 1;
-
-    // Check if all items in the order have been returned
-    const allItemsReturned = order.products.item.every(
-      (item) => item.productReturned === 1
-    );
-    if (allItemsReturned) {
-      order.status = "Returned";
-    }
-
+   
     // Save changes to the order and item
-    await Promise.all([order.save(), item.save()]);
+    await order.save();
 
     // Redirect the user to the profile page
-    res.redirect("/profile");
+    res.redirect("/loadOrderDetails");
   } catch (error) {
     console.log(error);
     res.status(500).send("An error occurred");
