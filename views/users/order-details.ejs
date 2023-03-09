@@ -19,7 +19,7 @@
               <thead>
                 <tr>
                   
-                  <th scope="col" >OrderId</th>
+                  <th scope="col" >Item</th>
                  
                   <th scope="col">Time</th>
                   <th scope="col">Payment</th>
@@ -37,7 +37,7 @@
               <tbody>  
                 <tr>
                   
-                    <td><%= key._id %></td>
+                    <td><%= key.products.item[0].productId.name %></td>
                     
                     <td><%= key.createdAt.toDateString() %></td>
                     <td><%= key.payment %></td>

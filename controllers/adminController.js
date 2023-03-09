@@ -451,7 +451,9 @@ const deleteCoupon = async (req, res) => {
 };
 
 const orders = async (req, res) => {
-  const orders = await Order.find({ status: { $ne: "Attempted" } }).populate(
+  const orders = await Order.find({ status: { $ne: "Attempted" } })
+  .sort({createdAt: -1})
+  .populate(
     "userId"
   );
   res.status(200).render("orders", { orders: orders });
@@ -462,10 +464,12 @@ const viewOrders = async (req, res) => {
   const orders = await Order.findById({
     _id: orderId,
     status: { $ne: "Attempted" },
-  })
+  }).sort({
+      createdAt: -1,
+    })
     .populate("userId")
     .populate("addressId")
-    .populate("products.item.productId").sort({createdAt:-1});
+    .populate("products.item.productId")
 
   if (orders) {
     res.status(200).render("view-order", {
@@ -572,6 +576,12 @@ const getSales = async (req, res) => {
   }
 };
 
+const confirmReturn = async(req,res)=>{
+  const order = await  Order.findByIdAndUpdate(
+    { _id: req.query.orderid },
+    { $set: { status: "Return" } }
+    )
+}
 
 module.exports = {
   adminSetup,
@@ -602,4 +612,5 @@ module.exports = {
   changeStatus,
   viewSales,
   getSales,
+  confirmReturn
 };

@@ -12,7 +12,6 @@ let userSession;
 
 const productDetails = async (req, res) => {
   try {
-    
     const id = req.params.id;
     const userData = await User.findOne({ _id: req.session.user_id });
     const allCategories = await Category.find({});
@@ -49,41 +48,39 @@ const getFilters = async (req, res) => {
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
-    let count
+    let count;
     // Create a new query object to include pagination parameters
     const queryPage = { ...req.query };
     delete queryPage.page;
-     
-    const filterType = req.query.filterType
-    let products
+
+    const filterType = req.query.filterType;
+    let products;
     const material = req.query.material;
     console.log(material);
     count = await Item.countDocuments();
-    if(filterType == 'high'){
-     products = await Item.find({}).sort({ price: -1 })
-    .skip(startIndex)
-    .limit(pageSize);
-    
+    if (filterType == "high") {
+      products = await Item.find({})
+        .sort({ price: -1 })
+        .skip(startIndex)
+        .limit(pageSize);
+    } else if (filterType == "low") {
+      products = await Item.find({})
+        .sort({ price: 1 })
+        .skip(startIndex)
+        .limit(pageSize);
+    } else if (filterType == "material") {
+      products = await Item.find({ material: material })
+        .skip(startIndex)
+        .limit(pageSize);
+      count = await Item.countDocuments({ material: material });
     }
-    else if(filterType == 'low'){
-       products = await Item.find({}).sort({ price: 1 })
-      .skip(startIndex)
-      .limit(pageSize);
-    }
-    else if(filterType == 'material'){
-      
-       products = await Item.find({ material: material })
-       .skip(startIndex)
-    .limit(pageSize);
-       count = await Item.countDocuments({ material: material });
-    }
-       
-       const pagination = {
-        currentPage: page,
-        totalPages: Math.ceil(count / pageSize),
-        totalItems: count,
-      };
-    res.json({ products: products, pagination:pagination });
+
+    const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(count / pageSize),
+      totalItems: count,
+    };
+    res.json({ products: products, pagination: pagination });
   } catch (error) {
     console.log(error.message);
   }
@@ -170,16 +167,14 @@ const searchItems = async (req, res) => {
   }
 };
 
-
 const searchCategory = async (req, res) => {
   try {
-    
     const pageSize = 6; // Number of items per page
     const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
-    let count
+    let count;
     // Create a new query object to include pagination parameters
     const queryPage = { ...req.query };
     delete queryPage.page;
@@ -189,25 +184,24 @@ const searchCategory = async (req, res) => {
     let filters;
     if (categoryId) {
       products = await Item.find({ category_id: categoryId })
-      
-      .skip(startIndex)
-      .limit(pageSize);
-       count = await Item.countDocuments({ category_id: categoryId });
+
+        .skip(startIndex)
+        .limit(pageSize);
+      count = await Item.countDocuments({ category_id: categoryId });
       filters = await Filter.find({ categoryId: categoryId });
-    }
-    else {
+    } else {
       products = await Item.find({});
-       count = await Item.countDocuments();
+      count = await Item.countDocuments();
       filters = await Filter.find({});
-      }
-      
+    }
+
     const pagination = {
       currentPage: page,
       totalPages: Math.ceil(count / pageSize),
       totalItems: count,
     };
-     
-    res.json({ products: products, filters: filters,pagination:pagination });
+
+    res.json({ products: products, filters: filters, pagination: pagination });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Error fetching products");
@@ -218,8 +212,13 @@ const searchBrand = async (req, res) => {
   try {
     const selectedBrands = req.body.brands; // array of selected brands
     const categoryId = req.body.categoryId;
-    console.log(selectedBrands);
-    
+    // console.log(selectedBrands);
+    const pageSize = 6; // Number of items per page
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+    let count;
     let products;
 
     const filter = await Filter.find({ brand: { $in: selectedBrands } }); // find filters for selected brands
@@ -227,21 +226,44 @@ const searchBrand = async (req, res) => {
 
     const filterIds = filter.map((f) => f._id); // get the filter ids
     if (categoryId) {
-      if (selectedBrands){
+      if (selectedBrands) {
         products = await Item.find({
           brand_id: { $in: filterIds },
-          category_id:categoryId
-        }); // find items for the selected brands
-      }
-      else products = await Item.find({ category_id: categoryId });
-    }
-    else{
+          category_id: categoryId,
+        })
+          .skip(startIndex)
+          .limit(pageSize); // find items for the selected brands
+        count = await Item.countDocuments({
+          brand_id: { $in: filterIds },
+          category_id: categoryId,
+        });
+      } else
+        products = await Item.find({ category_id: categoryId })
+          .skip(startIndex)
+          .limit(pageSize);
+      count = await Item.countDocuments({ category_id: categoryId });
+    } else if(selectedBrands){
       products = await Item.find({
         brand_id: { $in: filterIds },
-        
+      })
+        .skip(startIndex)
+        .limit(pageSize);
+      count = await Item.countDocuments({
+        brand_id: { $in: filterIds },
       });
     }
-    res.json(products);
+    else{
+      products = await Item.find({})
+        .skip(startIndex)
+        .limit(pageSize);
+      count = await Item.countDocuments({});
+    }
+    const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(count / pageSize),
+      totalItems: count,
+    };
+    res.json({ products: products, pagination: pagination });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Error fetching products");
@@ -250,26 +272,67 @@ const searchBrand = async (req, res) => {
 
 const searchColor = async (req, res) => {
   try {
+    const query = req.body.search;
+    const pageSize = 6; // Number of items per page
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+    let count;
+    // Create a new query object to include pagination parameters
+    const queryPage = { ...req.query };
+    delete queryPage.page;
+
     const color = req.body.color;
-    const products = await Item.find({ color: { $in: color } });
-  
-    res.json(products);
+    const products = await Item.find({ color: { $in: color } })
+      .skip(startIndex)
+      .limit(pageSize);
+    count = await Item.countDocuments({ color: { $in: color } });
+
+    const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(count / pageSize),
+      totalItems: count,
+    };
+
+    res.json({ products: products, pagination: pagination });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Error fetching products");
   }
 };
 
-
 const searchPrice = async (req, res) => {
   try {
+    const query = req.body.search;
+    const pageSize = 6; // Number of items per page
+    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+    let count;
+    // Create a new query object to include pagination parameters
+    const queryPage = { ...req.query };
+    delete queryPage.page;
+
     const minPrice = req.body.min || 0;
     const maxPrice = req.body.max || 999999;
     const products = await Item.find({
       price: { $gte: minPrice, $lte: maxPrice },
-    }).populate("category_id");
+    })
+      .populate("category_id")
+      .skip(startIndex)
+      .limit(pageSize);
+    count = await Item.countDocuments({
+      price: { $gte: minPrice, $lte: maxPrice },
+    });
 
-    res.json(products);
+    const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(count / pageSize),
+      totalItems: count,
+    };
+    res.json({ products: products, pagination: pagination });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Error fetching products");
@@ -282,26 +345,27 @@ const searchProducts = async (req, res) => {
 
   const startIndex = (page - 1) * pageSize;
   const endIndex = page * pageSize;
-  let count
+  let count;
   // Create a new query object to include pagination parameters
   const queryPage = { ...req.query };
   delete queryPage.page;
   console.log(query);
   const products = await Item.find({
     name: { $regex: query, $options: "i" },
-  }).populate("category_id")
-  .skip(startIndex)
+  })
+    .populate("category_id")
+    .skip(startIndex)
     .limit(pageSize);
-       count = await Item.countDocuments({
-        name: { $regex: query, $options: "i" },
-      });
-       const pagination = {
-        currentPage: page,
-        totalPages: Math.ceil(count / pageSize),
-        totalItems: count,
-      };
+  count = await Item.countDocuments({
+    name: { $regex: query, $options: "i" },
+  });
+  const pagination = {
+    currentPage: page,
+    totalPages: Math.ceil(count / pageSize),
+    totalItems: count,
+  };
   // console.log(products);
-  res.json({ products: products, pagination:pagination });
+  res.json({ products: products, pagination: pagination });
 };
 module.exports = {
   productDetails,

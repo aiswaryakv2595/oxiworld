@@ -47,7 +47,9 @@ admin_route.post('/updateCoupon',adminController.updateCoupon)
 
 admin_route.get('/orders',adminLoginAuth.isLogin,adminController.orders);
 admin_route.get('/view-order/:id',adminLoginAuth.isLogin,adminController.viewOrders);
+admin_route.post('/confirm-return',adminController.confirmReturn);
 admin_route.post('/cancelOrder',adminController.cancelOrder);
+
 admin_route.post('/change-status',adminController.changeStatus);
 
 //report

@@ -885,7 +885,8 @@ const loadorderdetails = async (req, res) => {
     const userdata = await User.findById({ _id: userSession.user_id });
     const orderdata = await Orders.find({ userId: userSession.user_id }).sort({
       createdAt: -1,
-    });
+    })
+    .populate('products.item.productId')
     res.render("order-details", {
       id: userSession.user_id,
       user: userdata,
@@ -1016,7 +1017,8 @@ const changePassword = async (req, res) => {
 
 const addReview = async (req, res) => {
   const { rate, description, productId, orderId } = req.body;
-  const order = await Orders.find({ "products.item.productId": productId });
+  const order = await Orders.findOne({ "products.item.productId": productId });
+  console.log(order);
   if (order) {
     const review = new Review({
       userId: req.session.user_id,

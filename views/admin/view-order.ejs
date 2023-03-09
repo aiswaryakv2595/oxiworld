@@ -70,7 +70,9 @@
                                         <option value="Shipped">Shipped</option> 
                                         <option value="Delivered">Delivered</option>
                                     </select>
+                                    <% if(orders.status != 'ReturnRequestReceived'){%>
                                 <button class="btn btn-success" id="statusBtn" type="submit">Change status</button>
+                                <%}%>
                             </form>
                             </div>
                         </div>
@@ -91,9 +93,22 @@
                 </div>
                
         </div>
-        
-        
+         
     </div>
+    <%if(orders.status =='ReturnRequestReceived'){%>
+    <div class="card mg-b-20">
+        <div class="card-body">
+            <div class="main-content-label tx-13 ">
+               
+                <a href="/confirm-return?orderid=<%=orders._id%>" class="btn btn-primary" id="confirmReturn">Confirm Return</a>
+               
+            </div>
+           
+    </div>
+    
+    
+</div>
+<%} %>
 
        
     </div>
