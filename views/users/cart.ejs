@@ -102,7 +102,8 @@
                   </div>
                   <% if(cartProducts){ %>
                     <% for(let key of cartProducts.item){ %>
-                      <div class="product-cart d-flex">
+                      <div class="product-cart">
+                      <div class="d-flex">
                         <div class="one-forth">
                           <div class="product-img" style="background-image: url('/products/<%= key.productId.images[0] %>');">
                           </div>
@@ -143,6 +144,11 @@
                           </div>
                         </div>
                       </div>
+                      
+                      <span class="remaining-stock" style="color: red;"> <%= remainingStock[key.productId._id.toString()] %> Items left</span>
+                       
+                      </div>
+                     
                     <% } %>
                   <% } %>
                   
@@ -229,13 +235,18 @@ function updateCartItem(productId, qty, inputEl) {
     type: 'POST',
     data: { productId: productId, qty: qty },
     success: function(data) {
-      // update subtotal and grand total
-      const productPrice = data.productPrice;
-      const newPrice = productPrice * qty;
-      inputEl.closest('.product-cart').find('.price-total').text(` ${newPrice}`);
-      $('#subtotal').text(` ${data.subtotal}`);
-      $('#totalart').text(`${data.grandTotal}`);
-    },
+  // update subtotal and grand total
+  const productPrice = data.productPrice;
+  const newPrice = productPrice * qty;
+  inputEl.closest('.product-cart').find('.price-total').text(` ${newPrice}`);
+  $('#subtotal').text(` ${data.subtotal}`);
+  $('#totalart').text(`${data.grandTotal}`);
+
+  // update remaining stock for this item
+  const remainingStock = data.remainingStock[productId];
+  inputEl.closest('.product-cart').find('.remaining-stock').text(`${remainingStock} Items left`);
+},
+
     error: function(jqXHR, textStatus, errorThrown) {
       console.log(textStatus, errorThrown);
     }

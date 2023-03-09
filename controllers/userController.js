@@ -349,11 +349,18 @@ const loadCart = async (req, res) => {
 
     const grandTotal = totalprice + 45;
 
+    const remainingStock = {};
+    for (let item of completeUser.cart.item) {
+      const remainingStockCount = item.productId.stock ;
+      remainingStock[item.productId._id.toString()] = remainingStockCount;
+    }
+    console.log('remainingStock',remainingStock);
     res.status(200).render("cart", {
       user: userData,
       cartProducts: completeUser.cart,
       totalprice: totalprice,
       grandTotal,
+      remainingStock
     });
   } catch (error) {
     console.log(error.message);
@@ -475,11 +482,16 @@ const updateCartItem = async (req, res) => {
     const cartItem = user.cart.item.find(
       (item) => item.productId._id.toString() === productId.toString()
     );
-    console.log(cartItem);
 
+    const product = await Item.findById(productId);
     const productPrice = cartItem.productId.price;
 
     const qtyChange = qty - cartItem.qty;
+    const stockChange = -qtyChange;
+    console.log(stockChange);
+
+    product.stock -= stockChange;
+    
 
     cartItem.qty = qty;
     cartItem.price = productPrice * qty;
@@ -498,16 +510,24 @@ const updateCartItem = async (req, res) => {
     // save the updated user document
     await user.save();
 
-    // send the updated subtotal and grand total back to the client
+    // get the remaining stock count of each item in the cart
+    const remainingStock = {};
+    for (let item of user.cart.item) {
+      const remainingStockCount = item.productId.stock - item.qty;
+      remainingStock[item.productId._id.toString()] = remainingStockCount;
+    }
+console.log(remainingStock);
+    // send the updated subtotal, grand total, and remaining stock counts back to the client
     const subtotal = user.cart.item.reduce((acc, item) => acc + item.price, 0);
     const grandTotal = subtotal + 45;
 
-    res.json({ subtotal, grandTotal, productPrice, qtyChange });
+    res.json({ subtotal, grandTotal, productPrice, qtyChange, stockChange, remainingStock });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating cart item");
   }
 };
+
 
 const loadCheckout = async (req, res) => {
   const user_id = req.session.user_id;
@@ -845,6 +865,7 @@ const orderSuccess = async (req, res) => {
       console.log(key.productId, " + ", key.qty);
       for (const prod of productdata) {
         if (new String(prod._id).trim() == new String(key.productId).trim()) {
+          
           prod.stock = prod.stock - key.qty;
           await prod.save();
         }
