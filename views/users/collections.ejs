@@ -33,7 +33,7 @@
               <ul>
                 <li><a href="#" class="category-link">All</a></li>
                 <% categories.forEach((row)=>{%>
-                  <li><a href="#" class="category-link" data-category-id="<%= row._id %>"><%= row.name %></a></li>
+                  <li><a href="#" class="category-link filter-type" data-filter-type="category" data-category-id="<%= row._id %>"><%= row.name %></a></li>
 
                 <%})%>
               </ul>
@@ -47,7 +47,7 @@
                 <% uniqueBrands.forEach((brand) => { %>             
                 <li>
                 <label>
-                <input type="checkbox" class="brand-checkbox" data-brand-name="<%= brand %>">
+                <input type="checkbox" class="brand-checkbox filter-type" data-filter-type="brand" data-brand-name="<%= brand %>">
                   <%= brand %>
                   </label>
                 </li>
@@ -169,218 +169,142 @@
 
 <script>
   
-  // filter category wise
-  $('.category-link').click(function(e) {
-  e.preventDefault();
-  $('.category-link').removeClass('active');
-  $(this).addClass('active');
+//   // filter category wise
+//   $('.category-link').click(function(e) {
+//   e.preventDefault();
+//   $('.category-link').removeClass('active');
+//   $(this).addClass('active');
   
-  const categoryId = $(this).data('category-id');
-  let checkedBrands = $('.brand-checkbox:checked').map(function() {
-    return $(this).data('brand-name');
-  }).get();
-  console.log(checkedBrands);
-  $.ajax({
-    url: `/category/products`,
-    method: 'POST',
-    data: { categoryId: categoryId, brands: checkedBrands },
-    success: function(data) {
-      console.log('Response data:', data);
-      const products = data.products;
-      const filters = data.filters;
-      const currentPage = data.pagination.currentPage;
-      const totalPages = data.pagination.totalPages;
-      const filterHtml =filters.map((filter)=>`
-                  <ul>
-                    <li>
-                      <label>
-                        <input type="checkbox" class="brand-checkbox" data-brand-name="${filter.brand}" data-category-id="${categoryId}">
-                        ${filter.brand}
-                      </label>
-                    </li>
-                  </ul>
-               `).join('')
-      const productsHtml = products.map(product => `
-        <div class="col-lg-4 mb-4 text-center">
-          <div class="product-entry border">
-            <a href="/productdetails/${product._id}" class="prod-img">
-              <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
-            </a>
-            <div class="desc">
-              <h2><a href="#">${product.name}</a></h2>
-              <span class="price">${product.price}</span>
-            </div>
-          </div>
-        </div>
-      `).join('');
-      const paginationHtml = `
-  <nav aria-label="Page navigation">
-    <ul class="pagination">
-      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Previous" data-page="${currentPage - 1}">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Previous</span>
-        </a>
-      </li>
-      ${Array.from({ length: totalPages }, (_, i) => `
-        <li class="page-item ${currentPage === i + 1 ? 'active' : ''}">
-          <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
-        </li>
-      `).join('')}
-      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Next" data-page="${currentPage + 1}">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Next</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-`;
-      $('#products-container').html(productsHtml);
-      $('#brand-name').html(filterHtml);
-      $('#pagination-container').html(paginationHtml);
-    },
-    error: function(xhr, status, error) {
-      console.error('Error fetching products:', error);
-    }
-  });
-});
-
-
-//filter brand wise
-$('#brand-name').on('change', '.brand-checkbox', function(e) {
-  const checkedBrands = $('.brand-checkbox:checked').map(function() {
-    return $(this).data('brand-name');
-  }).get();
-  const categoryIds = $('.brand-checkbox').data('category-id')
-  console.log('categoryIds: '+categoryIds);
-  console.log(checkedBrands);
-  $.ajax({
-    url: `/brands/products`,
-    method: 'POST',
-    data: { brands: checkedBrands, categoryId:categoryIds },
-    success: function(data) {
-      console.log('Response data:', data);
-      const products = data.products;
-      const currentPage = data.pagination.currentPage;
-      const totalPages = data.pagination.totalPages;
+//   const categoryId = $(this).data('category-id');
+//   let checkedBrands = $('.brand-checkbox:checked').map(function() {
+//     return $(this).data('brand-name');
+//   }).get();
+//   console.log(checkedBrands);
+//   $.ajax({
+//     url: `/category/products`,
+//     method: 'POST',
+//     data: { categoryId: categoryId, brands: checkedBrands },
+//     success: function(data) {
+//       console.log('Response data:', data);
+//       const products = data.products;
+//       const filters = data.filters;
+//       const currentPage = data.pagination.currentPage;
+//       const totalPages = data.pagination.totalPages;
       
-      const productsHtml = products.map(product => `
-        <div class="col-lg-4 mb-4 text-center">
-          <div class="product-entry border">
-            <a href="/productdetails/${product._id}" class="prod-img">
-              <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
-            </a>
-            <div class="desc">
-              <h2><a href="#">${product.name}</a></h2>
-              <span class="price">${product.price}</span>
-            </div>
-          </div>
-        </div>
-      `).join('');
-      const paginationHtml = `
-  <nav aria-label="Page navigation">
-    <ul class="pagination">
-      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Previous" data-page="${currentPage - 1}">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Previous</span>
-        </a>
-      </li>
-      ${Array.from({ length: totalPages }, (_, i) => `
-        <li class="page-item ${currentPage === i + 1 ? 'active' : ''}">
-          <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
-        </li>
-      `).join('')}
-      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Next" data-page="${currentPage + 1}">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Next</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-`;
+//       const productsHtml = products.map(product => `
+//         <div class="col-lg-4 mb-4 text-center">
+//           <div class="product-entry border">
+//             <a href="/productdetails/${product._id}" class="prod-img">
+//               <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+//             </a>
+//             <div class="desc">
+//               <h2><a href="#">${product.name}</a></h2>
+//               <span class="price">${product.price}</span>
+//             </div>
+//           </div>
+//         </div>
+//       `).join('');
+//       const paginationHtml = `
+//   <nav aria-label="Page navigation">
+//     <ul class="pagination">
+//       <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+//         <a class="page-link" href="#" aria-label="Previous" data-page="${currentPage - 1}">
+//           <span aria-hidden="true">&laquo;</span>
+//           <span class="sr-only">Previous</span>
+//         </a>
+//       </li>
+//       ${Array.from({ length: totalPages }, (_, i) => `
+//         <li class="page-item ${currentPage === i + 1 ? 'active' : ''}">
+//           <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
+//         </li>
+//       `).join('')}
+//       <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+//         <a class="page-link" href="#" aria-label="Next" data-page="${currentPage + 1}">
+//           <span aria-hidden="true">&raquo;</span>
+//           <span class="sr-only">Next</span>
+//         </a>
+//       </li>
+//     </ul>
+//   </nav>
+// `;
+//       $('#products-container').html(productsHtml);
+    
+//       $('#pagination-container').html(paginationHtml);
+//     },
+//     error: function(xhr, status, error) {
+//       console.error('Error fetching products:', error);
+//     }
+//   });
+// });
+
+
+// //filter brand wise
+// $('#brand-name').on('change', '.brand-checkbox', function(e) {
+//   const checkedBrands = $('.brand-checkbox:checked').map(function() {
+//     return $(this).data('brand-name');
+//   }).get();
+//   const categoryIds = $('.brand-checkbox').data('category-id')
+//   console.log('categoryIds: '+categoryIds);
+//   console.log(checkedBrands);
+//   $.ajax({
+//     url: `/brands/products`,
+//     method: 'POST',
+//     data: { brands: checkedBrands, categoryId:categoryIds },
+//     success: function(data) {
+//       console.log('Response data:', data);
+//       const products = data.products;
+//       const currentPage = data.pagination.currentPage;
+//       const totalPages = data.pagination.totalPages;
+      
+//       const productsHtml = products.map(product => `
+//         <div class="col-lg-4 mb-4 text-center">
+//           <div class="product-entry border">
+//             <a href="/productdetails/${product._id}" class="prod-img">
+//               <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
+//             </a>
+//             <div class="desc">
+//               <h2><a href="#">${product.name}</a></h2>
+//               <span class="price">${product.price}</span>
+//             </div>
+//           </div>
+//         </div>
+//       `).join('');
+//       const paginationHtml = `
+//   <nav aria-label="Page navigation">
+//     <ul class="pagination">
+//       <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+//         <a class="page-link" href="#" aria-label="Previous" data-page="${currentPage - 1}">
+//           <span aria-hidden="true">&laquo;</span>
+//           <span class="sr-only">Previous</span>
+//         </a>
+//       </li>
+//       ${Array.from({ length: totalPages }, (_, i) => `
+//         <li class="page-item ${currentPage === i + 1 ? 'active' : ''}">
+//           <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
+//         </li>
+//       `).join('')}
+//       <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+//         <a class="page-link" href="#" aria-label="Next" data-page="${currentPage + 1}">
+//           <span aria-hidden="true">&raquo;</span>
+//           <span class="sr-only">Next</span>
+//         </a>
+//       </li>
+//     </ul>
+//   </nav>
+// `;
  
   
-      $('#products-container').html(productsHtml);
-      $('#pagination-container').html(paginationHtml);
-    },
-    error: function(xhr, status, error) {
-      console.error('Error fetching products:', error);
-    }
-  });
-});
+//       $('#products-container').html(productsHtml);
+//       $('#pagination-container').html(paginationHtml);
+//     },
+//     error: function(xhr, status, error) {
+//       console.error('Error fetching products:', error);
+//     }
+//   });
+// });
 
 
-//clr
-$('#color-name').on('change', '.color-checkbox', function(e) {
-  const checkedColors = $('.color-checkbox:checked').map(function() {
-    return $(this).data('color');
-  }).get();
- 
-  console.log(checkedColors);
-  $.ajax({
-    url: `/color/products`,
-    method: 'POST',
-    data: { color: checkedColors},
-    success: function(data) {
-      console.log('Response data:', data);
-      const products = data.products;
-      const currentPage = data.pagination.currentPage;
-      const totalPages = data.pagination.totalPages;
-      const productsHtml = products.map(product => `
-        <div class="col-lg-4 mb-4 text-center">
-          <div class="product-entry border">
-            <a href="/productdetails/${product._id}" class="prod-img">
-              <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
-            </a>
-            <div class="desc">
-              <h2><a href="#">${product.name}</a></h2>
-              <span class="price">${product.price}</span>
-            </div>
-          </div>
-        </div>
-      `).join('');
-  
-      const paginationHtml = `
-  <nav aria-label="Page navigation">
-    <ul class="pagination">
-      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Previous" data-page="${currentPage - 1}">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Previous</span>
-        </a>
-      </li>
-      ${Array.from({ length: totalPages }, (_, i) => `
-        <li class="page-item ${currentPage === i + 1 ? 'active' : ''}">
-          <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
-        </li>
-      `).join('')}
-      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Next" data-page="${currentPage + 1}">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Next</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-`;
- 
-
-      $('#products-container').html(productsHtml);
-      $('#pagination-container').html(paginationHtml);
-    },
-    error: function(xhr, status, error) {
-      console.error('Error fetching products:', error);
-    }
-  });
-});
-
-
-
-
-$('.filter-type').click(function(e) {
+$('.filter-type').on('change click', function(e) {
   e.preventDefault();
   
   const filterType = $(this).data('filter-type')
@@ -401,9 +325,16 @@ $('.filter-type').click(function(e) {
   }
   const material = $(this).data('material');
   console.log(filterType);
-  
+  const category_id = $(this).data('category-id')
+  //brand name
+  // const brand = $(this).data('brand-name')
+  const checkedBrands = $('.brand-checkbox:checked').map(function() {
+    return $(this).data('brand-name');
+  }).get()
+  console.log(checkedBrands);
+  console.log();
   $.ajax({
-  url: `/getfilters?filterType=${filterType}&material=${material}`,
+  url: `/getfilters?filterType=${filterType}&material=${material}&category=${category_id}&brand=${checkedBrands}`,
   method: 'GET',
   success: function(data) {
   console.log('Response data:', data); // Add this line to log the data variable
@@ -464,121 +395,6 @@ $('.filter-type').click(function(e) {
 
 
 
-$('#price-filter-form input[type="button"]').click(function() {
-    var min = $('#price-filter-form input[name="min"]').val();
-    var max = $('#price-filter-form input[name="max"]').val();
-
-    $.post('/products/filter/price', { min: min, max: max }, function(data) {
-      // Update the products container with the filtered results
-      const products = data.products;
-      const currentPage = data.pagination.currentPage;
-      const totalPages = data.pagination.totalPages;
-      var productsHtml = '';
-      if (products.length > 0) {
-        productsHtml = products.map(product => `
-          <div class="col-lg-4 mb-4 text-center">
-            <div class="product-entry border">
-              <a href="/productdetails/${product._id}" class="prod-img">
-                <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
-              </a>
-              <div class="desc">
-                <h2><a href="#">${product.name}</a></h2>
-                <span class="price">${product.price}</span>
-              </div>
-            </div>
-          </div>
-        `).join('');
-     
-
-      const paginationHtml = `
-  <nav aria-label="Page navigation">
-    <ul class="pagination">
-      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Previous" data-page="${currentPage - 1}">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Previous</span>
-        </a>
-      </li>
-      ${Array.from({ length: totalPages }, (_, i) => `
-        <li class="page-item ${currentPage === i + 1 ? 'active' : ''}">
-          <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
-        </li>
-      `).join('')}
-      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Next" data-page="${currentPage + 1}">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Next</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-`;
- 
-      $('#products-container').html(productsHtml);
-      $('#pagination-container').html(paginationHtml);
-    } else {
-        productsHtml = '<p>No items found with the selected price range</p>';
-      }
-    });
-  });
- 
-$('#search-form input[type="button"]').click(function() {
-    var search = $('#search-form input[name="search"]').val();
-    
-
-    $.post('/products/search', { search: search}, function(data) {
-      // Update the products container with the filtered results
-      var productsHtml = '';
-      const products = data.products;
-      const currentPage = data.pagination.currentPage;
-      const totalPages = data.pagination.totalPages;
-      if (products.length > 0) {
-        productsHtml = products.map(product => `
-          <div class="col-lg-4 mb-4 text-center">
-            <div class="product-entry border">
-              <a href="/productdetails/${product._id}" class="prod-img">
-                <img src="/products/${product.images[0]}" class="img-fluid" alt="Free html5 bootstrap 4 template">
-              </a>
-              <div class="desc">
-                <h2><a href="#">${product.name}</a></h2>
-                <span class="price">${product.price}</span>
-              </div>
-            </div>
-          </div>
-        `).join('');
-        const paginationHtml = `
-  <nav aria-label="Page navigation">
-    <ul class="pagination">
-      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Previous" data-page="${currentPage - 1}">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Previous</span>
-        </a>
-      </li>
-      ${Array.from({ length: totalPages }, (_, i) => `
-        <li class="page-item ${currentPage === i + 1 ? 'active' : ''}">
-          <a class="page-link" href="#" data-page="${i + 1}">${i + 1}</a>
-        </li>
-      `).join('')}
-      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        <a class="page-link" href="#" aria-label="Next" data-page="${currentPage + 1}">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Next</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-`;
-    
-      $('#products-container').html(productsHtml);
-      $('#pagination-container').html(paginationHtml);
-    } else {
-        productsHtml = '<p>No items found </p>';
-      }
-      
-    });
-  });
- 
 </script>
 
 <%-include("../layouts/user-footer.ejs")-%>

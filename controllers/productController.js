@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Item = require("../models/itemModel");
 const Category = require("../models/categoryModel");
+const mongoose =require ('mongoose')
 
 const Filter = require("../models/filterModel");
 const Review = require("../models/reviewModel");
@@ -49,31 +50,42 @@ const getFilters = async (req, res) => {
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
     let count;
-    // Create a new query object to include pagination parameters
-    const queryPage = { ...req.query };
-    delete queryPage.page;
 
     const filterType = req.query.filterType;
-    let products;
-    const material = req.query.material;
-    console.log(material);
-    count = await Item.countDocuments();
-    if (filterType == "high") {
-      products = await Item.find({})
-        .sort({ price: -1 })
-        .skip(startIndex)
-        .limit(pageSize);
-    } else if (filterType == "low") {
-      products = await Item.find({})
-        .sort({ price: 1 })
-        .skip(startIndex)
-        .limit(pageSize);
-    } else if (filterType == "material") {
-      products = await Item.find({ material: material })
-        .skip(startIndex)
-        .limit(pageSize);
-      count = await Item.countDocuments({ material: material });
+    const category_id = req.query.category;
+    const brandsString = req.query.brand;
+    const brandsArray = brandsString.split(",");
+
+    let query = {};
+    let filter
+    let filterIds
+    // If category is selected, add it to the query
+    if (filterType == 'category') {
+      query.category_id = mongoose.Types.ObjectId(category_id);
     }
+    
+    // If brand is selected, find the filters and add them to the query
+    if (filterType == 'brand') {
+       filter = await Filter.find({ brand: { $in: brandsArray } });
+       filterIds = filter.map((f) => mongoose.Types.ObjectId(f._id));
+      query.brand_id = { $in: filterIds };
+    }
+
+    // If both category and brand are selected, add them to the query
+    if (filterType == 'category' && filterType == 'brand') {
+      query = {
+        category_id: mongoose.Types.ObjectId(category_id),
+        brand_id: { $in: filterIds }
+      };
+    }
+
+    // Aggregate items based on the query
+    const products = await Item.aggregate([
+      { $match: query },
+      { $sort: { price: 1 } }
+    ]);
+    
+    count = await Item.countDocuments(query);
 
     const pagination = {
       currentPage: page,
@@ -85,6 +97,7 @@ const getFilters = async (req, res) => {
     console.log(error.message);
   }
 };
+
 const filterCollections = async (req, res) => {
   try {
     const materialtype = req.query.materialtype;
