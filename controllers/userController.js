@@ -245,78 +245,6 @@ const verifyOtp = async (req, res) => {
     console.log(error.message);
   }
 };
-function getUniqueValues(filters, fieldName) {
-  const values = new Set();
-
-  for (const filter of filters) {
-    const fieldValue = filter[fieldName];
-    if (Array.isArray(fieldValue)) {
-      fieldValue.forEach((value) => values.add(value));
-    } else {
-      values.add(fieldValue);
-    }
-  }
-
-  return Array.from(values);
-}
-const showCollections = async (req, res, next) => {
-  try {
-    const pageSize = 6; // Number of items per page
-    const page = req.query.page ? parseInt(req.query.page, 10) : 1; // Current page number
-
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = page * pageSize;
-
-    // Create a new query object to include pagination parameters
-    const queryPage = { ...req.query };
-    delete queryPage.page;
-
-    const categories = await Category.find({});
-    const filters = await Filter.find({});
-    const categoryId = req.query.categoryId;
-    const brands = req.query.brands || [];
-
-    // Add category filter to Item.find() query
-    const query = categoryId ? { category_id: categoryId } : {};
-    if (brands.length) {
-      query.brand = { $in: brands };
-    }
-    const products = await Item.find(query)
-      .populate("brand_id")
-      .populate("category_id")
-      .skip(startIndex)
-      .limit(pageSize);
-    const count = await Item.countDocuments(query);
-
-    const pagination = {
-      currentPage: page,
-      totalPages: Math.ceil(count / pageSize),
-      totalItems: count,
-    };
-    const userData = await User.findById({ _id: req.session.user_id });
-
-    const uniqueBrands = getUniqueValues(filters, "brand");
-    const uniqueColors = getUniqueValues(products, "color");
-    const uniqueMaterials = getUniqueValues(products, "material");
-    const uniqueMaterialTypes = getUniqueValues(filters, "material_type");
-
-    res.locals.categories = categories;
-    res.locals.user = userData;
-    res.locals.products = products;
-    res.locals.uniqueBrands = uniqueBrands;
-    res.locals.uniqueColors = uniqueColors;
-    res.locals.uniqueMaterials = uniqueMaterials;
-    res.locals.uniqueMaterialTypes = uniqueMaterialTypes;
-    // res.locals.totalPages = totalPages;
-    // res.locals.currentPage = page;
-    // res.locals.next = next;
-    // res.locals.prev = prev;
-
-    res.status(200).render("collections", { pagination });
-  } catch (err) {
-    next(err);
-  }
-};
 
 const showCart = async (req, res) => {
   try {
@@ -1091,7 +1019,6 @@ module.exports = {
   saveUser,
   loadOtp,
   verifyOtp,
-  showCollections,
   showCart,
   loadCart,
   editCart,

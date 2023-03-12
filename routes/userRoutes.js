@@ -34,7 +34,7 @@ user_route.get("/logout", userAuth.isLogin, userController.logout);
 user_route.get("/", userController.profile);
 user_route.get("/profile", userAuth.isLogin, userController.profile);
 
-user_route.get("/collection", userAuth.isLogin, userController.showCollections);
+// user_route.get("/collection", userAuth.isLogin, userController.showCollections);
 
 user_route.get("/add-to-cart", userAuth.isLogin, userController.showCart);
 user_route.get("/load-cart", userAuth.isLogin, userController.loadCart);
