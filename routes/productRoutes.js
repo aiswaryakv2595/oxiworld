@@ -12,7 +12,7 @@ const userAuth = require('../middlewares/userAuth');
 const { db } = require('../models/userModel');
 
 product_route.get("/collection", userAuth.isLogin, productController.showCollections);
-product_route.get('/getfilters',userAuth.isLogin,productController.getFilters)
+// product_route.get('/getfilters',userAuth.isLogin,productController.getFilters)
 
 product_route.get('/productdetails/:id',userAuth.isLogin,productController.productDetails)
 
