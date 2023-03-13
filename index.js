@@ -56,7 +56,9 @@ app.use('/admin',adminSession, categoryRoutes)
 const itemRoutes = require('./routes/itemRoutes')
 app.use('/admin',adminSession,itemRoutes)
 
-
+app.get('*',(req,res)=>{
+    res.render('404')
+  })
 app.use(express.static('public'));
 app.listen(3000, function(){
     console.log('server is ready in 3000');
