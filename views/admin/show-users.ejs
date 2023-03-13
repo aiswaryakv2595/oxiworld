@@ -76,13 +76,11 @@
                     <a href="#"><%= row.email %></a>
                   </td>
                   <td>
-                    
+                    <input class="check-box mr-2" type="checkbox" data-id="<%=row._id%>" <% if (row.is_active) { %>checked="checked"<% } %> >
                     <a href="/admin/edituser/<%=row._id %>" class="btn btn-sm btn-info">
                       <i class="las la-pen"></i>
                     </a>
-                    <a href="#" class="btn btn-sm btn-danger">
-                      <i class="las la-trash"></i>
-                    </a>
+                    
                    
                   </td>
                 </tr>
@@ -128,5 +126,21 @@ function banChecker(){
   }
 }
    </script>
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script>
+    $(function () {
+        $('.check-box').click(function(event) {
+         let id = $(this).attr("data-id")
+         let page = $('#page').attr("data-page")
+         console.log(id);
+         let url = "/admin/banuser/"+id;
+         window.location.href = url;
+      });
+      $('#category').change(function() {
+    var val = $(this).val(); 
+  
+  })
+    });
+  </script>
 
 <%-include("../layouts/admin-footer.ejs")-%>

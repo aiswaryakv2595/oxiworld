@@ -24,17 +24,16 @@ const showCollections = async (req, res, next) => {
     delete queryPage.page;
     ///check
     const filterType = req.query.filterType;
-    const category_id =  req.query.category;
-   
+    const category_id = req.query.category;
+
     const brandsString = req.query.brand;
-    const brandsArray = brandsString ? brandsString.split(","): [];
+    const brandsArray = brandsString ? brandsString.split(",") : [];
 
     const colorsString = req.query.color;
-    const colorsArray = colorsString ? colorsString.split(","): [];
+    const colorsArray = colorsString ? colorsString.split(",") : [];
 
     const material = req.query.material;
 
-   
     const ajax = req.query.ajax;
 
     let query = {};
@@ -45,51 +44,37 @@ const showCollections = async (req, res, next) => {
 
     const categories = await Category.find({});
     const filters = await Filter.find({});
-    // const categoryId = req.query.categoryId;
-    // const brands = req.query.brands || [];
+   
 
-
-
-    // Add category filter to Item.find() query
-    // const query = categoryId ? { category_id: categoryId } : {};
-    // if (brands.length) {
-    //   query.brand = { $in: brands };
-    // }
-    
-    if (category_id && category_id != 'undefined') {
-     
+    if (category_id && category_id != "undefined") {
       query.category_id = category_id;
     }
 
-    if (brandsArray.length > 0 ) {
+    if (brandsArray.length > 0) {
       filter = await Filter.find({ brand: { $in: brandsArray } });
       filterIds = filter.map((f) => f._id);
       query.brand_id = { $in: filterIds };
     }
 
-    if (colorsArray.length > 0)
-      query.color = { $in: colorsArray };
+    if (colorsArray.length > 0) query.color = { $in: colorsArray };
 
-    if (material && material!= 'undefined') query.material = material;
-    if (filterType == 'search'){
+    if (material && material != "undefined") query.material = material;
+    if (filterType == "search") {
       const search = req.query.search;
       query.name = { $regex: search, $options: "i" };
-    } 
+    }
 
-
-
-console.log('query',query);
-if(!filterType)
-sortOrder = 0
- sortOrder = filterType === "high" ? -1 : 1;
- console.log('sort',sortOrder);
+    console.log("query", query);
+    if (!filterType) sortOrder = 0;
+    sortOrder = filterType === "high" ? -1 : 1;
+    console.log("sort", sortOrder);
     const products = await Item.find(query)
       .populate("brand_id")
       .populate("category_id")
-      .sort({price:sortOrder})
+      .sort({ price: sortOrder })
       .skip(startIndex)
       .limit(pageSize);
-      // console.log(products);
+    // console.log(products);
     const count = await Item.countDocuments(query);
 
     const pagination = {
@@ -102,7 +87,6 @@ sortOrder = 0
     const uniqueBrands = getUniqueValues(filters, "brand");
     const uniqueColors = getUniqueValues(products, "color");
     const uniqueMaterials = getUniqueValues(products, "material");
-    
 
     res.locals.categories = categories;
     res.locals.user = userData;
@@ -110,16 +94,14 @@ sortOrder = 0
     res.locals.uniqueBrands = uniqueBrands;
     res.locals.uniqueColors = uniqueColors;
     res.locals.uniqueMaterials = uniqueMaterials;
-   
-if(ajax){
-  res.json({
-    products: products,
-    pagination: pagination,
-    filter: filterData,
-  });
-}
-    else
-    res.status(200).render("collections", { pagination });
+
+    if (ajax) {
+      res.json({
+        products: products,
+        pagination: pagination,
+        filter: filterData,
+      });
+    } else res.status(200).render("collections", { pagination });
   } catch (err) {
     next(err);
   }
@@ -139,7 +121,6 @@ function getUniqueValues(filters, fieldName) {
 
   return Array.from(values);
 }
-
 
 const productDetails = async (req, res) => {
   try {
@@ -171,7 +152,6 @@ const productDetails = async (req, res) => {
     console.log(error.message);
   }
 };
-
 
 const searchPrice = async (req, res) => {
   try {
@@ -213,7 +193,6 @@ const searchPrice = async (req, res) => {
 module.exports = {
   showCollections,
   productDetails,
-
   searchPrice,
-  getUniqueValues
+  getUniqueValues,
 };

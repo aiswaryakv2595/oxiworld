@@ -15,6 +15,7 @@
         
         <h3 class="h3order">Order Details</h3>
         <br>
+        <div class="table-responsive-md">
           <table id="myTable" class="table">
               <thead>
                 <tr>
@@ -45,7 +46,8 @@
                     <% if(key.status == 'Placed' || key.status == 'Shipped'){%>
                      
                          
-                  <td><a href="/cancelOrder?id=<%= key._id %>" class="btn btn-danger" onclick="deletecontent()">Cancel Order</a></td>
+                      <td><a href="/cancelOrder?id=<%= key._id %>" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</a></td>
+
                   <%} else{%>
                     <td>Order  <%=key.status%></td>
                     <%}%>
@@ -59,7 +61,7 @@
               <% } %>
             </table>
       
-
+          </div>
     
 
         <% }else{ %> 

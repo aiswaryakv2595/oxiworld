@@ -74,6 +74,8 @@ const verifyLogin = async (req, res) => {
       if (userData.password == password) {
         req.session.admin_id = userData._id;
         req.session.role = userData.role;
+        req.session.admin = true;
+      
         res.status(200).redirect("/admin/dashboard");
       } else {
         res.render("login", { message: "Email or Pasword is incorrect" });
@@ -96,49 +98,51 @@ const dashboard = async (req, res) => {
         {
           label: "Orders",
           data: [
-            orderData.filter(order => order.status === "Placed").length,
-            orderData.filter(order => order.status === "Shipped").length,
-            orderData.filter(order => order.status === "Delivered").length
+            orderData.filter((order) => order.status === "Placed").length,
+            orderData.filter((order) => order.status === "Shipped").length,
+            orderData.filter((order) => order.status === "Delivered").length,
           ],
           backgroundColor: [
             "rgba(255, 99, 132, 0.2)",
             "rgba(54, 162, 235, 0.2)",
-            "rgba(75, 192, 192, 0.2)"
+            "rgba(75, 192, 192, 0.2)",
           ],
           borderColor: [
             "rgba(255, 99, 132, 1)",
             "rgba(54, 162, 235, 1)",
-            "rgba(75, 192, 192, 1)"
+            "rgba(75, 192, 192, 1)",
           ],
-          borderWidth: 1
-        }
-      ]
+          borderWidth: 1,
+        },
+      ],
     };
 
     const result = await Order.aggregate([
       {
         $match: {
-          status: "Delivered"
-        }
+          status: "Delivered",
+        },
       },
       {
         $group: {
           _id: null,
           totalOrders: { $sum: 1 },
           totalSales: { $sum: "$products.totalPrice" },
-          totalProductsSold: { $sum: { $size: "$products.item" } }
-        }
-      }
+          totalProductsSold: { $sum: { $size: "$products.item" } },
+        },
+      },
     ]);
-    
+
     // console.log(chartData);
-    
-    
-  
-    
+
     res
       .status(200)
-      .render("dashboard", { user: userData, orders: orderData,result:result,chartData });
+      .render("dashboard", {
+        user: userData,
+        orders: orderData,
+        result: result,
+        chartData,
+      });
   } catch (error) {
     console.log(error.message);
   }
@@ -146,14 +150,7 @@ const dashboard = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    req.session.destroy(function (err) {
-      if (err) {
-        console.log(err);
-        res.status(500).send("error");
-      } else {
-        res.status(200).redirect("/admin/login");
-      }
-    });
+    req.session.admin_id = null
   } catch (error) {
     console.log(error.message);
   }
@@ -219,42 +216,29 @@ const updateUser = async (req, res) => {
 };
 
 const banUser = async (req, res) => {
+  
   try {
     const userId = req.params.userid;
-    const userData = await User.findByIdAndUpdate(
-      { _id: userId },
-      { $set: { is_active: 0 } }
-    );
-    console.log(userData);
-    if (userData) {
-      console.log("success");
+    let userData;
+    const toggleActive = await User.findById({ _id: userId });
+    if (toggleActive.is_active == true) {
+      userData = await User.findByIdAndUpdate(
+        { _id: userId },
+        { $set: { is_active: 0 } }
+      );
     } else {
-      console.log("failed");
+      userData = await User.findByIdAndUpdate(
+        { _id: userId },
+        { $set: { is_active: 1 } }
+      );
     }
-    res.redirect("/admin/showusers");
+
+    if (userData) res.redirect("/admin/showusers");
   } catch (error) {
     console.log(error.message);
   }
 };
 
-const removeBanUser = async (req, res) => {
-  try {
-    const userId = req.params.userid;
-    const userData = await User.findByIdAndUpdate(
-      { _id: userId },
-      { $set: { is_active: 1 } }
-    );
-    console.log(userData);
-    if (userData) {
-      console.log("success");
-    } else {
-      console.log("failed");
-    }
-    res.redirect("/admin/showusers");
-  } catch (error) {
-    console.log(error.message);
-  }
-};
 
 const searchUser = async (req, res) => {
   const search = req.body.search;
@@ -381,6 +365,7 @@ const adminStoreCoupon = async (req, res) => {
   const coupon = Coupon({
     name: req.body.name,
     description: req.body.description,
+    expirydate:req.body.expirydate,
     discount_type: req.body.discount_type,
     discount: req.body.discount,
     min_value: req.body.min_value,
@@ -412,6 +397,7 @@ const updateCoupon = async (req, res) => {
         $set: {
           name: req.body.name,
           description: req.body.description,
+          expirydate:req.body.expirydate,
           discount_type: req.body.discount_type,
           discount: req.body.discount,
           min_value: req.body.min_value,
@@ -452,10 +438,8 @@ const deleteCoupon = async (req, res) => {
 
 const orders = async (req, res) => {
   const orders = await Order.find({ status: { $ne: "Attempted" } })
-  .sort({createdAt: -1})
-  .populate(
-    "userId"
-  );
+    .sort({ createdAt: -1 })
+    .populate("userId");
   res.status(200).render("orders", { orders: orders });
 };
 
@@ -464,12 +448,13 @@ const viewOrders = async (req, res) => {
   const orders = await Order.findById({
     _id: orderId,
     status: { $ne: "Attempted" },
-  }).sort({
+  })
+    .sort({
       createdAt: -1,
     })
     .populate("userId")
     .populate("addressId")
-    .populate("products.item.productId")
+    .populate("products.item.productId");
 
   if (orders) {
     res.status(200).render("view-order", {
@@ -517,9 +502,8 @@ const changeStatus = async (req, res) => {
 };
 
 const viewSales = async (req, res) => {
- 
   let counts;
-  
+
   counts = await Order.aggregate([
     { $unwind: "$products.item" },
     { $group: { _id: "$products.item.productId", count: { $sum: 1 } } },
@@ -541,7 +525,7 @@ const getSales = async (req, res) => {
   try {
     const startdate = new Date(req.body.from);
     const enddate = new Date(req.body.to);
-    const status = req.body.status
+    const status = req.body.status;
 
     console.log(startdate);
     console.log(enddate);
@@ -554,7 +538,6 @@ const getSales = async (req, res) => {
           createdAt: {
             $gte: startdate,
             $lt: enddate,
-           
           },
           status: "Delivered",
         },
@@ -569,19 +552,34 @@ const getSales = async (req, res) => {
       return counts;
     });
 
-    console.log('counts  ', counts);
+    console.log("counts  ", counts);
     res.json(counts); // include the orders array in the response data
   } catch (error) {
     console.log(error.message);
   }
 };
 
-const confirmReturn = async(req,res)=>{
-  const order = await  Order.findByIdAndUpdate(
+const confirmReturn = async (req, res) => {
+  const orderData = await Order.findById({ _id: req.query.orderid });
+  const userid = orderData.userId;
+  const userData = await User.findById(userid);
+  let wallet = userData.wallet || 0; // initialize wallet to user's current balance, or 0 if not set
+  const totalPrice = parseInt(orderData.products.totalPrice);
+  console.log('total',totalPrice);
+  wallet += totalPrice;
+  
+  if (orderData.payment == "RazorPay") {
+    await User.findByIdAndUpdate({_id:userid},{$set:{
+     wallet:wallet
+    }})
+  }
+  const order = await Order.findByIdAndUpdate(
     { _id: req.query.orderid },
     { $set: { status: "Return" } }
-    )
-}
+  );
+  if(order)
+  res.status(200).redirect('/admin/view-order/'+req.query.orderid)
+};
 
 module.exports = {
   adminSetup,
@@ -594,7 +592,6 @@ module.exports = {
   editUser,
   updateUser,
   banUser,
-  removeBanUser,
   searchUser,
   addBanner,
   addBannerSave,
@@ -612,5 +609,5 @@ module.exports = {
   changeStatus,
   viewSales,
   getSales,
-  confirmReturn
+  confirmReturn,
 };

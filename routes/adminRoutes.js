@@ -28,8 +28,7 @@ admin_route.get('/showusers',adminLoginAuth.isLogin,adminController.showUsers);
 admin_route.get('/edituser/:userid',adminLoginAuth.isLogin,adminController.editUser)
 admin_route.post('/updateuser',adminLoginAuth.isLogin,adminController.updateUser)
 
-admin_route.post('/banuser/:userid',adminLoginAuth.isLogin,adminController.banUser)
-admin_route.post('/removeban/:userid',adminLoginAuth.isLogin,adminController.removeBanUser)
+admin_route.get('/banuser/:userid',adminLoginAuth.isLogin,adminController.banUser)
 
 admin_route.post('/searchuser',adminLoginAuth.isLogin,adminController.searchUser)
 
@@ -47,7 +46,7 @@ admin_route.post('/updateCoupon',adminController.updateCoupon)
 
 admin_route.get('/orders',adminLoginAuth.isLogin,adminController.orders);
 admin_route.get('/view-order/:id',adminLoginAuth.isLogin,adminController.viewOrders);
-admin_route.post('/confirm-return',adminController.confirmReturn);
+admin_route.get('/confirm-return',adminController.confirmReturn);
 admin_route.post('/cancelOrder',adminController.cancelOrder);
 
 admin_route.post('/change-status',adminController.changeStatus);

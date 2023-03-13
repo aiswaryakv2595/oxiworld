@@ -55,6 +55,8 @@ const verifyLogin = async (req, res) => {
       if (passwordMatch) {
         req.session.user_id = userData._id;
         req.session.role = userData.role;
+        req.session.user1 = true;
+       
 
         if (userData) {
           res.redirect("/profile");
@@ -125,6 +127,7 @@ const resetPassword = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
+   
     const userData = await User.findOne({ _id: req.session.user_id });
     const category = await Category.find({ is_available: true });
     const limit = 4;
@@ -149,14 +152,8 @@ const profile = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    req.session.destroy(function (err) {
-      if (err) {
-        console.log(err);
-        res.status(404).send("error");
-      } else {
-        res.redirect("/login");
-      }
-    });
+    req.session.user_id = null
+    req.session.user1 = null
   } catch (error) {
     console.log(error.message);
   }
@@ -279,16 +276,16 @@ const loadCart = async (req, res) => {
 
     const remainingStock = {};
     for (let item of completeUser.cart.item) {
-      const remainingStockCount = item.productId.stock ;
+      const remainingStockCount = item.productId.stock;
       remainingStock[item.productId._id.toString()] = remainingStockCount;
     }
-    console.log('remainingStock',remainingStock);
+    console.log("remainingStock", remainingStock);
     res.status(200).render("cart", {
       user: userData,
       cartProducts: completeUser.cart,
       totalprice: totalprice,
       grandTotal,
-      remainingStock
+      remainingStock,
     });
   } catch (error) {
     console.log(error.message);
@@ -419,7 +416,6 @@ const updateCartItem = async (req, res) => {
     console.log(stockChange);
 
     product.stock -= stockChange;
-    
 
     cartItem.qty = qty;
     cartItem.price = productPrice * qty;
@@ -444,18 +440,24 @@ const updateCartItem = async (req, res) => {
       const remainingStockCount = item.productId.stock - item.qty;
       remainingStock[item.productId._id.toString()] = remainingStockCount;
     }
-console.log(remainingStock);
+    console.log(remainingStock);
     // send the updated subtotal, grand total, and remaining stock counts back to the client
     const subtotal = user.cart.item.reduce((acc, item) => acc + item.price, 0);
     const grandTotal = subtotal + 45;
 
-    res.json({ subtotal, grandTotal, productPrice, qtyChange, stockChange, remainingStock });
+    res.json({
+      subtotal,
+      grandTotal,
+      productPrice,
+      qtyChange,
+      stockChange,
+      remainingStock,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating cart item");
   }
 };
-
 
 const loadCheckout = async (req, res) => {
   const user_id = req.session.user_id;
@@ -617,18 +619,19 @@ const returnproduct = async (req, res) => {
     const userSession = req.session;
     console.log("session--->", userSession);
     const orderId = req.query.id;
-    
 
     // Find the order and item
-    const order = await Orders.findByIdAndUpdate({
-      _id: orderId,
-    },
-      {$set: {
-        status: "ReturnRequestReceived",
+    const order = await Orders.findByIdAndUpdate(
+      {
+        _id: orderId,
+      },
+      {
+        $set: {
+          status: "ReturnRequestReceived",
+        },
       }
-    }
     );
-   
+
     // Save changes to the order and item
     await order.save();
 
@@ -754,6 +757,8 @@ const applyCoupon = async (req, res) => {
       message = "Coupon Already used";
       delete req.session.offer;
       // throw new Error('Coupon has already been used');
+    } else if (couponData.expirydate < Date.now()) {
+      message = "Coupon Expired";
     } else if (user.cart.totalprice > couponData.min_value) {
       console.log(user.cart.totalprice);
 
@@ -793,7 +798,6 @@ const orderSuccess = async (req, res) => {
       console.log(key.productId, " + ", key.qty);
       for (const prod of productdata) {
         if (new String(prod._id).trim() == new String(key.productId).trim()) {
-          
           prod.stock = prod.stock - key.qty;
           await prod.save();
         }
@@ -832,10 +836,11 @@ const loadorderdetails = async (req, res) => {
   try {
     userSession = req.session;
     const userdata = await User.findById({ _id: userSession.user_id });
-    const orderdata = await Orders.find({ userId: userSession.user_id }).sort({
-      createdAt: -1,
-    })
-    .populate('products.item.productId')
+    const orderdata = await Orders.find({ userId: userSession.user_id })
+      .sort({
+        createdAt: -1,
+      })
+      .populate("products.item.productId");
     res.render("order-details", {
       id: userSession.user_id,
       user: userdata,
@@ -851,6 +856,20 @@ const cancelorder = async (req, res) => {
     userSession = req.session;
 
     const id = req.query.id;
+    const orderData = await Orders.findById(id);
+    const userData = await User.findById({ _id: userSession.user_id });
+    
+    let wallet = userData.wallet || 0; // initialize wallet to user's current balance, or 0 if not set
+    const totalPrice = parseInt(orderData.products.totalPrice);
+    console.log('total',totalPrice);
+    wallet += totalPrice;
+    
+    if (orderData.payment == "RazorPay") {
+      await User.findByIdAndUpdate({_id:userSession.user_id},{$set:{
+       wallet:wallet
+      }})
+    }
+    
     await Orders.findByIdAndUpdate(
       { _id: id },
       {
@@ -859,11 +878,14 @@ const cancelorder = async (req, res) => {
         },
       }
     );
+    
+    console.log('userData',userData);
     res.redirect("/loadorderdetails");
   } catch (error) {
     console.log(error.message);
   }
 };
+
 
 const vieworder = async (req, res) => {
   try {

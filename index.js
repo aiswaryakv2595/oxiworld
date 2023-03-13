@@ -17,28 +17,30 @@ const config = require('./config/config')
 app.set('view engine', 'ejs')
 const oneDay = 1000 * 60 * 60 * 24;
 const adminSession = session({
-    secret:config.sessionSecretAdmin,
+    name: 'adminSessionId',
+    secret: config.sessionSecretAdmin,
     resave: true,
     saveUninitialized: false,
     cookie: { maxAge: oneDay },
 });
   
-  const userSession = session({
-    secret:config.sessionSecret,
+const userSession = session({
+    name: 'userSessionId',
+    secret: config.sessionSecret,
     resave: true,
     saveUninitialized: false,
     cookie: { maxAge: oneDay },
 });
 
-app.use(function(req, res, next) {
-    if (!req.user)
-        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-    next();
-});
+// app.use(function(req, res, next) {
+//     if (!req.user)
+//         res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+//     next();
+// });
 
 
-const isAdmin = require('./middlewares/isAdmin')
-app.use(isAdmin.isAdmin)
+// const isAdmin = require('./middlewares/isAdmin')
+// app.use(isAdmin.isAdmin)
 
 // for admin routes
 const adminRoutes = require('./routes/adminRoutes')

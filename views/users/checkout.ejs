@@ -83,10 +83,8 @@
                                                  <div class="form-field">
                                                      <i class="icon icon-arrow-down3"></i>
                                                     <select name="people" id="people" class="form-control" required>
-                                                          <option value="#">Select country</option>
-                                                          <% countries.forEach((country)=>{%>
-                                                            <option value="<%=country.name%>"><%=country.name%></option>
-                                                            <%})%>
+                                                          <option value="#">India</option>
+                                                          
                                                     </select>
                                                  </div>
                                               </div>
@@ -171,6 +169,11 @@
                                         <span>Subtotal</span> <span id="grand-total"><%=totalPrice%></span>         
                                     </li>
                                 </ul>
+                               <% if(user.wallet!=0){%>
+                                <label for="wallet">Wallet Amount is <mark><%= user.wallet %></mark></label>
+                                <label for="checkbox">Redeem Wallet</label>
+                                <input id="checkbox" type="checkbox" data-total =<%=totalPrice%> >
+                           <%}%>
                                 <span id="message"></span>
                                 <h2>Payment Method</h2>
                                 <div class="form-group">
@@ -188,6 +191,7 @@
                                         </div>
                                     </div>
                                 </div>
+                               
                                 
                                 
                                
@@ -200,7 +204,9 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 text-center">
-                           <button class="btn btn-primary" type="submit">Place order</button>
+                            
+
+                           <button class="btn btn-primary w-100 bg-primary" type="submit">Place order</button>
                         </div>
                     </div>
                 </form>
@@ -240,6 +246,14 @@ $('#coupon-btn').click(function(e) {
     }
   });
 });
+
+$('#checkbox').on('change', function(e) {
+      e.preventDefault(); // prevent the default form submission behavior
+      const total = $(this).data('total');
+      if (this.checked) {
+        console.log(total);
+      }
+    });
 
 $('#savebtn').click(function(event) {
       event.preventDefault(); // prevent default form submission behavior
