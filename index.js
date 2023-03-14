@@ -15,6 +15,7 @@ app.use(cookieParser());
 const config = require('./config/config')
 
 app.set('view engine', 'ejs')
+
 const oneDay = 1000 * 60 * 60 * 24;
 const adminSession = session({
     name: 'adminSessionId',
@@ -39,8 +40,8 @@ const userSession = session({
 // });
 
 
-// const isAdmin = require('./middlewares/isAdmin')
-// app.use(isAdmin.isAdmin)
+const isAdmin = require('./middlewares/isAdmin')
+app.use(isAdmin.isAdmin)
 
 // for admin routes
 const adminRoutes = require('./routes/adminRoutes')
@@ -56,10 +57,12 @@ app.use('/admin',adminSession, categoryRoutes)
 const itemRoutes = require('./routes/itemRoutes')
 app.use('/admin',adminSession,itemRoutes)
 
-app.get('*',(req,res)=>{
-    res.render('404')
-  })
+
 app.use(express.static('public'));
+app.use((req, res, next) => {
+    res.status(404).render('404.ejs');
+  });
+  
 app.listen(3000, function(){
     console.log('server is ready in 3000');
 })
