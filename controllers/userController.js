@@ -56,7 +56,6 @@ const verifyLogin = async (req, res) => {
         req.session.user_id = userData._id;
         req.session.role = userData.role;
         req.session.user1 = true;
-       
 
         if (userData) {
           res.redirect("/profile");
@@ -127,7 +126,6 @@ const resetPassword = async (req, res) => {
 
 const profile = async (req, res) => {
   try {
-   
     const userData = await User.findOne({ _id: req.session.user_id });
     const category = await Category.find({ is_available: true });
     const limit = 4;
@@ -152,8 +150,9 @@ const profile = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    req.session.user_id = null
-    req.session.user1 = null
+    req.session.user_id = null;
+    req.session.user1 = null;
+    res.redirect("/");
   } catch (error) {
     console.log(error.message);
   }
@@ -487,7 +486,7 @@ let order;
 const placeOrder = async (req, res) => {
   userSession = req.session;
   const userId = userSession.user_id;
-  const payment = req.body.payment;
+  let payment;
   const address_id = req.body.address_id;
   let totalPrice;
 
@@ -512,7 +511,12 @@ const placeOrder = async (req, res) => {
   userData.cart.totalprice = updatedTotal;
   const updatedUserData = await userData.save();
   console.log(completeUser.cart);
-
+  //check payment method
+  if (Array.isArray(req.body.payment)) {
+    payment = req.body.payment.join("+");
+  } else {
+    payment = req.body.payment;
+  }
   const offerName = userSession.offer ? userSession.offer.name : "None";
   if (updatedTotal > 0) {
     order = await Orders({
@@ -521,7 +525,7 @@ const placeOrder = async (req, res) => {
       addressId: address_id,
       products: {
         item: completeUser.cart.item,
-        totalPrice: updatedTotal,
+        // totalPrice: updatedTotal,
       },
       offer: offerName,
     });
@@ -535,10 +539,30 @@ const placeOrder = async (req, res) => {
 
     userSession.currentOrder = order._id;
     console.log("orderid--" + userSession.currentOrder);
-
+    let wallet = userData.wallet;
+    let new_wallet;
     if (req.body.payment == "Cash-On-Delivery") {
       // If payment method is COD, set status to Placed and redirect to success page
       order.status = "Placed";
+      order.products.totalPrice = updatedTotal;
+      await order.save();
+      res.redirect("/success");
+    } else if (req.body.payment == "Wallet") {
+      order.status = "Placed";
+      new_wallet = parseInt(wallet - updatedTotal);
+      // res.send({
+      //   'wallet':wallet,
+      //   'new wallet':new_wallet,
+      //   'updated total':updatedTotal
+      // })
+      await User.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $set: {
+            wallet: new_wallet,
+          },
+        }
+      );
       await order.save();
       res.redirect("/success");
     } else if (req.body.payment == "RazorPay") {
@@ -567,7 +591,43 @@ const placeOrder = async (req, res) => {
         await order.save();
         res.redirect("/payment-failed");
       }
+    } else if (
+      req.body.payment.includes("Wallet") &&
+      req.body.payment.includes("RazorPay")
+    ) {
+      console.log("total before wallet", updatedTotal);
+      //   new_wallet = 0
+      //   await User.findByIdAndUpdate({_id:userId},{$set:{
+      //     wallet:new_wallet
+      //    }})
+      updatedTotal = updatedTotal - wallet;
+      //  console.log('total after wallet',updatedTotal);
+      try {
+        var instance = new RazorPay({
+          key_id: process.env.key_id,
+          key_secret: process.env.key_secret,
+        });
+        let razorpayOrder = await instance.orders.create({
+          amount: updatedTotal * 100, // Amount in paise
+          currency: "INR",
+          receipt: order._id.toString(),
+        });
+        res.render("razorpay", {
+          userId: userSession.user_id,
+          total: updatedTotal,
+          order_id: razorpayOrder.id,
+          key_id: process.env.key_id,
+          user: userData,
+          order: order,
+          orderId: order._id.toString(), // Pass the order ID to the checkout page
+        });
+      } catch (err) {
+        order.status = "Payment failed";
+        await order.save();
+        res.redirect("/payment-failed");
+      }
     } else {
+      // res.send(req.body.payment)
       res.redirect("/collection");
     }
   } else {
@@ -581,6 +641,9 @@ const razorpayCheckout = async (req, res) => {
 
     const userId = req.session.user_id;
     const order_id = req.body.order_id;
+    const updatedTotal = req.body.total;
+
+    let new_wallet = 0;
 
     var instance = new RazorPay({
       key_id: process.env.key_id,
@@ -605,6 +668,16 @@ const razorpayCheckout = async (req, res) => {
 
     // Update the order status and save the order
     order.status = "Placed";
+    order.products.totalPrice = updatedTotal;
+
+    await User.findByIdAndUpdate(
+      { _id: userId },
+      {
+        $set: {
+          wallet: new_wallet,
+        },
+      }
+    );
 
     await order.save();
 
@@ -858,18 +931,23 @@ const cancelorder = async (req, res) => {
     const id = req.query.id;
     const orderData = await Orders.findById(id);
     const userData = await User.findById({ _id: userSession.user_id });
-    
+
     let wallet = userData.wallet || 0; // initialize wallet to user's current balance, or 0 if not set
     const totalPrice = parseInt(orderData.products.totalPrice);
-    console.log('total',totalPrice);
+    console.log("total", totalPrice);
     wallet += totalPrice;
-    
+
     if (orderData.payment == "RazorPay") {
-      await User.findByIdAndUpdate({_id:userSession.user_id},{$set:{
-       wallet:wallet
-      }})
+      await User.findByIdAndUpdate(
+        { _id: userSession.user_id },
+        {
+          $set: {
+            wallet: wallet,
+          },
+        }
+      );
     }
-    
+
     await Orders.findByIdAndUpdate(
       { _id: id },
       {
@@ -878,14 +956,13 @@ const cancelorder = async (req, res) => {
         },
       }
     );
-    
-    console.log('userData',userData);
+
+    console.log("userData", userData);
     res.redirect("/loadorderdetails");
   } catch (error) {
     console.log(error.message);
   }
 };
-
 
 const vieworder = async (req, res) => {
   try {

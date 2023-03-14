@@ -151,6 +151,7 @@ const dashboard = async (req, res) => {
 const logout = async (req, res) => {
   try {
     req.session.admin_id = null
+    res.redirect('/admin/login')
   } catch (error) {
     console.log(error.message);
   }

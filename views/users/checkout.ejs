@@ -170,16 +170,19 @@
                                     </li>
                                 </ul>
                                <% if(user.wallet!=0){%>
-                                <label for="wallet">Wallet Amount is <mark><%= user.wallet %></mark></label>
-                                <label for="checkbox">Redeem Wallet</label>
-                                <input id="checkbox" type="checkbox" data-total =<%=totalPrice%> >
+                               
+                                <label for="checkbox"><i class="bi bi-wallet-fill"></i> Wallet</label>
+                                <input id="checkbox" type="checkbox" name="payment" value="Wallet" data-total="<%=totalPrice%>" data-wallet =<%=user.wallet%> >
+                                <p id="wallet"></p>
+                               
+                                
                            <%}%>
                                 <span id="message"></span>
                                 <h2>Payment Method</h2>
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <div class="radio">
-                                           <label><input type="radio" name="payment" checked value="Cash-On-Delivery"> Cash On Delivery</label>
+                                           <label><input type="radio" class="payment" id="cod" name="payment" checked value="Cash-On-Delivery"> Cash On Delivery</label>
                                         </div>
                                     </div>
                                 </div>
@@ -187,7 +190,7 @@
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <div class="radio">
-                                           <label><input type="radio" name="payment" value="RazorPay"> Online Payment</label>
+                                           <label><input type="radio" id="online" class="payment" name="payment" value="RazorPay"> Online Payment</label>
                                         </div>
                                     </div>
                                 </div>
@@ -249,9 +252,27 @@ $('#coupon-btn').click(function(e) {
 
 $('#checkbox').on('change', function(e) {
       e.preventDefault(); // prevent the default form submission behavior
-      const total = $(this).data('total');
+      const wallet = $(this).data('wallet');
+      const total = $(this).data('total')
       if (this.checked) {
-        console.log(total);
+        console.log(wallet);
+        console.log('total',total);
+        document.getElementById('wallet').innerHTML = `Your wallet Balance is ${wallet}`
+        if(wallet >=total){
+            $('.payment').prop('disabled', true).prop('checked', false);
+    console.log('Radio buttons disabled');
+        }
+        else{
+            $('#online').prop('checked',true)
+            $('#cod').prop('checked',false).prop('disabled',true)
+        }
+      }
+      else{
+      document.getElementById('wallet').innerHTML = ``
+      $('.payment').prop('disabled', false);
+      $('#cod').prop('checked',true)
+
+  console.log('Radio buttons enabled');
       }
     });
 
