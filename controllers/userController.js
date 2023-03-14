@@ -513,7 +513,7 @@ const placeOrder = async (req, res) => {
   console.log(completeUser.cart);
   //check payment method
   if (Array.isArray(req.body.payment)) {
-    payment = req.body.payment.join("+");
+    payment = "RazorPay";
   } else {
     payment = req.body.payment;
   }
