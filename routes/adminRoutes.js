@@ -20,7 +20,7 @@ admin_route.post('/login',adminController.verifyLogin)
 
 admin_route.get('/logout',adminLoginAuth.isLogin,adminController.logout)
 
-admin_route.get('/dashboard',adminController.dashboard);
+admin_route.get('/dashboard',adminLoginAuth.isLogin,adminController.dashboard);
 
 admin_route.get('/showusers',adminLoginAuth.isLogin,adminController.showUsers);
 //-----------item-------
