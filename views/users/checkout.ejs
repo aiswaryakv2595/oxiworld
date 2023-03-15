@@ -32,7 +32,7 @@
                                 <div class="cart-detail">
                                     <label>
                                         <input type="radio" name="address" value="<%= address[i]._id %>"
-                                        class="address-radio" required>
+                                        class="address-radio" <% if (i === 0) { %>checked<% } %> required>
                                        
                                         <%= address[i].name %><br>
                                         <%= address[i].address %><br>
@@ -158,7 +158,7 @@
                 </div>
 
                 <div class="col-lg-4">
-                <form action="/checkout" method="post">
+                <form action="/checkout" method="post" onsubmit="return validateForm()">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="cart-detail">
@@ -224,7 +224,16 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<script>
+    function validateForm() {
+      var addressId = document.getElementById("address-id").value;
+      if (addressId == "") {
+        document.getElementById("message").innerHTML = "Please select an address.";
+        return false;
+      }
+      return true;
+    }
+    </script>
 <script>
     $('.address-radio').on('click', function() {
       var addressId = $(this).val();
