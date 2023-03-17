@@ -1,44 +1,47 @@
 <%-include('../layouts/header')-%>
-<div class="container">
-  
-  <div class="vh-100 d-flex justify-content-center align-items-center ">
-    <div class="col-md-5 p-5 shadow-sm border rounded-5 border-primary bg-white">
-   
-            <div class="card-body">
-              <h5 class="card-title">Register</h5>
-              <form action="" method="post" id="form" onsubmit="return onSubmitFunction()">
-                <div class="mb-3 row">
-                    <label for="staticEmail" class="col-sm-3 col-form-label">Name</label>
-                    <div class="col-sm-9">
-                      <input type="text" name="name" class="form-control" id="name">
-                    </div>
-                  </div>
-                  
-                  <div class="mb-3 row">
-                    <label for="inputPassword" class="col-sm-3 col-form-label">Email</label>
-                    <div class="col-sm-9">
-                      <input type="email" id="email" name="email" class="form-control">
-                    </div>
-                  </div>
+<style>
+  form {
+        padding: 18px 44px 1px;
+        margin-top: 12px;
+        
+        
+     }
+</style>
 
-                  <div class="mb-3 row">
-                    <label for="inputPassword" class="col-sm-3 col-form-label">Phone</label>
-                    <div class="col-sm-9">
-                      <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                          <select  name="country_code" class="form-control" id="">
-                           
-                              <option value="+91">+91</option>
-                           
-                          </select>
-                        </div>
-                      <input type="text" name="phone" class="form-control" id="phone" >
-                      </div>
-                    </div>
-                  </div>
-                  <div class="mb-3 row">
+<%
+if(typeof message !== 'undefined'){
+  %> 
+  <p style="color: red;"> <%= message %></p>
+  <%
+}
+%>
+<form action="" method="post" id="form" onsubmit="return onSubmitFunction()">
+<div class="row flex-row">
+  <div class="col-md-9">
+  <h1>Register</h1>
+</div>
+<div class="col-md-3">
+<a href="/"> <img src="/assets/img/brand/logo.png" width="50" height="50"></a>
+</div>
+</div>
+  <div class="form-group row flex-row">
+    <label for="email" class="col-sm-2 col-form-label">Name</label>
+    <input type="email" name="name" autocomplete="off" placeholder="Name" id="name">
+  </div>
+  <div class="form-group row flex-row">
+    <label for="email" class="col-sm-2 col-form-label">Email</label>
+    <input type="email" name="email" autocomplete="off" placeholder="Email" id="email">
+  </div>
+  <div class="form-group row flex-row">
+    <label for="phone" class="col-sm-2 col-form-label">Phone</label>
+       <input type="text" name="phone" id="phone" >
+    </div>
+  </div>
+  <div class="form-group row flex-row ">
+  
                     <label for="inputPassword" class="col-sm-3 col-form-label">Gender</label>
                     <div class="col-sm-9">
+                   
                       <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="gender" id="inlineRadio1" value="Male">
                         <label class="form-check-label" for="inlineRadio1">Male</label>
@@ -48,38 +51,36 @@
                         <label class="form-check-label" for="inlineRadio2">Female</label>
                       </div>
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio2" value="Others">
+                        <input class="form-check-input" type="radio" name="gender" id="inlineRadio3" value="Others">
                         <label class="form-check-label" for="inlineRadio3">Others</label>
                       </div>
                     </div>
-                  </div>
                   
-                  <div class="mb-3 row">
-                    <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
-                    <div class="col-sm-9">
-                      <input type="password" name="password" class="form-control" id="inputPassword" >
-                    </div>
-                  </div>
-                  <div class="mb-3 row">
-                    <label for="inputPassword" class="col-sm-3 col-form-label">Confirm Password</label>
-                    <div class="col-sm-9">
-                      <input type="password" name="confirmPassword" class="form-control" id="confirm" >
-                    </div>
-                  </div>
-                  <% if(locals.message){%>
-                  <p class="text-danger"><%= message %></p>
-                 <%}%>
-                 
-                <button type="submit" class="btn btn-primary" onclick="onSubmitFunction()">Submit</button>
-              <p id="error"></p>
-                      
-              </form>
-           
-         
-        </div>
-      </div>
-    </div>
-</div>
+  <div class="form-group row flex-row mb-3">
+    <label for="password" class="col-sm-3 col-form-label">Password</label>
+    <input type="password" name="password" id="inputPassword">
+    
+  </div>
+  <div class="form-group row flex-row mb-3">
+    <label for="inputPassword" class="col-sm-3 col-form-label">Confirm Password</label>
+    <input type="password" name="confirmPassword" id="confirm">
+    
+  </div>
+ 
+  <button type="submit">Sign up</button>
+   <a href="/login"
+    class="text-primary fw-bold">Back to Login
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"/>
+      <path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+    </svg>
+  </a>
+
+  
+    <p id="error"></p>
+</form>
+
+
 <script>
  
 
