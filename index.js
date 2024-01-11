@@ -3,7 +3,8 @@ const app = express()
 const session = require('express-session');
 
 const cookieParser = require("cookie-parser");
-
+const dotenv = require('dotenv')
+dotenv.config()
 const mongoose = require('mongoose');
 mongoose.set("strictQuery", false);
 mongoose.connect('mongodb://127.0.0.1:27017/oxiworld')
@@ -63,7 +64,7 @@ app.use(express.static('public'));
 app.use((req, res, next) => {
     res.status(404).render('404.ejs');
   });
-  
-app.listen(3000, function(){
+  const port = process.env.PORT || 3000
+app.listen(port, function(){
     console.log('server is ready in 3000');
 })
