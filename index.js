@@ -7,7 +7,6 @@ const dotenv = require('dotenv')
 dotenv.config()
 const mongoose = require('mongoose');
 mongoose.set("strictQuery", false);
-// mongoose.connect('mongodb://127.0.0.1:27017/oxiworld')
 mongoose.connect('mongodb+srv://aiswaryakv:aisuadoor@cluster0.w3dtvqz.mongodb.net/test');
 
 app.use(express.json())
