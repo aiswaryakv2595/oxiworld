@@ -22,7 +22,7 @@ const showCollections = async (req, res, next) => {
     // Create a new query object to include pagination parameters
     const queryPage = { ...req.query };
     delete queryPage.page;
-    ///check
+
     const filterType = req.query.filterType;
     const category_id = req.query.category;
 
@@ -40,13 +40,11 @@ const showCollections = async (req, res, next) => {
     let filter;
     let filterIds;
     let filterData;
-    ///
 
     const categories = await Category.find({});
     const filters = await Filter.find({});
-   
 
-    if (category_id && category_id != "undefined") {
+    if (category_id && category_id !== "undefined") {
       query.category_id = category_id;
     }
 
@@ -58,13 +56,14 @@ const showCollections = async (req, res, next) => {
 
     if (colorsArray.length > 0) query.color = { $in: colorsArray };
 
-    if (material && material != "undefined") query.material = material;
-    if (filterType == "search") {
+    if (material && material !== "undefined") query.material = material;
+    if (filterType === "search") {
       const search = req.query.search;
       query.name = { $regex: search, $options: "i" };
     }
 
     console.log("query", query);
+    let sortOrder = 0;
     if (!filterType) sortOrder = 0;
     sortOrder = filterType === "high" ? -1 : 1;
     console.log("sort", sortOrder);
@@ -74,7 +73,7 @@ const showCollections = async (req, res, next) => {
       .sort({ price: sortOrder })
       .skip(startIndex)
       .limit(pageSize);
-    // console.log(products);
+
     const count = await Item.countDocuments(query);
 
     const pagination = {
@@ -82,14 +81,12 @@ const showCollections = async (req, res, next) => {
       totalPages: Math.ceil(count / pageSize),
       totalItems: count,
     };
-    const userData = await User.findById({ _id: req.session.user_id });
 
     const uniqueBrands = getUniqueValues(filters, "brand");
     const uniqueColors = getUniqueValues(products, "color");
     const uniqueMaterials = getUniqueValues(products, "material");
 
     res.locals.categories = categories;
-    res.locals.user = userData;
     res.locals.products = products;
     res.locals.uniqueBrands = uniqueBrands;
     res.locals.uniqueColors = uniqueColors;
@@ -101,11 +98,21 @@ const showCollections = async (req, res, next) => {
         pagination: pagination,
         filter: filterData,
       });
-    } else res.status(200).render("collections", { pagination });
+    } else {
+      if (req.session.user_id) {
+        const userData = await User.findById({ _id: req.session.user_id });
+        res.locals.user = userData;
+        res.status(200).render("collections", { pagination });
+      } else {
+        res.status(200).render("collections", { pagination, user: null }); // Render the regular collections page for guest users
+      }
+    }
   } catch (err) {
     next(err);
   }
 };
+
+
 
 function getUniqueValues(filters, fieldName) {
   const values = new Set();

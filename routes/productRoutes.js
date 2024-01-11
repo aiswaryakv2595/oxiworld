@@ -10,6 +10,7 @@ const productController = require('../controllers/productController');
 
 const userAuth = require('../middlewares/userAuth');
 const { db } = require('../models/userModel');
+product_route.get("/collection", productController.showCollections);
 
 product_route.get("/collection", userAuth.isLogin, productController.showCollections);
 
