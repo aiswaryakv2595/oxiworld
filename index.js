@@ -7,7 +7,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 const mongoose = require('mongoose');
 mongoose.set("strictQuery", false);
-mongoose.connect('mongodb+srv://aiswaryakv:aisuadoor@oxiworld.yrl81uo.mongodb.net/oxiworld');
+mongoose.connect('mongodb+srv://aiswaryakv:aisuadoor@oxiworld.yrl81uo.mongodb.net/oxiworld',{ useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
