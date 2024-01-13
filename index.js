@@ -7,7 +7,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 const mongoose = require('mongoose');
 mongoose.set("strictQuery", false);
-mongoose.connect('mongodb+srv://aiswaryakv:aisuadoor@cluster0.w3dtvqz.mongodb.net/test');
+mongoose.connect('mongodb+srv://aiswaryakv:aisuadoor@oxiworld.yrl81uo.mongodb.net/oxiworld');
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
