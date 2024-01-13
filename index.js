@@ -6,8 +6,7 @@ const cookieParser = require("cookie-parser");
 const dotenv = require('dotenv')
 dotenv.config()
 const mongoose = require('mongoose');
-mongoose.set("strictQuery", false);
-mongoose.connect(process.env.URI,{ useNewUrlParser: true, useUnifiedTopology: true });
+
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -64,6 +63,11 @@ app.use((req, res, next) => {
     res.status(404).render('404.ejs');
   });
   const port = process.env.PORT || 3000
-app.listen(port, function(){
-    console.log('server is ready in 3000');
-})
+  mongoose
+  .connect(process.env.URI)
+  .then(() => {
+    app.listen(3000, () => {
+        console.log('Server is running on port 3000');
+      });
+    })
+    .catch((err) => console.log(err));
