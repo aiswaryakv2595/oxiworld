@@ -30,7 +30,10 @@ const userSession = session({
     secret: config.sessionSecret,
     resave: true,
     saveUninitialized: false,
-    cookie: { maxAge: oneDay },
+    cookie: { 
+      secure: true,
+      maxAge: oneDay 
+    },
 });
 
 // app.use(function(req, res, next) {
